@@ -1,0 +1,6871 @@
+// NAF Events – server.js
+// Version: 1.0.1
+const express  = require("express");
+const session  = require("express-session");
+const bcrypt   = require("bcrypt");
+const multer   = require("multer");
+const fs       = require("fs");
+const path     = require("path");
+const { v4: uuid } = require("uuid");
+
+// ── E-post via Nodemailer + Runbox SMTP ──────────────────────────
+// Konfigurasjon via miljøvariabler (settes i docker-compose.yml / Portainer):
+//   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
+//   TEST_EMAIL_OVERRIDE  – send all mail to this address instead (testing)
+let _transporter = null;
+function getTransporter() {
+  if (_transporter) return _transporter;
+  try {
+    const nodemailer = require("nodemailer");
+    const host = process.env.SMTP_HOST;
+    const port = parseInt(process.env.SMTP_PORT || "587");
+    const user = process.env.SMTP_USER;
+    const pass = process.env.SMTP_PASS;
+    if (!host || !user || !pass) return null;
+    _transporter = nodemailer.createTransport({
+      host, port,
+      secure: port === 465,
+      auth: { user, pass },
+      tls: { rejectUnauthorized: false },
+    });
+    return _transporter;
+  } catch(e) {
+    console.error("[email] nodemailer not available:", e.message);
+    return null;
+  }
+}
+
+async function sendEmail({ to, subject, html, text, replyTo }) {
+  const s = getSettings();
+  if (!s.emailEnabled) {
+    console.log("[email] Disabled in settings – skipping to:", to);
+    writeEmailLog({ status: "skipped", to, subject, reason: "email_disabled" });
+    return { ok: false, reason: "email_disabled" };
+  }
+  const transport = getTransporter();
+  if (!transport) {
+    console.error("[email] No transporter – check SMTP_HOST/USER/PASS env vars");
+    writeEmailLog({ status: "error", to, subject, reason: "smtp_not_configured" });
+    return { ok: false, reason: "smtp_not_configured" };
+  }
+  const fromAddr = process.env.SMTP_FROM || s.emailFrom || ("noreply@" + (s.eventDomain || DOMAIN));
+  const fromName = s.emailFromName || "Events Admin";
+  const from = `${fromName} <${fromAddr}>`;
+
+  // Test override: redirect all mail to a single address
+  const testOverride = process.env.TEST_EMAIL_OVERRIDE;
+  let actualTo = to;
+  let actualSubject = subject;
+  if (testOverride) {
+    actualTo = testOverride;
+    actualSubject = `[TEST → ${to}] ${subject}`;
+  }
+
+  try {
+    const info = await transport.sendMail({
+      from, to: actualTo, subject: actualSubject,
+      html, text,
+      ...(replyTo ? { replyTo } : {}),
+    });
+    console.log("[email] Sendt til:", actualTo, "| MsgID:", info.messageId);
+    return { ok: true, id: info.messageId };
+  } catch(e) {
+    console.error("[email] Feil:", e.message);
+    return { ok: false, reason: e.message };
+  }
+}
+
+// ── E-postmaler ──────────────────────────────────────────────────
+function emailRegConfirmation(ev, reg, settings) {
+  const siteName   = settings.siteName || "Events Admin";
+  const contact    = settings.contactEmail || "";
+  const dateStr    = ev.date ? new Date(ev.date).toLocaleDateString("nb-NO", { weekday:"long", year:"numeric", month:"long", day:"numeric" }) : "";
+  const timeStr    = ev.date ? new Date(ev.date).toLocaleTimeString("nb-NO", { hour:"2-digit", minute:"2-digit" }) : "";
+  const checkinPinLine = reg.checkinPin ? `<p><strong>Din innsjekk-PIN: ${reg.checkinPin}</strong> – oppgi denne på tableten ved ankomst.</p>` : "";
+  const subject    = `✅ Påmelding bekreftet – ${ev.title}`;
+  const html = `
+<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a">
+  <div style="background:#FFD100;padding:1.5rem 2rem;border-radius:8px 8px 0 0">
+    <h1 style="margin:0;font-size:1.3rem;color:#1a1a1a">${siteName}</h1>
+  </div>
+  <div style="background:#f9f9f9;padding:2rem;border-radius:0 0 8px 8px;border:1px solid #e0e0e0">
+    <h2 style="margin-top:0">Hei ${reg.name}!</h2>
+    <p>Du er nå påmeldt:</p>
+    <div style="background:#fff;border-left:4px solid #FFD100;padding:1rem 1.25rem;border-radius:4px;margin:1rem 0">
+      <strong style="font-size:1.1rem">${ev.title}</strong><br>
+      ${dateStr ? `<span style="color:#555">📅 ${dateStr}${timeStr ? " kl. " + timeStr : ""}</span><br>` : ""}
+      ${ev.location ? `<span style="color:#555">📍 ${ev.location}</span>` : ""}
+    </div>
+    ${checkinPinLine}
+    <p style="color:#555;font-size:.9rem">
+      Har du spørsmål? ${contact ? `Ta kontakt på <a href="mailto:${contact}">${contact}</a>.` : "Ta kontakt med arrangøren."}
+    </p>
+    ${reg.cancelUrl ? `<p style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid #e0e0e0;font-size:.8rem;color:#999">Vil du avmelde deg? <a href="${reg.cancelUrl}" style="color:#888">Klikk her for å avmelde deg</a></p>` : ""}
+    <hr style="border:none;border-top:1px solid #e0e0e0;margin:1.5rem 0">
+    <p style="font-size:.75rem;color:#999;margin:0">
+      🔒 Vi lagrer kun navn, e-post og telefon for å administrere påmeldingen. 
+      Data deles ikke med tredjeparter og anonymiseres automatisk etter arrangementet.
+    </p>
+  </div>
+</div>`;
+  const text = `Hei ${reg.name}!\n\nDu er påmeldt: ${ev.title}\n${dateStr ? dateStr + (timeStr ? " kl. " + timeStr : "") + "\n" : ""}${ev.location ? ev.location + "\n" : ""}\n${contact ? "Spørsmål? " + contact : ""}\n\n– ${siteName}`;
+  return { subject, html, text };
+}
+
+function emailCancellationConfirmation(ev, reg, settings) {
+  const siteName = settings.siteName || "Events Admin";
+  const subject  = `❌ Avmelding bekreftet – ${ev.title}`;
+  const html = `
+<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a">
+  <div style="background:#FFD100;padding:1.5rem 2rem;border-radius:8px 8px 0 0">
+    <h1 style="margin:0;font-size:1.3rem;color:#1a1a1a">${siteName}</h1>
+  </div>
+  <div style="background:#f9f9f9;padding:2rem;border-radius:0 0 8px 8px;border:1px solid #e0e0e0">
+    <h2 style="margin-top:0">Hei ${reg.name}!</h2>
+    <p>Vi bekrefter at du er avmeldt fra <strong>${ev.title}</strong>.</p>
+    <p style="color:#555;font-size:.9rem">Ønsker du å melde deg på igjen kan du gjøre det via arrangementssiden.</p>
+  </div>
+</div>`;
+  const text = `Hei ${reg.name}!\n\nDu er avmeldt fra: ${ev.title}\n\n– ${siteName}`;
+  return { subject, html, text };
+}
+
+const APP_VERSION = "1.0.0";
+
+const app          = express();
+const DATA         = process.env.DATA_DIR     || "./data";
+const DOMAIN       = process.env.BASE_DOMAIN  || "naf-events.no";
+const ADMIN_DOMAIN = process.env.ADMIN_DOMAIN || ("admin." + DOMAIN);
+const SECRET       = process.env.SESSION_SECRET || "change-me-in-env";
+if (!process.env.SESSION_SECRET) console.warn("[SIKKERHET] SESSION_SECRET er ikke satt! Sett den i Portainer miljøvariabler.");
+const GH_KEY       = process.env.GRAPHHOPPER_KEY || "";
+
+const USERS_FILE    = path.join(DATA, "users.json");
+const EVENTS_FILE   = path.join(DATA, "events.json");
+const SETTINGS_FILE = path.join(DATA, "settings.json");
+const MEMBERS_FILE  = path.join(DATA, "members.json");
+const WISHES_F   = path.join(DATA, "wishes.json");
+const UPLOADS    = path.join(DATA, "uploads");
+const DEVLOG_OWNER = process.env.DEVLOG_OWNER || ("admin@" + (process.env.BASE_DOMAIN || "events-admin.no"));
+
+// ── Breakglass accounts ──────────────────────────────────────────
+// Provisioned via env vars only – never via UI
+// BREAKGLASS_1=email:password  BREAKGLASS_2=email:password  BREAKGLASS_3=email:password
+const BREAKGLASS_LOG_FILE = path.join(DATA, "breakglass_log.json");
+function getBreakglassAccounts() {
+  const accounts = [];
+  [process.env.BREAKGLASS_1, process.env.BREAKGLASS_2, process.env.BREAKGLASS_3]
+    .forEach(function(val, i) {
+      if (!val) return;
+      const sep = val.indexOf(":");
+      if (sep < 1) return;
+      accounts.push({ index: i + 1, email: val.slice(0, sep).toLowerCase().trim(), password: val.slice(sep + 1) });
+    });
+  return accounts;
+}
+function isBreakglassEmail(email) {
+  return getBreakglassAccounts().some(function(a) { return a.email === email.toLowerCase(); });
+}
+
+const DEVLOG_F     = path.join(DATA, "devlog.json");
+const SERIES_F     = path.join(DATA, "series.json");
+const BLOCKS_F     = path.join(DATA, "blocks.json");
+const VOLUNTEERS_FILE = path.join(DATA, "volunteers.json");
+const INVENTAR_FILE   = path.join(DATA, "inventar.json");
+const EMAIL_LOG_FILE  = path.join(DATA, "email_log.json");
+
+// ── SSE (Server-Sent Events) ─────────────────────────────────────
+// Klienter abonnerer på /api/events/stream?department=xxx
+const sseClients = new Map(); // clientId → { res, department }
+let sseNextId = 1;
+
+function broadcastEventUpdate(department) {
+  sseClients.forEach(function(client) {
+    // null department = global change (t.ex. avdelning opprettet/slettet) → send til alle
+    // ellers: send til klienter uten filter, eller med matchende filter
+    if (department === null || !client.department || client.department === department) {
+      try {
+        client.res.write("data: " + JSON.stringify({ type: "events_updated", department }) + "\n\n");
+      } catch(e) { /* klient koblet fra */ }
+    }
+  });
+}
+
+fs.mkdirSync(UPLOADS, { recursive: true });
+fs.mkdirSync(DATA,    { recursive: true });
+
+// Auto-create data files if missing
+[
+  [USERS_FILE,     "[]"],
+  [EVENTS_FILE,    "[]"],
+  [MEMBERS_FILE,   "[]"],
+  [VOLUNTEERS_FILE,"[]"],
+  [INVENTAR_FILE,  "[]"],
+  [BLOCKS_F,       "[]"],
+  [SERIES_F,       "[]"],
+  [WISHES_F,       "[]"],
+  [DEVLOG_F,       '{"entries":[]}'],
+  [SETTINGS_FILE,  JSON.stringify({ eventDomain: DOMAIN, siteName: "Events Admin", contactEmail: "", departments: [], setupDone: false })],
+  [EMAIL_LOG_FILE,      "[]"],
+  [BREAKGLASS_LOG_FILE, "[]"],
+].forEach(function([f, init]) {
+  if (!fs.existsSync(f)) fs.writeFileSync(f, init);
+});
+
+// ── Storage helpers ──────────────────────────────────────────────
+const readJSON  = function(f) { try { return JSON.parse(fs.readFileSync(f)); } catch(e) { return []; } };
+// Atomar skriving: skriv til .tmp, rename – unngår korrupt JSON ved krasj
+const writeJSON = function(f, d) {
+  const tmp = f + ".tmp";
+  fs.writeFileSync(tmp, JSON.stringify(d, null, 2));
+  fs.renameSync(tmp, f);
+};
+
+// ── XSS-beskyttelse ───────────────────────────────────────────────
+function escHtml(s) {
+  if (s == null) return "";
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
+// ── Settings ─────────────────────────────────────────────────────
+const defaultSettings = {
+  eventDomain: DOMAIN,
+  siteName: "Events Admin",
+  contactEmail: "",
+  showCountdown: true,
+  showParticipantCount: true,
+  allowSelfCheckIn: true,
+  requireGuestbookApproval: true,
+  departments: [],
+  setupDone: false,
+  logoUrl: "",
+  theme: "dark",
+  colors: {
+    accent: "#FFD100",
+    card: "#2A2A2A",
+    kursBg: "#1a3a5a", kursBorder: "#2a5a8a",
+    turBg: "#3a1a5a",  turBorder: "#5a2a8a",
+    standBg: "#1a3a1a", standBorder: "#2a5a2a",
+    anyBg: "#3a3a1a",  anyBorder: "#5a5a2a",
+  },
+};
+
+const getSettings = function() {
+  try { return Object.assign({}, defaultSettings, JSON.parse(fs.readFileSync(SETTINGS_FILE))); }
+  catch(e) { return Object.assign({}, defaultSettings); }
+};
+const saveSettings = function(s) { writeJSON(SETTINGS_FILE, s); };
+
+// ── E-postlogg ───────────────────────────────────────────────────
+const EMAIL_LOG_MAX = 500;
+function writeEmailLog(entry) {
+  try {
+    const log = readJSON(EMAIL_LOG_FILE);
+    log.unshift(Object.assign({ id: require("crypto").randomBytes(6).toString("hex"), ts: new Date().toISOString() }, entry));
+    if (log.length > EMAIL_LOG_MAX) log.length = EMAIL_LOG_MAX;
+    writeJSON(EMAIL_LOG_FILE, log);
+  } catch(e) {
+    console.error("[emaillog] Kunne ikke skrive logg:", e.message);
+  }
+}
+
+// ── One-time migration: add department:null to inventar items without it ──
+(function migrateInventar() {
+  try {
+    const items = readJSON(INVENTAR_FILE);
+    let changed = false;
+    items.forEach(function(item) {
+      if (!Object.prototype.hasOwnProperty.call(item, "department")) {
+        item.department = null;
+        changed = true;
+      }
+    });
+    if (changed) {
+      writeJSON(INVENTAR_FILE, items);
+      console.log("[migration] Added department:null to", items.length, "inventar items");
+    }
+  } catch(e) { console.error("[migration] inventar:", e.message); }
+})();
+
+// ── Init default admin ───────────────────────────────────────────
+(async function() {
+  if (!fs.existsSync(USERS_FILE) || readJSON(USERS_FILE).length === 0) {
+    const hash = await bcrypt.hash("admin123", 12);
+    const adminEmail = "admin@" + DOMAIN;
+    writeJSON(USERS_FILE, [{
+      id: uuid(), email: adminEmail,
+      hash: hash, role: "admin", name: "Admin", department: null
+    }]);
+    console.log("Default admin: " + adminEmail + " / admin123");
+  }
+})();
+
+// ── Middleware ───────────────────────────────────────────────────
+app.set("trust proxy", 1);
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+
+// Grunnleggende security headers (uten helmet-avhengighet)
+app.use(function(req, res, next) {
+  res.set("X-Content-Type-Options", "nosniff");
+  res.set("X-Frame-Options", "DENY");
+  res.set("X-XSS-Protection", "1; mode=block");
+  res.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.set("Content-Security-Policy",
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://unpkg.com; " +
+    "style-src 'self' 'unsafe-inline' https://unpkg.com; " +
+    "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.openstreetmap.org; " +
+    "frame-src https://www.openstreetmap.org; " +
+    "connect-src 'self' " +
+      "https://photon.komoot.io " +
+      "https://nominatim.openstreetmap.org " +
+      "https://overpass-api.de " +
+      "https://router.project-osrm.org " +
+      "https://graphhopper.com " +
+      "https://brouter.de " +
+      "https://cdnjs.cloudflare.com " +
+      "https://unpkg.com; " +
+    "font-src 'self'; " +
+    "frame-ancestors 'none';"
+  );
+  next();
+});
+
+// Ingen caching på API-svar (viktig bak Traefik)
+app.use("/api", function(req, res, next) {
+  res.set("Cache-Control", "no-store");
+  next();
+});
+app.use("/uploads", express.static(UPLOADS));
+// Prevent Cloudflare cdn-cgi script injection errors
+app.get("/cdn-cgi/*", function(req, res) { res.status(204).end(); });
+app.use("/static", express.static(path.join(__dirname, "static")));
+app.use(session({
+  name: "naf_sid",
+  secret: SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === "production" ? "auto" : false,
+    sameSite: "lax",
+    maxAge: 86400000 * 7,
+    httpOnly: true,
+  }
+}));
+
+// Filtype-validering for opplastinger
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+const upload = multer({
+  dest: UPLOADS,
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: function(req, file, cb) {
+    if (ALLOWED_IMAGE_TYPES.indexOf(file.mimetype) === -1) {
+      return cb(new Error("Kun bilder er tillatt (jpeg, png, gif, webp)"));
+    }
+    cb(null, true);
+  }
+});
+
+// ── Subdomain → event page (MÅ ligge FØR express.static) ────────
+app.use(function(req, res, next) {
+  if (req.path.startsWith("/api") || req.path.startsWith("/uploads") || req.path.startsWith("/avmeld") || req.path.startsWith("/static") || req.path.startsWith("/gb-photo") || req.path.startsWith("/gb-photos") || req.path.startsWith("/logo")) return next();
+
+  const host = (req.headers["x-forwarded-host"] || req.hostname || "").split(",")[0].trim().toLowerCase();
+
+  // Reserverte subdomener som ikke skal behandles som event-slug
+  const RESERVED = ["sso", "www", "mail", "smtp", "ftp", "api"];
+  if (host === ADMIN_DOMAIN || host === DOMAIN || host === "www." + DOMAIN) return next();
+  const sub0 = host.split(".")[0];
+  if (RESERVED.indexOf(sub0) !== -1) return next();
+
+  var slug = null;
+  var domains = [DOMAIN];
+  try {
+    var s = getSettings();
+    if (s.eventDomain && domains.indexOf(s.eventDomain) === -1) domains.push(s.eventDomain);
+  } catch(e) {}
+
+  for (var i = 0; i < domains.length; i++) {
+    var d = domains[i];
+    if (host === d || host === "www." + d) break;
+    var sub = host.replace("." + d, "");
+    if (sub && sub !== host && sub !== "www") { slug = sub; break; }
+  }
+
+  if (slug) {
+    // Check if slug matches a department
+    var settings = getSettings();
+    var dept = (settings.departments || []).find(function(a) { return a.slug === slug; });
+    if (dept) return serveDepartmentPage(dept, req, res);
+    req.eventSlug = slug;
+    return serveEventPage(req, res);
+  }
+  next();
+});
+
+// Service Worker må serveres fra rot med no-cache
+app.get("/sw.js", function(req, res) {
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  res.setHeader("Content-Type", "application/javascript");
+  const domain = DOMAIN;
+  res.send(`
+const SW_VERSION = "events-admin-v6";
+const EVENT_CACHE = SW_VERSION + "-events";
+
+// Install – skip waiting immediately, no precaching
+self.addEventListener("install", function(e) {
+  e.waitUntil(self.skipWaiting());
+});
+
+// Activate – delete ALL old caches, claim all clients
+self.addEventListener("activate", function(e) {
+  e.waitUntil(
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+    }).then(function() {
+      return self.clients.claim();
+    }).then(function() {
+      // Tell all clients to reload so they pick up the clean state
+      return self.clients.matchAll({ type: "window" }).then(function(clients) {
+        clients.forEach(function(c) { c.postMessage({ type: "SW_UPDATED" }); });
+      });
+    })
+  );
+});
+
+// Fetch – ONLY intercept public event subdomain pages, never admin
+self.addEventListener("fetch", function(e) {
+  const url = new URL(e.request.url);
+  // Pass through everything on the admin domain untouched
+  if (url.hostname === "${ADMIN_DOMAIN || 'admin.' + domain}") return;
+  // Only cache GET requests for public event pages and snapshots
+  if (e.request.method !== "GET") return;
+  const isEventPage = url.hostname.endsWith(".${domain}") && url.pathname === "/";
+  const isSnapshot  = url.pathname.match(/^\\/api\\/events\\/[^/]+\\/snapshot$/);
+  if (isEventPage || isSnapshot) {
+    e.respondWith(
+      fetch(e.request).then(function(res) {
+        var clone = res.clone();
+        caches.open(EVENT_CACHE).then(function(c) { c.put(e.request, clone); });
+        return res;
+      }).catch(function() {
+        return caches.match(e.request);
+      })
+    );
+  }
+  // All other requests: don't intercept, let browser handle normally
+});
+
+// Message from page: precache upcoming event URLs
+self.addEventListener("message", function(e) {
+  if (e.data && e.data.type === "PRECACHE_EVENTS") {
+    var urls = e.data.urls || [];
+    caches.open(EVENT_CACHE).then(function(cache) {
+      urls.forEach(function(url) {
+        fetch(url).then(function(res) {
+          if (res.ok) cache.put(url, res);
+        }).catch(function() {});
+      });
+    });
+  }
+});
+`);
+});
+
+
+// Static files (index.html, app.js, sw.js etc.)
+app.use(express.static(__dirname));
+
+// ── Auth guards ──────────────────────────────────────────────────
+const auth = function(req, res, next) {
+  if (!req.session.user) return res.status(401).json({ error: "Ikke innlogget" });
+  // Breakglass sessions are not in users.json – skip DB refresh
+  if (req.session.user.role === "breakglass") return next();
+  // Synkroniser alltid accessList fra fil – fanger opp endringer etter login
+  var fresh = readJSON(USERS_FILE).find(function(u){ return u.id === req.session.user.id; });
+  if (fresh) {
+    req.session.user.role      = fresh.role;
+    req.session.user.accessList = getAccessList(fresh);
+    req.session.user.name      = fresh.name;
+    req.session.user.title     = fresh.tittel || null;
+  }
+  next();
+};
+const adminOnly = function(req, res, next) {
+  if (req.session.user && req.session.user.role === "admin") return next();
+  res.status(403).json({ error: "Kun for administratorer" });
+};
+const managerOrAdmin = function(req, res, next) {
+  if (!req.session.user) return res.status(403).json({ error: "Ikke innlogget" });
+  var u = req.session.user;
+  // Admin alltid OK
+  if (u.role === "admin") return next();
+  // Other roles OK if they have at least one access entry
+  if (getAccessList(u).length > 0) return next();
+  res.status(403).json({ error: "Ingen tilgang" });
+};
+
+
+// Gets the user's access list. New model: accessList[] array per department.
+// Legacy fallback: use department field for old users with empty accessList[].
+function getAccessList(user) {
+  if (Array.isArray(user.accessList) && user.accessList.length) return user.accessList;
+  if (user.department) return [{ department: user.department, subgroups: user.subgroups || [], eventTyper: user.eventTyper || [], role: (user.role === "department_manager" || user.role === "avdelingsleder") ? "department_manager" : "event_manager" }];
+  return [];
+}
+
+
+
+
+
+const canEditEvent = function(ev, user) {
+  if (!user) return false;
+  if (user.role === "admin") return true;
+  var accessList = getAccessList(user);
+
+  for (var i = 0; i < accessList.length; i++) {
+    var t = accessList[i];
+    var roleVal = t.role || "arrangementsansvarlig";
+
+    // Department manager: can edit all events in their department,
+    // AND events with no department assigned (unowned events)
+    if (roleVal === "department_manager" || roleVal === "avdelingsleder") {
+      if (!ev.department || t.department === ev.department) return true;
+      continue;
+    }
+
+    // For subgroup/event managers: department must match (or event has no dept)
+    if (ev.department && t.department !== ev.department) continue;
+
+    if (roleVal === "subgroup_manager" || roleVal === "undergruppeansvarlig") {
+      // Can edit events in their own subgroups
+      if (ev.subgroup && t.subgroups && t.subgroups.indexOf(ev.subgroup) !== -1) return true;
+      // Can edit events with no subgroup only if they created it
+      if (!ev.subgroup && ev.createdBy && ev.createdBy === user.email) return true;
+      continue;
+    }
+
+    if (roleVal === "event_manager" || roleVal === "arrangementsansvarlig") {
+      // Must have created the event
+      if (ev.createdBy && ev.createdBy !== user.email) continue;
+      var evType = ev.eventType || "stand";
+      if (t.eventTyper && t.eventTyper.length && t.eventTyper.indexOf(evType) === -1) continue;
+      if (ev.subgroup && t.subgroups && t.subgroups.length && t.subgroups.indexOf(ev.subgroup) === -1) continue;
+      return true;
+    }
+  }
+
+  // Last resort: user created the event themselves
+  if (ev.createdBy && ev.createdBy === user.email) return true;
+
+  return false;
+};
+
+// ── Permissions ──────────────────────────────────────────────────
+// Calculate what the user is allowed to do – frontend bruker kun disse flaggene,
+// aldri role direkte. All tilgangskontroll skjer fortsatt i server.
+// Breakglass: minimal permission set – restore + reset admin password only
+function buildBreakglassPermissions() {
+  return {
+    isBreakglass:       true,
+    isAdmin:            false,
+    isManager:          false,
+    isSubgroupManager:  false,
+    isEventManager:     false,
+    canCreateEvent:     false,
+    canManageUsers:     false,
+    canManageDepartments: false,
+    canSeeMembers:      false,
+    canRunGdpr:         false,
+    canEditBlocks:      false,
+    canBreakglassRestore: true,
+    canBreakglassResetAdmin: true,
+    editableDepartments: [],
+    mySubgroups: [],
+    accessList: [],
+  };
+}
+
+function buildPermissions(user, settings) {
+  var departments = settings.departments || [];
+  var accessList  = getAccessList(user);
+  var isAdmin  = user.role === "admin";
+  var isManager  = isAdmin || (user.role === "department_manager" || user.role === "avdelingsleder") || accessList.some(function(t) { return (t.role === "department_manager" || t.role === "avdelingsleder"); });
+  var isSubgroupManager  = user.role === "undergruppeansvarlig" || accessList.some(function(t) { return (t.role === "subgroup_manager" || t.role === "undergruppeansvarlig"); });
+  var isEventManager = user.role === "arrangementsansvarlig" || accessList.some(function(t) { return (t.role === "event_manager" || t.role === "arrangementsansvarlig"); });
+  var canCreateSomething = isManager || isSubgroupManager || isEventManager;
+
+  // Primary department (first access entry)
+  var myDepartment = accessList.length ? accessList[0].department : (user.department || null);
+  var myDeptObj   = departments.find(function(a) { return a.id === myDepartment; }) || null;
+  var myDepartmentName  = myDeptObj ? myDeptObj.name : null;
+
+  // Avdelinger brukeren kan sette på events
+  var editableDepartments = isAdmin
+    ? departments.map(function(a) { return { id: a.id, name: a.name, subgroups: a.subgroups || [] }; })
+    : accessList.map(function(t) {
+        var dept = departments.find(function(a) { return a.id === t.department; });
+        return dept ? { id: dept.id, name: dept.name, subgroups: dept.subgroups || [], myRole: t.role, mySubgroups: t.subgroups || [], myEventTypes: t.eventTypes || [] } : null;
+      }).filter(Boolean);
+
+  // Subgroups the user has access to (all accessList combined)
+  var mySubgroupsList = [];
+  accessList.forEach(function(t) {
+    if (!t.subgroups || !t.subgroups.length) return;
+    var deptObj = departments.find(function(a) { return a.id === t.department; });
+    if (!deptObj) return;
+    (deptObj.subgroups || []).forEach(function(u) {
+      if (t.subgroups.indexOf(u.id) !== -1 && !mySubgroupsList.find(function(x){ return x.id === u.id; }))
+        mySubgroupsList.push(u);
+    });
+  });
+
+  return {
+    // Navigasjon
+    canSeeDevlog:   user.email === DEVLOG_OWNER,
+
+    // Avdelinger
+    canManageDepartments:   isAdmin,
+    canManageSubgroups: isAdmin || isManager,
+
+    // Events
+    canCreateEvent:     canCreateSomething,
+    canSetDepartment:     isAdmin,
+    canSetDepartmentField: isAdmin,
+
+    // Brukere
+    canManageUsers:    isAdmin || isManager || isSubgroupManager,
+    // Which scope can create users for
+    canCreateUsersForDept: isAdmin || isManager,
+    canCreateUsersForSubgroup: isSubgroupManager && !isManager,
+
+    // Medlemsliste
+    canSeeMembers:    isAdmin || isManager || isSubgroupManager,
+    canImportMembers: isAdmin || isManager || isSubgroupManager,
+    canDeleteMembers: isAdmin || isManager,
+
+    // GDPR
+    canRunGdpr: isAdmin,
+
+    // Blokker/kalender
+    canEditBlocks: isAdmin || isManager,
+
+    // Tilgangsnivå
+    isAdmin:   isAdmin,
+    isManager:   isManager,
+    isSubgroupManager:   isSubgroupManager,
+    isEventManager:  isEventManager,
+
+    // Metadata
+    myDepartment:         myDepartment,
+    myDepartmentName:          myDepartmentName,
+    editableDepartments: editableDepartments,
+    mySubgroups:     mySubgroupsList,
+    accessList:          accessList,
+    displayName:        user.name || user.email,
+    email:              user.email,
+  };
+}
+const _rl = new Map();
+function rateLimit(maxReq, windowMs) {
+  return function(req, res, next) {
+    const key = (req.headers["x-forwarded-for"] || req.ip || "unknown").split(",")[0].trim();
+    const now = Date.now();
+    const entry = _rl.get(key) || { count: 0, start: now };
+    if (now - entry.start > windowMs) { entry.count = 0; entry.start = now; }
+    entry.count++;
+    _rl.set(key, entry);
+    if (entry.count > maxReq) return res.status(429).json({ error: "For mange forsøk – vent litt" });
+    next();
+  };
+}
+// Clean up old state hvert 10. minutt
+setInterval(function() {
+  const cut = Date.now() - 600000;
+  _rl.forEach(function(v, k) { if (v.start < cut) _rl.delete(k); });
+}, 600000);
+
+// ── Version ──────────────────────────────────────────────────────
+// ── Static files (leaflet bundled locally) ─────────────────────
+// Public config (non-secret values needed by admin frontend)
+app.get("/api/config", auth, function(req, res) {
+  res.json({
+    ghKey: process.env.GRAPHHOPPER_KEY || "",
+    domain: DOMAIN,
+    adminDomain: ADMIN_DOMAIN,
+  });
+});
+
+app.get("/api/version", function(req, res) {
+  res.json({ version: APP_VERSION });
+});
+
+// ── Oppdateringssystem ───────────────────────────────────────────
+// URL til sentralt manifest – kan overstyres med UPDATE_URL env-var
+const UPDATE_BASE     = process.env.UPDATE_URL      || "https://updates.events-admin.no";
+const UPDATE_MANIFEST = process.env.UPDATE_MANIFEST || "manifest.json";
+
+app.get("/api/update/check", auth, adminOnly, async function(req, res) {
+  try {
+    const r = await fetch(UPDATE_BASE + "/" + UPDATE_MANIFEST, {
+      headers: { "User-Agent": "EventsAdmin/" + APP_VERSION },
+      signal: AbortSignal.timeout(8000)
+    });
+    if (!r.ok) return res.status(502).json({ err: "Manifest ikke tilgjengelig" });
+    const manifest = await r.json();
+    const latest = manifest.version || "0.0.0";
+    const hasUpdate = compareVersions(latest, APP_VERSION) > 0;
+    res.json({
+      current:   APP_VERSION,
+      latest,
+      hasUpdate,
+      changelog: manifest.changelog || [],
+      files:     manifest.files || []
+    });
+  } catch(e) {
+    res.status(502).json({ err: "Kunne ikke kontakte oppdateringsserver: " + e.message });
+  }
+});
+
+app.post("/api/update/apply", auth, adminOnly, async function(req, res) {
+  const { files } = req.body; // [{name, url, sha256}]
+  if (!files || !files.length) return res.status(400).json({ err: "Ingen filer angitt" });
+
+  const crypto = require("crypto");
+  const tmpDir = path.join(DATA, "_update_tmp");
+  if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+
+  try {
+    // 1. Last ned alle filer til tmp
+    for (const f of files) {
+      if (!["server.js","index.html","package.json"].includes(f.name))
+        return res.status(400).json({ err: "Ugyldig filnavn: " + f.name });
+      const r = await fetch(f.url, { signal: AbortSignal.timeout(30000) });
+      if (!r.ok) throw new Error("Nedlasting feilet for " + f.name);
+      const buf = Buffer.from(await r.arrayBuffer());
+      // Verifiser checksum
+      if (f.sha256) {
+        const hash = crypto.createHash("sha256").update(buf).digest("hex");
+        if (hash !== f.sha256) throw new Error("Checksum feilet for " + f.name);
+      }
+      fs.writeFileSync(path.join(tmpDir, f.name), buf);
+    }
+
+    // 2. Sikkerhetskopiér gjeldende filer
+    const backupDir = path.join(DATA, "_update_backup_" + APP_VERSION);
+    if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
+    for (const f of files) {
+      const src = path.join(process.cwd(), f.name);
+      if (fs.existsSync(src)) fs.copyFileSync(src, path.join(backupDir, f.name));
+    }
+
+    // 3. Flytt nye filer på plass
+    for (const f of files) {
+      fs.copyFileSync(path.join(tmpDir, f.name), path.join(process.cwd(), f.name));
+    }
+
+    // 4. Rydd opp tmp
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+
+    res.json({ ok: true, message: "Filer oppdatert. Starter om om 3 sekunder…" });
+
+    // 5. Restart prosessen (Docker restart policy starter den opp igjen)
+    setTimeout(function() { process.exit(0); }, 3000);
+
+  } catch(e) {
+    // Rollback
+    try {
+      const backupDir = path.join(DATA, "_update_backup_" + APP_VERSION);
+      if (fs.existsSync(backupDir)) {
+        for (const f of files) {
+          const bak = path.join(backupDir, f.name);
+          if (fs.existsSync(bak)) fs.copyFileSync(bak, path.join(process.cwd(), f.name));
+        }
+      }
+    } catch(re) {}
+    res.status(500).json({ err: "Oppdatering feilet: " + e.message + " – gamle filer gjenopprettet" });
+  }
+});
+
+function compareVersions(a, b) {
+  const pa = a.split(".").map(Number), pb = b.split(".").map(Number);
+  for (let i = 0; i < 3; i++) {
+    if ((pa[i]||0) > (pb[i]||0)) return 1;
+    if ((pa[i]||0) < (pb[i]||0)) return -1;
+  }
+  return 0;
+}
+
+// ── Auth API ─────────────────────────────────────────────────────
+app.post("/api/login", rateLimit(10, 60000), async function(req, res) {
+  const email    = (req.body.email || "").toLowerCase().trim();
+  const password = req.body.password || "";
+  if (!email || !password) return res.status(400).json({ error: "E-post og passord er påkrevd" });
+
+  // ── Breakglass login ──
+  const bgAccounts = getBreakglassAccounts();
+  const bgAccount  = bgAccounts.find(function(a) { return a.email === email; });
+  if (bgAccount) {
+    // Timing-safe compare to prevent timing attacks
+    const crypto = require("crypto");
+    const pwdBuf = Buffer.from(password);
+    const expBuf = Buffer.from(bgAccount.password);
+    const safeMatch = pwdBuf.length === expBuf.length &&
+      crypto.timingSafeEqual(pwdBuf, expBuf);
+    if (!safeMatch) return res.status(401).json({ error: "Feil e-post eller passord" });
+
+    // Log the breakglass login
+    const bgLog = readJSON(BREAKGLASS_LOG_FILE);
+    const bgEntry = {
+      id:        require("crypto").randomBytes(6).toString("hex"),
+      ts:        new Date().toISOString(),
+      account:   bgAccount.index,
+      email:     bgAccount.email,
+      ip:        req.ip || req.connection.remoteAddress || "ukjent",
+      userAgent: req.headers["user-agent"] || "ukjent",
+    };
+    bgLog.unshift(bgEntry);
+    if (bgLog.length > 200) bgLog.length = 200;
+    writeJSON(BREAKGLASS_LOG_FILE, bgLog);
+    console.warn("[BREAKGLASS] Innlogging fra konto", bgAccount.index, "| IP:", bgEntry.ip);
+
+    // Alert all admins by email
+    const admins = readJSON(USERS_FILE).filter(function(u) { return u.role === "admin"; });
+    const s = getSettings();
+    admins.forEach(async function(admin) {
+      if (!admin.email || admin.email === "[slettet]") return;
+      await sendEmail({
+        to: admin.email,
+        subject: "🚨 BREAKGLASS-innlogging – " + bgAccount.email + " – " + new Date().toLocaleString("nb-NO"),
+        html: "<div style=\"font-family:sans-serif;max-width:520px\"><div style=\"background:#7f1d1d;padding:1rem 1.5rem;border-radius:8px 8px 0 0\">" +
+              "<h2 style=\"color:#fca5a5;margin:0\">🚨 Breakglass-konto aktivert</h2></div>" +
+              "<div style=\"background:#1a1a1a;padding:1.5rem;border-radius:0 0 8px 8px;color:#ccc\">" +
+              "<p><strong>Konto:</strong> Breakglass #" + bgAccount.index + " (" + bgAccount.email + ")</p>" +
+              "<p><strong>Tidspunkt:</strong> " + new Date().toLocaleString("nb-NO") + "</p>" +
+              "<p><strong>IP-adresse:</strong> " + bgEntry.ip + "</p>" +
+              "<p><strong>Nettleser:</strong> " + (req.headers["user-agent"] || "ukjent").slice(0, 80) + "</p>" +
+              "<p style=\"color:#f87171\">Hvis dette ikke var deg, byt breakglass-passordet umiddelbart i Portainer.</p>" +
+              "</div></div>",
+        text: "ADVARSEL: Breakglass-konto #" + bgAccount.index + " (" + bgAccount.email + ") logget inn " +
+              new Date().toLocaleString("nb-NO") + " fra IP " + bgEntry.ip,
+      });
+    });
+
+    const bgSessionData = {
+      id:    "breakglass-" + bgAccount.index,
+      email: bgAccount.email,
+      role:  "breakglass",
+      name:  "Breakglass #" + bgAccount.index,
+      title: null,
+      accessList: [],
+    };
+    req.session.regenerate(function(err) {
+      if (err) return res.status(500).json({ error: "Sesjonfeil" });
+      req.session.user = bgSessionData;
+      req.session.save(function(err2) {
+        if (err2) return res.status(500).json({ error: "Sesjonfeil" });
+        res.json({ ok: true, user: Object.assign({}, bgSessionData, {
+          permissions: buildBreakglassPermissions(),
+        })});
+      });
+    });
+    return;
+  }
+
+  // ── Normal login ──
+  const users = readJSON(USERS_FILE);
+  const user  = users.find(function(u) { return u.email === email; });
+  if (!user || !(await bcrypt.compare(password, user.hash)))
+    return res.status(401).json({ error: "Feil e-post eller passord" });
+  const sessionData = { id: user.id, email: user.email, role: user.role, name: user.name, title: user.tittel || null, accessList: getAccessList(user) };
+  req.session.regenerate(function(err) {
+    if (err) { console.error("Session regenerate error:", err); return res.status(500).json({ error: "Sesjonfeil" }); }
+    req.session.user = sessionData;
+    req.session.save(function(err2) {
+      if (err2) { console.error("Session save error:", err2); return res.status(500).json({ error: "Sesjonfeil" }); }
+      var permissions = buildPermissions(user, getSettings());
+      res.json({ ok: true, user: Object.assign({}, sessionData, { permissions: permissions }) });
+    });
+  });
+});
+
+
+// ══════════════════════════════════════════════════════════════════
+// ── BACKUP SYSTEM ─────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+const crypto = require("crypto");
+const BACKUP_VERSION = 1;
+const BACKUP_SECRET  = process.env.BACKUP_SECRET || "naf-events-default-backup-key-change-me";
+if (!process.env.BACKUP_SECRET) console.warn("[SIKKERHET] BACKUP_SECRET er ikke satt! Backup-filer bruker standardnøkkel.");
+const BACKUP_ALGO    = "aes-256-gcm";
+
+// ── Derive a 32-byte key from the passphrase ──────────────────────
+function deriveBackupKey(passphrase) {
+  return crypto.pbkdf2Sync(passphrase, "naf-events-backup-salt-v1", 100000, 32, "sha256");
+}
+
+// ── Encrypt a JSON payload → Buffer ──────────────────────────────
+function encryptBackup(payload) {
+  const key = deriveBackupKey(BACKUP_SECRET);
+  const iv  = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv(BACKUP_ALGO, key, iv);
+  const json    = JSON.stringify(payload);
+  const enc     = Buffer.concat([cipher.update(json, "utf8"), cipher.final()]);
+  const tag     = cipher.getAuthTag();
+  // Format: [4 bytes version][16 bytes IV][16 bytes authTag][N bytes ciphertext]
+  const out = Buffer.alloc(4 + 16 + 16 + enc.length);
+  out.writeUInt32BE(BACKUP_VERSION, 0);
+  iv.copy(out,  4);
+  tag.copy(out, 20);
+  enc.copy(out, 36);
+  return out;
+}
+
+// ── Decrypt a Buffer → parsed JSON ───────────────────────────────
+function decryptBackup(buf) {
+  if (buf.length < 37) throw new Error("Ugyldig backup-fil (for kort)");
+  const version = buf.readUInt32BE(0);
+  if (version !== BACKUP_VERSION) throw new Error("Ukjent backup-versjon: " + version);
+  const key  = deriveBackupKey(BACKUP_SECRET);
+  const iv   = buf.slice(4, 20);
+  const tag  = buf.slice(20, 36);
+  const enc  = buf.slice(36);
+  const dec  = crypto.createDecipheriv(BACKUP_ALGO, key, iv);
+  dec.setAuthTag(tag);
+  const json = dec.update(enc) + dec.final("utf8");
+  return JSON.parse(json);
+}
+
+// ── Build backup payload for one department ───────────────────────
+// Backup segments available per department
+const BACKUP_SEGMENTS = {
+  events:     { label: "Arrangementkalender",    desc: "Alle events, påmeldinger, innsjekk og gjestebok" },
+  members:    { label: "Medlemsliste",            desc: "Medlemsregister for avdelingen" },
+  volunteers: { label: "Frivillige",              desc: "Frivilligregister med oppmøtehistorikk" },
+  inventar:   { label: "Inventarliste",           desc: "Utstyr og lagerbeholdning (kun full backup / admin)" },
+};
+
+function buildDeptBackup(deptId, segments) {
+  const settings     = getSettings();
+  const dept         = (settings.departments || []).find(function(d) { return d.id === deptId; });
+  if (!dept) throw new Error("Avdeling ikke funnet: " + deptId);
+
+  // Default: all segments except inventar (which is global/admin-only)
+  const segs = segments || ["events","members","volunteers"];
+
+  const payload = {
+    backupVersion: BACKUP_VERSION,
+    createdAt:     new Date().toISOString(),
+    deptId:        deptId,
+    deptName:      dept.name,
+    siteName:      settings.siteName || "Events Admin",
+    segments:      segs,
+  };
+
+  if (segs.includes("events")) {
+    payload.events = readJSON(EVENTS_FILE).filter(function(e) {
+      return e.department === deptId;
+    });
+  }
+  if (segs.includes("members")) {
+    payload.members = readJSON(MEMBERS_FILE).filter(function(m) {
+      return m.department === deptId;
+    });
+  }
+  if (segs.includes("volunteers")) {
+    payload.volunteers = readJSON(VOLUNTEERS_FILE).filter(function(v) {
+      return v.department === deptId;
+    });
+  }
+  // inventar is global – only included by explicit admin request
+  if (segs.includes("inventar")) {
+    const allInv = readJSON(INVENTAR_FILE);
+    // Per-dept backup: only items belonging to this dept
+    payload.inventar = allInv.filter(function(i){ return !i.department || i.department === deptId; });
+  }
+
+  return payload;
+}
+
+// ── Build full-system backup (admin only) ─────────────────────────
+function buildFullBackup(segments) {
+  const segs = segments || ["events","members","volunteers","inventar","settings"];
+  const payload = {
+    backupVersion: BACKUP_VERSION,
+    createdAt:     new Date().toISOString(),
+    deptId:        null,
+    deptName:      "Full system",
+    siteName:      getSettings().siteName || "Events Admin",
+    segments:      segs,
+  };
+  if (segs.includes("events"))     payload.events     = readJSON(EVENTS_FILE);
+  if (segs.includes("members"))    payload.members    = readJSON(MEMBERS_FILE);
+  if (segs.includes("volunteers")) payload.volunteers = readJSON(VOLUNTEERS_FILE);
+  if (segs.includes("inventar"))   payload.inventar   = readJSON(INVENTAR_FILE);
+  if (segs.includes("settings"))   payload.settings   = getSettings();
+  return payload;
+}
+
+// ── Send backup email to a recipient ─────────────────────────────
+async function sendBackupEmail(toEmail, deptName, backupBuf, dateStr) {
+  const s        = getSettings();
+  const siteName = s.siteName || "Events Admin";
+  const filename = `backup_${deptName.replace(/[^a-zA-Z0-9]/g,"_")}_${dateStr}.nafbak`;
+  const subject  = `🔒 Ukentlig backup – ${deptName} – ${dateStr}`;
+  const html = `
+<div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a">
+  <div style="background:#FFD100;padding:1.25rem 2rem;border-radius:8px 8px 0 0">
+    <h1 style="margin:0;font-size:1.1rem;color:#1a1a1a">${siteName}</h1>
+  </div>
+  <div style="background:#f9f9f9;padding:2rem;border-radius:0 0 8px 8px;border:1px solid #e0e0e0">
+    <h2 style="margin-top:0;font-size:1.1rem">🔒 Ukentlig sikkerhetskopi</h2>
+    <p>Vedlagt er en kryptert backup av avdeling <strong>${deptName}</strong> generert <strong>${dateStr}</strong>.</p>
+    <div style="background:#fff;border-left:4px solid #FFD100;padding:.75rem 1rem;border-radius:4px;margin:1rem 0;font-size:.9rem">
+      <strong>Fil:</strong> ${filename}<br>
+      <strong>Format:</strong> Kryptert .nafbak (AES-256-GCM)<br>
+      <strong>Gjenoppretting:</strong> Last opp filen under Innstillinger → Backup og gjenoppretting
+    </div>
+    <p style="color:#555;font-size:.85rem">Oppbevar filen trygt. Den inneholder personopplysninger og kan bare åpnes av dette systemet med riktig nøkkel.</p>
+  </div>
+</div>`;
+  const text = `Ukentlig backup av ${deptName} – ${dateStr}
+
+Fil: ${filename}
+Gjenoppretting: Innstillinger → Backup og gjenoppretting
+
+– ${siteName}`;
+
+  const transport = getTransporter();
+  if (!transport) { console.error("[backup] Ingen e-post-transport konfigurert"); return false; }
+
+  const fromAddr = process.env.SMTP_FROM || s.emailFrom || ("noreply@" + (s.eventDomain || DOMAIN));
+  try {
+    await transport.sendMail({
+      from: `${siteName} <${fromAddr}>`,
+      to: toEmail,
+      subject,
+      html,
+      text,
+      attachments: [{
+        filename,
+        content: backupBuf,
+        contentType: "application/octet-stream",
+      }],
+    });
+    console.log("[backup] Sendt til:", toEmail, "avdeling:", deptName);
+    return true;
+  } catch(e) {
+    console.error("[backup] Feil:", e.message);
+    return false;
+  }
+}
+
+// ── Weekly backup scheduler (runs every Monday 06:00) ─────────────
+function scheduleWeeklyBackup() {
+  function msUntilNextMonday6am() {
+    const now  = new Date();
+    const next = new Date(now);
+    // Advance to next Monday
+    const day = now.getDay(); // 0=Sun,1=Mon,...
+    const daysUntilMon = day === 1 ? 7 : (8 - day) % 7 || 7;
+    next.setDate(now.getDate() + daysUntilMon);
+    next.setHours(6, 0, 0, 0);
+    return next.getTime() - now.getTime();
+  }
+
+  function runWeeklyBackup() {
+    const s         = getSettings();
+    const users     = readJSON(USERS_FILE);
+    const dateStr   = new Date().toISOString().slice(0, 10);
+    const depts     = s.departments || [];
+
+    // Find all department managers with backup e-mail enabled
+    depts.forEach(async function(dept) {
+      if (!dept.backupEnabled) return;
+      const managers = users.filter(function(u) {
+        const acc = getAccessList(u);
+        return acc.some(function(a) {
+          return a.department === dept.id &&
+            (a.role === "department_manager" || a.role === "avdelingsleder");
+        });
+      });
+      if (!managers.length) return;
+
+      try {
+        const payload   = buildDeptBackup(dept.id);
+        const backupBuf = encryptBackup(payload);
+        for (const mgr of managers) {
+          if (mgr.email && mgr.email !== "[slettet]") {
+            await sendBackupEmail(mgr.email, dept.name, backupBuf, dateStr);
+          }
+        }
+      } catch(e) {
+        console.error("[backup] Feil for avdeling", dept.name, ":", e.message);
+      }
+    });
+
+    // Schedule next run in exactly 7 days
+    setTimeout(runWeeklyBackup, 7 * 24 * 60 * 60 * 1000);
+    console.log("[backup] Ukentlig backup kjørt for", dateStr);
+  }
+
+  const delay = msUntilNextMonday6am();
+  setTimeout(runWeeklyBackup, delay);
+  console.log("[backup] Neste ukentlig backup om",
+    Math.round(delay / 1000 / 60 / 60), "timer (mandag 06:00)");
+}
+scheduleWeeklyBackup();
+
+// ── API: Get available backup segments ─────────────────────────
+app.get("/api/backup/segments", auth, function(req, res) {
+  res.json(BACKUP_SEGMENTS);
+});
+
+// ── API: Trigger manual backup (admin or dept manager) ───────────
+app.post("/api/backup/download", auth, async function(req, res) {
+  const user    = req.session.user;
+  const deptId  = req.body.deptId || null;
+  const isAdmin = user.role === "admin";
+
+  if (!deptId && !isAdmin) {
+    return res.status(403).json({ error: "Kun admin kan lage full backup" });
+  }
+  if (deptId) {
+    const acc = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === user.id; }) || {});
+    const ok  = isAdmin || acc.some(function(a) {
+      return a.department === deptId &&
+        (a.role === "department_manager" || a.role === "avdelingsleder");
+    });
+    if (!ok) return res.status(403).json({ error: "Ingen tilgang til denne avdelingen" });
+  }
+
+  try {
+    const segments  = Array.isArray(req.body.segments) ? req.body.segments : null;
+    const payload   = deptId ? buildDeptBackup(deptId, segments) : buildFullBackup(segments);
+    const backupBuf = encryptBackup(payload);
+    const dateStr   = new Date().toISOString().slice(0, 10);
+    const name      = deptId ? payload.deptName : "full";
+    const filename  = `backup_${name.replace(/[^a-zA-Z0-9]/g,"_")}_${dateStr}.nafbak`;
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.send(backupBuf);
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ── API: Peek at backup file (decrypt + return metadata only) ────
+app.post("/api/backup/peek", auth, multer({ storage: multer.memoryStorage() }).single("backupFile"), function(req, res) {
+  if (!req.file) return res.status(400).json({ error: "Ingen fil lastet opp" });
+  try {
+    const payload = decryptBackup(req.file.buffer);
+    // Count items per segment
+    const counts = {};
+    if (payload.events)     counts.events     = payload.events.length;
+    if (payload.members)    counts.members    = payload.members.length;
+    if (payload.volunteers) counts.volunteers = payload.volunteers.length;
+    if (payload.inventar)   counts.inventar   = payload.inventar.length;
+    if (payload.settings)   counts.settings   = 1;
+    res.json({
+      backupVersion: payload.backupVersion,
+      createdAt:     payload.createdAt,
+      deptId:        payload.deptId,
+      deptName:      payload.deptName,
+      segments:      payload.segments || Object.keys(counts),
+      counts,
+    });
+  } catch(e) {
+    res.status(400).json({ error: "Kunne ikke lese filen: " + e.message });
+  }
+});
+
+// ── API: Restore from backup file ─────────────────────────────────
+app.post("/api/backup/restore", auth, adminOnly, rateLimit(5, 60000), multer({ storage: multer.memoryStorage() }).single("backupFile"), async function(req, res) {
+  if (!req.file) return res.status(400).json({ error: "Ingen fil lastet opp" });
+  const mode = req.body.mode || "merge"; // "merge" or "replace"
+
+  let payload;
+  try {
+    payload = decryptBackup(req.file.buffer);
+  } catch(e) {
+    return res.status(400).json({ error: "Kunne ikke dekryptere filen: " + e.message });
+  }
+
+  if (!payload.events && !payload.members && !payload.volunteers && !payload.inventar && !payload.settings) {
+    return res.status(400).json({ error: "Ugyldig backup-innhold" });
+  }
+
+  // Respect segment filter from frontend (if provided)
+  let requestedSegments = null;
+  try {
+    if (req.body.segments) requestedSegments = JSON.parse(req.body.segments);
+  } catch(e) {}
+  // Filter payload to only requested segments
+  if (requestedSegments) {
+    if (!requestedSegments.includes("events"))     delete payload.events;
+    if (!requestedSegments.includes("members"))    delete payload.members;
+    if (!requestedSegments.includes("volunteers")) delete payload.volunteers;
+    if (!requestedSegments.includes("inventar"))   delete payload.inventar;
+    if (!requestedSegments.includes("settings"))   delete payload.settings;
+  }
+
+  const summary = { restored: 0, skipped: 0, updated: 0 };
+  const restoredSegments = [];
+  const dateStr = payload.createdAt ? payload.createdAt.slice(0, 10) : "ukjent";
+
+  // ── Restore events ──
+  if (payload.events && payload.events.length) {
+    const current = readJSON(EVENTS_FILE);
+    if (mode === "replace") {
+      // Replace only events belonging to this dept (or all if full backup)
+      const keep = payload.deptId
+        ? current.filter(function(e) { return e.department !== payload.deptId; })
+        : [];
+      writeJSON(EVENTS_FILE, [...keep, ...payload.events]);
+      summary.restored += payload.events.length;
+    } else {
+      // Merge: add missing, update existing (prefer backup version)
+      const currentMap = new Map(current.map(function(e) { return [e.id, e]; }));
+      payload.events.forEach(function(e) {
+        if (!currentMap.has(e.id)) {
+          current.push(e);
+          summary.restored++;
+        } else {
+          // Only update if backup is newer
+          const cur = currentMap.get(e.id);
+          const backupDate  = new Date(e.updatedAt || e.createdAt || 0);
+          const currentDate = new Date(cur.updatedAt || cur.createdAt || 0);
+          if (backupDate >= currentDate) {
+            const idx = current.findIndex(function(c) { return c.id === e.id; });
+            current[idx] = e;
+            summary.updated++;
+          } else {
+            summary.skipped++;
+          }
+        }
+      });
+      writeJSON(EVENTS_FILE, current);
+    }
+  }
+
+  // ── Restore members ──
+  if (payload.members && payload.members.length) {
+    const currentM = readJSON(MEMBERS_FILE);
+    if (mode === "replace" && payload.deptId) {
+      const keepM = currentM.filter(function(m) { return m.department !== payload.deptId; });
+      writeJSON(MEMBERS_FILE, [...keepM, ...payload.members]);
+      summary.restored += payload.members.length;
+    } else {
+      const mMap = new Map(currentM.map(function(m) { return [m.id, m]; }));
+      payload.members.forEach(function(m) {
+        if (!mMap.has(m.id)) { currentM.push(m); summary.restored++; }
+        else { summary.skipped++; }
+      });
+      writeJSON(MEMBERS_FILE, currentM);
+    }
+  }
+
+  // ── Restore volunteers ──
+  if (payload.volunteers && payload.volunteers.length) {
+    const currentV = readJSON(VOLUNTEERS_FILE);
+    if (mode === "replace" && payload.deptId) {
+      const keepV = currentV.filter(function(v) { return v.department !== payload.deptId; });
+      writeJSON(VOLUNTEERS_FILE, [...keepV, ...payload.volunteers]);
+      summary.restored += payload.volunteers.length;
+    } else {
+      const vMap = new Map(currentV.map(function(v) { return [v.id, v]; }));
+      payload.volunteers.forEach(function(v) {
+        if (!vMap.has(v.id)) { currentV.push(v); summary.restored++; }
+        else { summary.skipped++; }
+      });
+      writeJSON(VOLUNTEERS_FILE, currentV);
+    }
+  }
+
+  // ── Restore settings (full backup only) ──
+  if (payload.settings && !payload.deptId) {
+    const s = getSettings();
+    // Only restore safe settings fields, never overwrite auth/security
+    const safe = ["siteName","contactEmail","eventDomain","showCountdown",
+                  "showParticipantCount","allowSelfCheckIn","requireGuestbookApproval",
+                  "emailEnabled","emailFrom","emailFromName","accentColor","departments",
+                  "colors","logoUrl","theme","setupDone"];
+    safe.forEach(function(k) {
+      if (payload.settings[k] !== undefined) s[k] = payload.settings[k];
+    });
+    saveSettings(s);
+  }
+
+  // ── Restore inventar ──
+  if (payload.inventar && payload.inventar.length) {
+    if (mode === "replace") {
+      writeJSON(INVENTAR_FILE, payload.inventar);
+      summary.restored += payload.inventar.length;
+    } else {
+      const currentI = readJSON(INVENTAR_FILE);
+      const iMap = new Map(currentI.map(function(i) { return [i.id, i]; }));
+      payload.inventar.forEach(function(item) {
+        if (!iMap.has(item.id)) { currentI.push(item); summary.restored++; }
+        else { summary.skipped++; }
+      });
+      writeJSON(INVENTAR_FILE, currentI);
+    }
+  }
+
+  // Track which segments were actually restored
+  if (payload.events)     restoredSegments.push("events");
+  if (payload.members)    restoredSegments.push("members");
+  if (payload.volunteers) restoredSegments.push("volunteers");
+  if (payload.inventar)   restoredSegments.push("inventar");
+  if (payload.settings)   restoredSegments.push("settings");
+
+  console.log("[backup] Gjenoppretting fra", dateStr,
+    "avdeling:", payload.deptName,
+    "| segments:", restoredSegments.join(","),
+    "| restored:", summary.restored, "updated:", summary.updated, "skipped:", summary.skipped);
+
+  res.json({
+    ok: true,
+    createdAt:        payload.createdAt,
+    deptName:         payload.deptName,
+    mode,
+    summary,
+    restoredSegments,
+  });
+});
+
+// ── API: Toggle backup for department ─────────────────────────────
+app.post("/api/departments/:id/backup-enabled", auth, function(req, res) {
+  const user = req.session.user;
+  const s    = getSettings();
+  const idx  = (s.departments || []).findIndex(function(d) { return d.id === req.params.id; });
+  if (idx === -1) return res.status(404).json({ error: "Ikke funnet" });
+
+  const acc = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === user.id; }) || {});
+  const ok  = user.role === "admin" || acc.some(function(a) {
+    return a.department === req.params.id &&
+      (a.role === "department_manager" || a.role === "avdelingsleder");
+  });
+  if (!ok) return res.status(403).json({ error: "Ingen tilgang" });
+
+  s.departments[idx].backupEnabled = !!req.body.enabled;
+  saveSettings(s);
+  res.json({ ok: true, backupEnabled: s.departments[idx].backupEnabled });
+});
+// ══════════════════════════════════════════════════════════════════
+
+// ── Breakglass API ────────────────────────────────────────────────
+const breakglassOnly = function(req, res, next) {
+  if (req.session.user && req.session.user.role === "breakglass") return next();
+  res.status(403).json({ error: "Kun for breakglass-kontoer" });
+};
+
+// Full system restore – breakglass only
+app.post("/api/breakglass/restore", auth, breakglassOnly,
+  multer({ storage: multer.memoryStorage() }).single("backupFile"),
+  async function(req, res) {
+    if (!req.file) return res.status(400).json({ error: "Ingen fil lastet opp" });
+
+    let payload;
+    try {
+      payload = decryptBackup(req.file.buffer);
+    } catch(e) {
+      return res.status(400).json({ error: "Kunne ikke dekryptere filen: " + e.message });
+    }
+
+    if (!payload.events && !payload.settings && !payload.members) {
+      return res.status(400).json({ error: "Ugyldig backup-innhold" });
+    }
+
+    const summary = { restored: 0, files: [] };
+
+    // Restore ALL segments unconditionally (full replace)
+    if (payload.events) {
+      writeJSON(EVENTS_FILE, payload.events);
+      summary.restored += payload.events.length;
+      summary.files.push("events (" + payload.events.length + ")");
+    }
+    if (payload.members) {
+      writeJSON(MEMBERS_FILE, payload.members);
+      summary.restored += payload.members.length;
+      summary.files.push("members (" + payload.members.length + ")");
+    }
+    if (payload.volunteers) {
+      writeJSON(VOLUNTEERS_FILE, payload.volunteers);
+      summary.restored += payload.volunteers.length;
+      summary.files.push("volunteers (" + payload.volunteers.length + ")");
+    }
+    if (payload.inventar) {
+      writeJSON(INVENTAR_FILE, payload.inventar);
+      summary.restored += payload.inventar.length;
+      summary.files.push("inventar (" + payload.inventar.length + ")");
+    }
+    if (payload.settings) {
+      // Never overwrite critical security settings
+      const s = getSettings();
+      const safe = ["siteName","contactEmail","eventDomain","showCountdown","showParticipantCount",
+                    "allowSelfCheckIn","requireGuestbookApproval","emailEnabled","emailFrom",
+                    "emailFromName","accentColor","departments","colors","logoUrl","theme","setupDone"];
+      safe.forEach(function(k) { if (payload.settings[k] !== undefined) s[k] = payload.settings[k]; });
+      saveSettings(s);
+      summary.files.push("settings");
+    }
+
+    // Log the restore action
+    const bgLog = readJSON(BREAKGLASS_LOG_FILE);
+    bgLog.unshift({
+      id:        require("crypto").randomBytes(6).toString("hex"),
+      ts:        new Date().toISOString(),
+      action:    "restore",
+      email:     req.session.user.email,
+      ip:        req.ip || req.connection.remoteAddress || "ukjent",
+      backupDate: payload.createdAt || "ukjent",
+      summary,
+    });
+    writeJSON(BREAKGLASS_LOG_FILE, bgLog);
+    console.warn("[BREAKGLASS] Restore utført av", req.session.user.email,
+      "| backup fra:", payload.createdAt, "| filer:", summary.files.join(", "));
+
+    // Alert all admins
+    const admins = readJSON(USERS_FILE).filter(function(u){ return u.role === "admin"; });
+    const s = getSettings();
+    admins.forEach(async function(admin) {
+      if (!admin.email || admin.email === "[slettet]") return;
+      await sendEmail({
+        to: admin.email,
+        subject: "🚨 Breakglass RESTORE utført – " + new Date().toLocaleString("nb-NO"),
+        html: "<div style=\"font-family:sans-serif;max-width:520px\"><div style=\"background:#7f1d1d;padding:1rem 1.5rem;border-radius:8px 8px 0 0\">" +
+              "<h2 style=\"color:#fca5a5;margin:0\">🚨 Full database-restore utført</h2></div>" +
+              "<div style=\"background:#1a1a1a;padding:1.5rem;border-radius:0 0 8px 8px;color:#ccc\">" +
+              "<p><strong>Utført av:</strong> " + req.session.user.email + "</p>" +
+              "<p><strong>Backup-dato:</strong> " + (payload.createdAt || "ukjent") + "</p>" +
+              "<p><strong>Tidspunkt:</strong> " + new Date().toLocaleString("nb-NO") + "</p>" +
+              "<p><strong>Gjenopprettet:</strong> " + summary.files.join(", ") + "</p>" +
+              "<p style=\"color:#f87171\">Systemet er nå gjenopprettet til backup-tidspunktet. Avdelingsledere kan nå kjøre sin avdelings-backup for å hente tilbake nyere data.</p>" +
+              "</div></div>",
+        text: "BREAKGLASS RESTORE: " + req.session.user.email + " gjenopprettet database fra " + (payload.createdAt || "ukjent"),
+      });
+    });
+
+    broadcastEventUpdate(null);
+    res.json({ ok: true, createdAt: payload.createdAt, summary });
+  }
+);
+
+// Reset admin password – breakglass only
+app.post("/api/breakglass/reset-admin-password", auth, breakglassOnly, async function(req, res) {
+  const newPassword = (req.body.password || "").trim();
+  if (!newPassword || newPassword.length < 12)
+    return res.status(400).json({ error: "Passord må være minst 12 tegn" });
+
+  const targetEmail = (req.body.email || "").toLowerCase().trim();
+  if (!targetEmail) return res.status(400).json({ error: "E-post er påkrevd" });
+
+  const users    = readJSON(USERS_FILE);
+  const adminIdx = users.findIndex(function(u) {
+    return u.email === targetEmail && u.role === "admin";
+  });
+  if (adminIdx === -1)
+    return res.status(404).json({ error: "Admin-bruker ikke funnet: " + targetEmail });
+
+  // Block resetting breakglass emails via this endpoint
+  if (isBreakglassEmail(targetEmail))
+    return res.status(403).json({ error: "Kan ikke endre breakglass-kontoer" });
+
+  users[adminIdx].hash = await bcrypt.hash(newPassword, 12);
+  writeJSON(USERS_FILE, users);
+
+  // Log it
+  const bgLog = readJSON(BREAKGLASS_LOG_FILE);
+  bgLog.unshift({
+    id:      require("crypto").randomBytes(6).toString("hex"),
+    ts:      new Date().toISOString(),
+    action:  "reset_admin_password",
+    email:   req.session.user.email,
+    target:  targetEmail,
+    ip:      req.ip || req.connection.remoteAddress || "ukjent",
+  });
+  writeJSON(BREAKGLASS_LOG_FILE, bgLog);
+  console.warn("[BREAKGLASS] Admin-passord tilbakestilt av", req.session.user.email, "| mål:", targetEmail);
+
+  res.json({ ok: true, message: "Passord tilbakestilt for " + targetEmail });
+});
+
+// Breakglass log (read-only, admin only)
+app.get("/api/breakglass/log", auth, adminOnly, function(req, res) {
+  res.json(readJSON(BREAKGLASS_LOG_FILE));
+});
+
+// ── E-postlogg API ───────────────────────────────────────────────
+app.get("/api/email-log", auth, function(req, res) {
+  const me = req.session.user;
+  if (me.role !== "admin") {
+    const myAcc = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {});
+    const isDeptMgr = myAcc.some(function(t){ return t.role === "department_manager" || t.role === "avdelingsleder"; });
+    if (!isDeptMgr) return res.status(403).json({ error: "Ingen tilgang" });
+  }
+  const log = readJSON(EMAIL_LOG_FILE);
+  const limit = Math.min(parseInt(req.query.limit) || 100, 500);
+  res.json(log.slice(0, limit));
+});
+
+app.delete("/api/email-log", auth, adminOnly, function(req, res) {
+  writeJSON(EMAIL_LOG_FILE, []);
+  res.json({ ok: true });
+});
+
+app.post("/api/email-log/test", auth, adminOnly, async function(req, res) {
+  const to = (req.body.to || "").trim();
+  if (!to) return res.status(400).json({ error: "E-postadresse mangler" });
+  const s = getSettings();
+
+  // Test SMTP directly – bypasses emailEnabled so we can diagnose problems
+  console.log("[email-test] Forsøker å sende test til:", to);
+  console.log("[email-test] SMTP_HOST:", process.env.SMTP_HOST || "(ikke satt)");
+  console.log("[email-test] SMTP_USER:", process.env.SMTP_USER || "(ikke satt)");
+  console.log("[email-test] SMTP_FROM:", process.env.SMTP_FROM || "(ikke satt)");
+
+  const transport = getTransporter();
+  if (!transport) {
+    console.error("[email-test] Ingen transport – SMTP ikke konfigurert");
+    return res.status(500).json({
+      ok: false,
+      error: "SMTP ikke konfigurert. Sjekk at SMTP_HOST, SMTP_USER og SMTP_PASS er satt i Portainer miljøvariabler."
+    });
+  }
+
+  const fromAddr = process.env.SMTP_FROM || s.emailFrom || ("noreply@" + (s.eventDomain || DOMAIN));
+  const siteName = s.siteName || "Events Admin";
+  const sentAt   = new Date().toLocaleString("nb-NO");
+
+  try {
+    const info = await transport.sendMail({
+      from:    (s.emailFromName || siteName) + " <" + fromAddr + ">",
+      to,
+      subject: "✅ Test-e-post fra " + siteName,
+      html: "<div style=\"font-family:sans-serif;padding:2rem;max-width:480px;color:#1a1a1a\">" +
+            "<div style=\"background:#FFD100;padding:1rem 1.5rem;border-radius:8px 8px 0 0\">" +
+            "<strong>" + siteName + "</strong></div>" +
+            "<div style=\"background:#f9f9f9;padding:1.5rem;border-radius:0 0 8px 8px;border:1px solid #e0e0e0\">" +
+            "<h2 style=\"margin-top:0\">SMTP fungerer! 🎉</h2>" +
+            "<p>Denne e-posten bekrefter at konfigurasjonen er korrekt.</p>" +
+            "<table style=\"font-size:.85rem;color:#555\"><tr><td><strong>Til:&nbsp;</strong></td><td>" + to + "</td></tr>" +
+            "<tr><td><strong>Fra:&nbsp;</strong></td><td>" + fromAddr + "</td></tr>" +
+            "<tr><td><strong>Sendt:&nbsp;</strong></td><td>" + sentAt + "</td></tr></table>" +
+            "</div></div>",
+      text: "SMTP fungerer! Sendt fra " + siteName + " til " + to + " kl. " + sentAt,
+    });
+    writeEmailLog({ status: "sent", to, subject: "✅ Test-e-post fra " + siteName, msgId: info.messageId });
+    res.json({ ok: true, to, id: info.messageId });
+  } catch(e) {
+    console.error("[email-test] Sendingsfeil:", e.message);
+    writeEmailLog({ status: "error", to, subject: "✅ Test-e-post fra " + siteName, error: e.message });
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// ── Glemt passord ───────────────────────────────────────────────
+app.post("/api/forgot-password", rateLimit(5, 60000), function(req, res) {
+  const email = (req.body.email || "").toLowerCase().trim();
+  if (!email) return res.json({ ok: true }); // Alltid OK for å unngå enumeration
+  const users = readJSON(USERS_FILE);
+  const user  = users.find(function(u) { return u.email === email; });
+  if (!user) return res.json({ ok: true });
+  const tmp = Math.random().toString(36).slice(2, 10);
+  const hash = bcrypt.hashSync(tmp, 10);
+  user.password = hash;
+  writeJSON(USERS_FILE, users);
+  const s    = getSettings();
+  const name = user.name || user.email;
+  const adminUrl = "https://admin." + (s.eventDomain || DOMAIN);
+  const subject  = "🔑 Nytt midlertidig passord – " + (s.siteName || "Events Admin");
+  const html = `<div style="font-family:sans-serif;max-width:520px;margin:0 auto">
+    <div style="background:#FFD100;padding:1rem 1.5rem;border-radius:8px 8px 0 0">
+      <strong>${s.siteName || "Events Admin"}</strong></div>
+    <div style="background:#f9f9f9;padding:1.5rem;border-radius:0 0 8px 8px;border:1px solid #e0e0e0">
+      <p>Hei ${name}!</p>
+      <p>Ditt midlertidige passord er: <strong style="font-size:1.2rem;letter-spacing:.05em">${tmp}</strong></p>
+      <p><a href="${adminUrl}" style="background:#FFD100;color:#1a1a1a;padding:.6rem 1.25rem;border-radius:6px;text-decoration:none;font-weight:700">Logg inn →</a></p>
+      <p style="color:#999;font-size:.8rem">Bytt passord under Innstillinger etter innlogging.</p>
+    </div></div>`;
+  const text = `Hei ${name}!\n\nMidlertidig passord: ${tmp}\nLogg inn: ${adminUrl}\n\nBytt passord etter innlogging.`;
+  sendEmail({ to: email, subject, html, text }).catch(function() {});
+  res.json({ ok: true });
+});
+
+app.post("/api/logout", function(req, res) {
+  req.session.destroy(function() { res.json({ ok: true }); });
+});
+
+app.get("/api/me", auth, function(req, res) {
+  var user = readJSON(USERS_FILE).find(function(u) { return u.id === req.session.user.id; });
+  if (!user) return res.status(401).json({ error: "Ikke innlogget" });
+  var permissions = buildPermissions(user, getSettings());
+  res.json(Object.assign({}, req.session.user, { permissions: permissions, vehicle: user.vehicle || null }));
+});
+
+app.put("/api/me/profile", auth, async function(req, res) {
+  const users = readJSON(USERS_FILE);
+  const i = users.findIndex(function(u) { return u.id === req.session.user.id; });
+  if (i < 0) return res.status(401).json({ error: "Ikke innlogget" });
+
+  // Bekreft nåværende passord
+  const current = req.body.currentPassword || "";
+  const ok = await bcrypt.compare(current, users[i].hash);
+  if (!ok) return res.status(403).json({ error: "Feil nåværende passord" });
+
+  // E-post
+  if (req.body.email) {
+    const newEmail = req.body.email.toLowerCase().trim();
+    const taken = users.some(function(u, j) { return j !== i && u.email === newEmail; });
+    if (taken) return res.status(409).json({ error: "E-postadressen er allerede i bruk" });
+    users[i].email = newEmail;
+    req.session.user.email = newEmail;
+  }
+
+  // Nytt passord
+  if (req.body.newPassword) {
+    if (req.body.newPassword.length < 8)
+      return res.status(400).json({ error: "Passord må være minst 8 tegn" });
+    users[i].hash = await bcrypt.hash(req.body.newPassword, 12);
+  }
+
+  writeJSON(USERS_FILE, users);
+  res.json({ ok: true, email: users[i].email });
+});
+
+// Kjøretøy – ingen passord nødvendig
+app.put("/api/me/vehicle", auth, function(req, res) {
+  const users = readJSON(USERS_FILE);
+  const i = users.findIndex(function(u) { return u.id === req.session.user.id; });
+  if (i < 0) return res.status(401).json({ error: "Ikke innlogget" });
+  const v = req.body.vehicle || {};
+  users[i].vehicle = {
+    make:  (v.make  || "").trim().slice(0, 60),
+    model: (v.model || "").trim().slice(0, 60),
+    tank:  parseFloat(v.tank)  || 0,
+    l100:  parseFloat(v.l100)  || 0,
+    note:  (v.note  || "").trim().slice(0, 120),
+  };
+  writeJSON(USERS_FILE, users);
+  res.json({ ok: true, vehicle: users[i].vehicle });
+});
+
+// Hent gruppe-rekkevidde for et event (minste rekkevidde blant påmeldte med kjøretøy)
+app.get("/api/events/:id/group-range", auth, function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Event ikke funnet" });
+  const users = readJSON(USERS_FILE);
+  const regs  = ev.registrations || [];
+  const staff = ev.staff || [];
+
+  const vehicles = [];
+
+  // 1. Kjøretøy direkte fra påmeldinger (tur-skjema)
+  regs.forEach(function(r) {
+    if (r.vehicle && r.vehicle.tank > 0 && r.vehicle.l100 > 0) {
+      const range = Math.floor((r.vehicle.tank / r.vehicle.l100) * 100 * 0.85);
+      vehicles.push({ name: r.name, make: r.vehicle.make, model: r.vehicle.model,
+                      tank: r.vehicle.tank, l100: r.vehicle.l100, range, source: "reg" });
+    }
+  });
+
+  // 2. Kjøretøy fra brukerkontoer (for påmeldte/stab som har konto)
+  const regEmails  = new Set(regs.map(function(r) { return r.email; }));
+  const staffEmails = new Set(staff.map(function(s) { return s.email; }));
+  // Unngå duplikat – hopp over brukere som allerede har oppgitt via skjema
+  const regEmailsWithVehicle = new Set(vehicles.map(function(v) { return; }));
+  users.forEach(function(u) {
+    if (u.vehicle && u.vehicle.tank > 0 && u.vehicle.l100 > 0
+        && (regEmails.has(u.email) || staffEmails.has(u.email))
+        && !regs.find(function(r) { return r.email === u.email && r.vehicle && r.vehicle.tank > 0; })) {
+      const range = Math.floor((u.vehicle.tank / u.vehicle.l100) * 100 * 0.85);
+      vehicles.push({ name: u.name, make: u.vehicle.make, model: u.vehicle.model,
+                      tank: u.vehicle.tank, l100: u.vehicle.l100, range, source: "user" });
+    }
+  });
+
+  if (!vehicles.length) return res.json({ range: null, limiting: null, vehicles: [] });
+  vehicles.sort(function(a, b) { return a.range - b.range; });
+  res.json({ range: vehicles[0].range, limiting: vehicles[0], vehicles });
+});
+
+// ── Settings API ─────────────────────────────────────────────────
+app.get("/api/settings", auth, function(req, res) { res.json(getSettings()); });
+
+app.put("/api/settings", auth, adminOnly, function(req, res) {
+  const current = getSettings();
+  const updated = Object.assign(current, req.body);
+  // Eksplisitt: sikre at gdprRetentionDays er et tall
+  if (req.body.gdprRetentionDays !== undefined) {
+    updated.gdprRetentionDays = Number(req.body.gdprRetentionDays) || 365;
+  }
+  saveSettings(updated);
+  res.json(updated);
+});
+
+// ── Setup status (ingen auth – sjekkes ved første sidelast) ───────
+app.get("/api/setup-status", function(req, res) {
+  const s = getSettings();
+  res.json({ setupDone: !!s.setupDone, siteName: s.siteName || "", logoUrl: s.logoUrl || "", theme: s.theme || "dark", colors: s.colors || {} });
+});
+
+// ── Logo-opplasting + fargeekstraksjon ───────────────────────────
+const logoUpload = multer({
+  storage: multer.diskStorage({
+    destination: function(req, file, cb) {
+      const dir = path.join(DATA, "uploads");
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      cb(null, dir);
+    },
+    filename: function(req, file, cb) {
+      const ext = path.extname(file.originalname).toLowerCase() || ".png";
+      cb(null, "logo" + ext);
+    }
+  }),
+  fileFilter: function(req, file, cb) {
+    cb(null, /^image\/(png|jpeg|jpg|gif|svg\+xml|webp)$/.test(file.mimetype));
+  },
+  limits: { fileSize: 2 * 1024 * 1024 }
+});
+
+app.post("/api/settings/logo", auth, adminOnly, logoUpload.single("logo"), function(req, res) {
+  if (!req.file) return res.status(400).json({ err: "Ingen fil" });
+  const logoUrl = "/logo/" + req.file.filename;
+
+  // Farger ekstraheres i nettleseren via Canvas og sendes med requesten
+  let colors = { accent: null, palette: [] };
+  if (req.body.colors) {
+    try { colors = JSON.parse(req.body.colors); } catch(e) {}
+  }
+
+  const s = getSettings();
+  s.logoUrl = logoUrl;
+  if (colors.accent) {
+    if (!s.colors) s.colors = {};
+    s.colors.accent = colors.accent;
+  }
+  saveSettings(s);
+  res.json({ logoUrl, colors });
+});
+
+// Serve logo-filer
+app.use("/logo", express.static(path.join(DATA, "uploads")));
+
+// ── Avdelinger API ───────────────────────────────────────────────
+function slugify(str) {
+  return str.toLowerCase()
+    .replace(/æ/g,"ae").replace(/ø/g,"o").replace(/å/g,"a")
+    .replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+}
+
+app.get("/api/departments", auth, function(req, res) {
+  res.json(getSettings().departments || []);
+});
+
+app.post("/api/departments", auth, adminOnly, function(req, res) {
+  const deptName = (req.body.name || "").trim();
+  if (!deptName) return res.status(400).json({ error: "Navn er påkrevd" });
+  const s = getSettings();
+  if (!s.departments) s.departments = [];
+  if (s.departments.find(function(a) { return a.name.toLowerCase() === deptName.toLowerCase(); }))
+    return res.status(409).json({ error: "Avdelingen finnes allerede" });
+  s.departments.push({ id: uuid(), name: deptName, slug: slugify(deptName), subgroups: [] });
+  saveSettings(s);
+  broadcastEventUpdate(null);
+  res.json(s.departments);
+});
+
+app.delete("/api/departments/:id", auth, adminOnly, function(req, res) {
+  const s = getSettings();
+  s.departments = (s.departments || []).filter(function(a) { return a.id !== req.params.id; });
+  saveSettings(s);
+  broadcastEventUpdate(null);
+  res.json(s.departments);
+});
+
+// ── Undergrupper API ─────────────────────────────────────────────
+// Department manager can administer subgroups in their own department
+function ugGuard(req, res, next) {
+  const u = req.session.user;
+  if (!u) return res.status(401).json({ error: "Ikke innlogget" });
+  if (u.role === "admin") return next();
+  var myAccessList = getAccessList(readJSON(USERS_FILE).find(function(x){ return x.id === u.id; }) || {});
+  var harAvdTilgang = myAccessList.some(function(t){
+    return t.department === req.params.deptId && (t.role === "department_manager" || t.role === "avdelingsleder");
+  });
+  if (harAvdTilgang) return next();
+  res.status(403).json({ error: "Ingen tilgang" });
+}
+
+app.post("/api/departments/:deptId/subgroups", auth, ugGuard, function(req, res) {
+  const sgName  = (req.body.name || "").trim();
+  const color = (req.body.color || "#7dff7d").trim();
+  if (!sgName) return res.status(400).json({ error: "Navn er påkrevd" });
+  const s = getSettings();
+  const dept = (s.departments || []).find(function(a) { return a.id === req.params.deptId; });
+  if (!dept) return res.status(404).json({ error: "Avdeling ikke funnet" });
+  if (!dept.subgroups) dept.subgroups = [];
+  if (dept.subgroups.find(function(u) { return u.name.toLowerCase() === sgName.toLowerCase(); }))
+    return res.status(409).json({ error: "Undergruppen finnes allerede" });
+  dept.subgroups.push({ id: uuid(), name: sgName, color: color });
+  saveSettings(s);
+  broadcastEventUpdate(req.params.deptId);
+  res.json(dept);
+});
+
+app.delete("/api/departments/:deptId/subgroups/:sgId", auth, ugGuard, function(req, res) {
+  const s = getSettings();
+  const dept = (s.departments || []).find(function(a) { return a.id === req.params.deptId; });
+  if (!dept) return res.status(404).json({ error: "Avdeling ikke funnet" });
+  dept.subgroups = (dept.subgroups || []).filter(function(u) { return u.id !== req.params.sgId; });
+  saveSettings(s);
+  broadcastEventUpdate(req.params.deptId);
+  res.json(dept);
+});
+
+app.put("/api/departments/:deptId/subgroups/:sgId", auth, ugGuard, function(req, res) {
+  const s = getSettings();
+  const dept = (s.departments || []).find(function(a) { return a.id === req.params.deptId; });
+  if (!dept) return res.status(404).json({ error: "Avdeling ikke funnet" });
+  const ug = (dept.subgroups || []).find(function(u) { return u.id === req.params.sgId; });
+  if (!ug) return res.status(404).json({ error: "Undergruppe ikke funnet" });
+  if (req.body.name)  ug.name  = req.body.name.trim();
+  if (req.body.color) ug.color = req.body.color.trim();
+  saveSettings(s);
+  broadcastEventUpdate(req.params.deptId);
+  res.json(dept);
+});
+
+app.put("/api/departments/:deptId/eventtypes/:typeId", auth, adminOnly, function(req, res) {
+  const s = getSettings();
+  const dept = (s.departments || []).find(function(a) { return a.id === req.params.deptId; });
+  if (!dept) return res.status(404).json({ error: "Avdeling ikke funnet" });
+  if (!dept.eventTyperConfig) dept.eventTyperConfig = {};
+  dept.eventTyperConfig[req.params.typeId] = {
+    color: req.body.color || "#7dff7d",
+    label: req.body.label || req.params.typeId,
+  };
+  saveSettings(s);
+  broadcastEventUpdate(req.params.deptId);
+  res.json(dept);
+});
+
+
+// ── Users API ────────────────────────────────────────────────────
+function userPublic(u, forAvdeling) {
+  var accessList = getAccessList(u);
+  if (forAvdeling) accessList = accessList.filter(function(t) { return t.department === forAvdeling; });
+  return { id: u.id, email: u.email, role: u.role, name: u.name, title: u.tittel || null, accessList: accessList, createdBy: u.createdBy || null };
+}
+
+app.get("/api/users", auth, function(req, res) {
+  const me = req.session.user;
+  const users = readJSON(USERS_FILE);
+  if (me.role === "admin") return res.json(users.map(function(u) { return userPublic(u); }));
+  var myTilganger2 = getAccessList(readJSON(USERS_FILE).find(function(u) { return u.id === me.id; }) || {});
+  var manageRoles = ["department_manager","avdelingsleder","subgroup_manager","undergruppeansvarlig"];
+  var myManageAvdIds = myTilganger2.filter(function(t){ return manageRoles.indexOf(t.role) !== -1; }).map(function(t){ return t.department; });
+  if (myManageAvdIds.length > 0) {
+    // Check if caller is dept manager (sees whole dept) or only subgroup manager (sees own subgroups)
+    var callerIsOnlySubMgr = myTilganger2.every(function(t){
+      return t.role === "subgroup_manager" || t.role === "undergruppeansvarlig";
+    }) && !myTilganger2.some(function(t){
+      return t.role === "department_manager" || t.role === "avdelingsleder";
+    });
+    var mySubgroupIds = myTilganger2.reduce(function(acc, t){ return acc.concat(t.subgroups || []); }, []);
+
+    var relevant = users.filter(function(u) {
+      if (u.id === me.id) return true;
+      var uAccess = getAccessList(u);
+      // Check if user is in a dept the caller manages
+      var inMyDept = uAccess.some(function(t){ return myManageAvdIds.indexOf(t.department) !== -1; });
+      if (!inMyDept) return false;
+      // Subgroup manager: further restrict to users in their subgroups
+      if (callerIsOnlySubMgr && mySubgroupIds.length) {
+        return uAccess.some(function(t){
+          return myManageAvdIds.indexOf(t.department) !== -1 &&
+            (t.subgroups || []).some(function(sg){ return mySubgroupIds.indexOf(sg) !== -1; });
+        });
+      }
+      return true;
+    });
+    return res.json(relevant.map(function(u) {
+      if (u.id === me.id) return userPublic(u);
+      return userPublic(u, myManageAvdIds.find(function(id) {
+        return getAccessList(u).some(function(t) { return t.department === id; });
+      }));
+    }));
+  }
+  var self = users.find(function(u) { return u.id === me.id; });
+  res.json([userPublic(self || {})]);
+});
+
+// Sjekk om e-post finnes (for avdelingsleder-flyt)
+app.get("/api/users/lookup", auth, function(req, res) {
+  const me = req.session.user;
+  var hasManageRole = me.role === "admin" || getAccessList(
+    readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {}
+  ).some(function(t){ return ["department_manager","avdelingsleder","subgroup_manager","undergruppeansvarlig"].indexOf(t.role) !== -1; });
+  if (!hasManageRole) return res.status(403).json({ error: "Ingen tilgang" });
+  const email = (req.query.email || "").toLowerCase();
+  const users = readJSON(USERS_FILE);
+  const found = users.find(function(u) { return u.email === email; });
+  if (!found) return res.json({ found: false });
+  res.json({ found: true, id: found.id, name: found.name, email: found.email, role: found.role });
+});
+
+app.post("/api/users", auth, function(req, res, next) {
+  if (req.session.user.role === "admin") return next();
+  var me   = req.session.user;
+  var myT  = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {});
+  var targetDept = (req.body.newAccess || req.body.access || {}).department || req.body.department || null;
+
+  var canCreate = false;
+  myT.forEach(function(t) {
+    if (t.role === "department_manager" || t.role === "avdelingsleder") {
+      // Dept manager can create users for their own dept
+      if (!targetDept || t.department === targetDept) canCreate = true;
+    } else if (t.role === "subgroup_manager" || t.role === "undergruppeansvarlig") {
+      // Subgroup manager can create users for their own dept/subgroups
+      if (!targetDept || t.department === targetDept) canCreate = true;
+    }
+  });
+
+  if (canCreate) {
+    req.body.createdBy = me.id;
+    return next();
+  }
+  res.status(403).json({ error: "Ingen tilgang" });
+}, async function(req, res) {
+  const me       = req.session.user;
+  const email    = (req.body.email || "").toLowerCase();
+  const password = req.body.password;
+  const role     = req.body.role || "avdelingsleder";
+  const name     = req.body.name || "";
+  const titleValue   = req.body.tittel || null;
+  const createdBy = req.body.createdBy || null;
+  const newAccess = req.body.newAccess || req.body.access || null;
+
+  if (!email) return res.status(400).json({ error: "E-post er påkrevd" });
+  const users = readJSON(USERS_FILE);
+  const existing = users.find(function(u) { return u.email === email; });
+
+  if (existing) {
+    if (!newAccess) return res.status(409).json({ error: "E-posten er allerede i bruk", existingId: existing.id });
+    var accessList = getAccessList(existing).filter(function(t) { return t.department !== newAccess.department; });
+    accessList.push(newAccess);
+    existing.accessList = accessList;
+    writeJSON(USERS_FILE, users);
+    return res.json({ ok: true, merged: true });
+  }
+
+  if (!password) return res.status(400).json({ error: "Passord er påkrevd for nye brukere" });
+  var initialAccessList = [];
+  if (newAccess) initialAccessList.push(newAccess);
+  else if (req.body.department) initialAccessList.push({ department: req.body.department, subgroups: Array.isArray(req.body.subgroups) ? req.body.subgroups : [], eventTyper: Array.isArray(req.body.eventTyper) ? req.body.eventTyper : [] });
+  users.push({ id: uuid(), email, hash: await bcrypt.hash(password, 12), role, name, title: titleValue, accessList: initialAccessList, createdBy });
+  writeJSON(USERS_FILE, users);
+  res.json({ ok: true, merged: false });
+});
+
+app.put("/api/users/:id", auth, async function(req, res) {
+  const users = readJSON(USERS_FILE);
+  // Breakglass accounts are provisioned via env vars – block any UI changes
+  const targetUser = users.find(function(u){ return u.id === req.params.id; });
+  if (targetUser && isBreakglassEmail(targetUser.email))
+    return res.status(403).json({ error: "Breakglass-kontoer kan ikke endres via UI – bruk Portainer miljøvariabler" });
+
+  const i = users.findIndex(function(u) { return u.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  const me = req.session.user;
+
+  if (me.role !== "admin") {
+    var myAccess2 = getAccessList(readJSON(USERS_FILE).find(function(u) { return u.id === me.id; }) || {});
+    var myManageDepts = myAccess2.filter(function(t){
+      return t.role === "department_manager" || t.role === "avdelingsleder" ||
+             t.role === "subgroup_manager"   || t.role === "undergruppeansvarlig";
+    }).map(function(t){ return t.department; });
+
+    // Can always edit yourself
+    var editingSelf = users[i].id === me.id;
+    // Can edit others only if they are in a dept you manage
+    var targetInMyDept = !editingSelf && getAccessList(users[i]).some(function(t){
+      return myManageDepts.indexOf(t.department) !== -1;
+    });
+
+    if (!editingSelf && !targetInMyDept)
+      return res.status(403).json({ error: "Ingen tilgang til denne brukeren" });
+
+    // Non-admin cannot elevate to admin or department_manager
+    if (req.body.role === "admin" || req.body.role === "department_manager")
+      return res.status(403).json({ error: "Kan ikke tildele denne rollen" });
+
+    // Subgroup manager cannot promote beyond their own level
+    var iAmOnlySubMgr = myAccess2.every(function(t){
+      return t.role === "subgroup_manager" || t.role === "undergruppeansvarlig";
+    });
+    if (iAmOnlySubMgr && (req.body.newAccess || req.body.access)) {
+      var newRole = (req.body.newAccess || req.body.access).role || "";
+      if (newRole === "department_manager" || newRole === "avdelingsleder")
+        return res.status(403).json({ error: "Undergruppeleder kan ikke gi avdelingsleder-tilgang" });
+    }
+  }
+
+  if (req.body.name   !== undefined) users[i].name   = req.body.name;
+  if (req.body.tittel !== undefined || req.body.titleValue !== undefined) users[i].tittel = req.body.titleValue || req.body.tittel || null;
+  if (req.body.role   !== undefined && me.role === "admin") users[i].role = req.body.role;
+  if (req.body.password) users[i].hash = await bcrypt.hash(req.body.password, 12);
+
+  if (req.body.newAccess || req.body.access) {
+    var t = req.body.newAccess || req.body.access;
+    var myAvdIds3 = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {}).map(function(t){ return t.department; });
+    if (me.role !== "admin" && myAvdIds3.indexOf(t.department) === -1)
+      return res.status(403).json({ error: "Kan ikke endre tilgang for andre avdelinger" });
+    var rest = getAccessList(users[i]).filter(function(x) { return x.department !== t.department; });
+    rest.push(t);
+    users[i].accessList = rest;
+  }
+  if (req.body.accessList !== undefined && me.role === "admin") users[i].accessList = req.body.accessList;
+
+  writeJSON(USERS_FILE, users);
+  res.json({ ok: true });
+});
+
+app.delete("/api/users/:id", auth, function(req, res) {
+  const me = req.session.user;
+  const users = readJSON(USERS_FILE);
+  const target = users.find(function(u) { return u.id === req.params.id; });
+  if (!target) return res.status(404).json({ error: "Ikke funnet" });
+  // Block deletion of breakglass accounts
+  if (isBreakglassEmail(target.email))
+    return res.status(403).json({ error: "Breakglass-kontoer kan ikke slettes – administreres via Portainer" });
+
+  if (me.role === "admin") {
+    writeJSON(USERS_FILE, users.filter(function(u) { return u.id !== req.params.id; }));
+    return res.json({ ok: true });
+  }
+  // Department manager can remove users from their own departments
+  // Subgroup manager can remove users from their own subgroups
+  var myAccDel = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {});
+  var isDeptMgr = myAccDel.some(function(t){ return t.role === "department_manager" || t.role === "avdelingsleder"; });
+  var isSubMgr  = myAccDel.some(function(t){ return t.role === "subgroup_manager"  || t.role === "undergruppeansvarlig"; });
+
+  if (isDeptMgr || isSubMgr) {
+    var myDeptsDel = myAccDel.map(function(t){ return t.department; });
+    // Can only act on users in departments the caller manages
+    var targetInMyDept = getAccessList(target).some(function(x){ return myDeptsDel.indexOf(x.department) !== -1; });
+    if (!targetInMyDept) return res.status(403).json({ error: "Ingen tilgang til denne brukeren" });
+
+    // Remove only the access entries that belong to caller's departments
+    var remaining = getAccessList(target).filter(function(x){ return myDeptsDel.indexOf(x.department) === -1; });
+    if (remaining.length === 0) {
+      writeJSON(USERS_FILE, users.filter(function(u){ return u.id !== req.params.id; }));
+    } else {
+      target.accessList = remaining;
+      writeJSON(USERS_FILE, users);
+    }
+    return res.json({ ok: true });
+  }
+  res.status(403).json({ error: "Ingen tilgang" });
+});
+
+// ── Events API ───────────────────────────────────────────────────
+
+// SSE-strøm: klienter kobler til for live-oppdateringer
+app.get("/api/events/stream", function(req, res) {
+  const department = req.query.department || null;
+  const clientId = sseNextId++;
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.flushHeaders();
+
+  // Send en ping med en gang for å bekrefte tilkobling
+  res.write("data: " + JSON.stringify({ type: "connected", clientId }) + "\n\n");
+
+  sseClients.set(clientId, { res, department });
+
+  // Keepalive hvert 25 sek
+  const keepalive = setInterval(function() {
+    try { res.write(": keepalive\n\n"); } catch(e) {}
+  }, 25000);
+
+  req.on("close", function() {
+    clearInterval(keepalive);
+    sseClients.delete(clientId);
+  });
+});
+
+app.get("/api/events", auth, function(req, res) {
+  var user = req.session.user;
+  var myAvds = getUserDepartments(user);
+  res.json(readJSON(EVENTS_FILE).filter(function(e) {
+    // Admin ser alt
+    if (user.role === "admin") return true;
+    // Ikke-admin uten noen avdelinger ser ingenting
+    if (!myAvds.length) return false;
+    // Event må tilhøre en av brukerens avdelinger (eller være collaborator)
+    if (e.department && myAvds.includes(e.department)) return true;
+    // Vis events der bruker er collaborator (invitert fra annen avdeling)
+    return (e.collaborators || []).some(function(c) {
+      return myAvds.includes(c.departmentId) && (c.status === "accepted" || c.status === "pending");
+    });
+  }).map(function(e) {
+    var isCollabGuest = !canEditEvent(e, user) && (e.collaborators || []).some(function(c) {
+      return myAvds.includes(c.departmentId);
+    });
+    var myCollabAvdId = isCollabGuest
+      ? (e.collaborators || []).find(function(c) { return myAvds.includes(c.departmentId); }).departmentId
+      : null;
+    var collabStatus = isCollabGuest
+      ? (e.collaborators || []).find(function(c) { return myAvds.includes(c.departmentId); }).status
+      : null;
+    return Object.assign({}, e, {
+      registrationCount: (e.registrations || []).length,
+      canEdit: canEditEvent(e, user),
+      isCollabGuest:  isCollabGuest,
+      myCollabAvdId:  myCollabAvdId,
+      collabStatus:   collabStatus,
+      // Fjern sensitiv data fra andre avdelingers staff
+      guestStaff:  e.guestStaff  || {},
+      guestShifts: e.guestShifts || {},
+    });
+  }));
+});
+
+app.get("/api/events/:id", function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  res.json(ev);
+});
+
+app.post("/api/events", auth, managerOrAdmin, upload.single("image"), function(req, res) {
+  const title       = (req.body.title || "").trim().slice(0, 200);
+  const description = (req.body.description || "").slice(0, 5000);
+  const date        = req.body.date;
+  const location    = (req.body.location || "").slice(0, 200);
+  const maxP        = Number(req.body.maxParticipants) || 0;
+  const showP       = req.body.showParticipants === "true";
+  const isPublic    = req.body.isPublic === "true";
+  if (!title) return res.status(400).json({ error: "Tittel er påkrevd" });
+  const s = getSettings();
+  const evDomain = s.eventDomain || DOMAIN;
+  const users = readJSON(USERS_FILE);
+  const creator = users.find(function(u) { return u.id === req.session.user.id; });
+  // Department: use explicit value from request, otherwise user's department
+  var ct = creator ? getAccessList(creator) : [];
+  const eventDept = req.body.department || (ct.length ? ct[0].department : null);
+  const subgroup = req.body.subgroup || null;
+
+  // Get name for department and subgroup for slug
+  const deptObj = eventDept ? (s.departments || []).find(function(a){ return a.id === eventDept; }) : null;
+  const ugObj  = (deptObj && subgroup) ? (deptObj.subgroups || []).find(function(u){ return u.id === subgroup; }) : null;
+
+  function toSlugPart(str) {
+    return (str || "").toLowerCase()
+      .replace(/æ/g,"ae").replace(/ø/g,"o").replace(/å/g,"a")
+      .replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+  }
+  const parts = [toSlugPart(title)];
+  if (deptObj) parts.push(toSlugPart(deptObj.name));
+  if (ugObj)  parts.push(toSlugPart(ugObj.name));
+  if (date)   parts.push(new Date(date).getFullYear());
+  const baseSlug = parts.join("-");
+
+  const events = readJSON(EVENTS_FILE);
+  var slug = baseSlug;
+  var counter = 2;
+  while (events.find(function(e) { return e.slug === slug; })) {
+    slug = baseSlug + "-" + counter++;
+  }
+  const ev = {
+    id: uuid(), slug: slug, title: title, description: description,
+    date: date || null, location: location, maxParticipants: maxP, showParticipants: showP,
+    isPublic: isPublic,
+    isInternal:    req.body.isInternal === "true",
+    internalNote:  (req.body.internalNote || "").slice(0, 5000),
+    emailTemplate: req.body.emailTemplate || "default",
+    eventType: ["kurs","tur"].indexOf(req.body.eventType) !== -1 ? req.body.eventType : "stand",
+    endTime: req.body.endTime ? req.body.endTime.trim() : null,
+    endDate: req.body.endDate ? req.body.endDate.trim() : null,
+    image: req.file ? "/uploads/" + path.basename(req.file.filename) : null,
+    registrations: [], staff: [], guestbook: [],
+    url: "https://" + slug + "." + evDomain,
+    createdAt: new Date().toISOString(),
+    createdBy: req.session.user.email,
+    department: eventDept,
+    subgroup: subgroup,
+    staffPin: req.body.staffPin ? req.body.staffPin.trim() : null,
+    seriesId: req.body.seriesId || null,
+    lottery: (function() {
+      try { const l = JSON.parse(req.body.lottery || "null"); return l && l.enabled !== undefined ? { enabled: !!l.enabled, mode: l.mode || "manual", prize: (l.prize || "").slice(0, 100), winners: [] } : null; }
+      catch(e) { return null; }
+    })(),
+  };
+  events.push(ev);
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(eventDept);
+  res.json(ev);
+});
+
+app.put("/api/events/:id", auth, managerOrAdmin, upload.single("image"), function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const i = events.findIndex(function(e) { return e.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  if (!canEditEvent(events[i], req.session.user))
+    return res.status(403).json({ error: "Du kan bare redigere dine egne events" });
+  if (req.body.title            !== undefined) events[i].title           = (req.body.title || "").trim().slice(0, 200);
+  if (req.body.description      !== undefined) events[i].description     = (req.body.description || "").slice(0, 5000);
+  if (req.body.date             !== undefined) events[i].date            = req.body.date || null;
+  if (req.body.location         !== undefined) events[i].location        = (req.body.location || "").slice(0, 200);
+  if (req.body.maxParticipants  !== undefined) events[i].maxParticipants = Number(req.body.maxParticipants);
+  if (req.body.showParticipants !== undefined) events[i].showParticipants = req.body.showParticipants === "true";
+  if (req.body.isPublic         !== undefined) events[i].isPublic         = req.body.isPublic === "true";
+  if (req.body.isInternal       !== undefined) events[i].isInternal       = req.body.isInternal === "true";
+  if (req.body.internalNote     !== undefined) events[i].internalNote     = (req.body.internalNote || "").slice(0, 5000);
+  if (req.body.emailTemplate    !== undefined) events[i].emailTemplate    = req.body.emailTemplate || "default";
+  if (req.body.eventType        !== undefined) events[i].eventType       = ["kurs","tur"].indexOf(req.body.eventType) !== -1 ? req.body.eventType : "stand";
+  if (req.body.department    !== undefined)               events[i].department       = req.body.department || null;
+  if (req.body.subgroup !== undefined)               events[i].subgroup    = req.body.subgroup || null;
+  if (req.file)                                events[i].image           = "/uploads/" + path.basename(req.file.filename);
+  if (req.body.staffPin !== undefined)         events[i].staffPin        = req.body.staffPin ? req.body.staffPin.trim() : null;
+  if (req.body.endTime  !== undefined)         events[i].endTime         = req.body.endTime ? req.body.endTime.trim() : null;
+  if (req.body.endDate  !== undefined)         events[i].endDate         = req.body.endDate ? req.body.endDate.trim() : null;
+  if (req.body.seriesId  !== undefined)          events[i].seriesId         = req.body.seriesId || null;
+  if (req.body.lottery !== undefined) {
+    try {
+      const l = JSON.parse(req.body.lottery);
+      if (l && l.enabled !== undefined) {
+        const existing = events[i].lottery || {};
+        events[i].lottery = {
+          enabled: !!l.enabled,
+          mode:    l.mode || "manual",
+          prize:   (l.prize || "").slice(0, 100),
+          winners: existing.winners || [],
+        };
+      }
+    } catch(e) {}
+  }
+  if (req.body.lottery   !== undefined) {
+    try {
+      const l = JSON.parse(req.body.lottery);
+      if (l && l.enabled !== undefined) {
+        if (!events[i].lottery) events[i].lottery = { winners: [] };
+        events[i].lottery.enabled = !!l.enabled;
+        events[i].lottery.mode    = l.mode || "manual";
+        events[i].lottery.prize   = (l.prize || "").slice(0, 100);
+        if (!events[i].lottery.winners) events[i].lottery.winners = [];
+      }
+    } catch(e) {}
+  }
+  if (req.body.lottery   !== undefined) {
+    try {
+      const l = JSON.parse(req.body.lottery || "null");
+      if (l && l.enabled !== undefined) {
+        const existing = events[i].lottery || {};
+        events[i].lottery = {
+          enabled: !!l.enabled,
+          mode:    l.mode || "manual",
+          prize:   (l.prize || "").slice(0, 100),
+          winners: existing.winners || [],
+          lastDraw: existing.lastDraw || null,
+        };
+      }
+    } catch(e) {}
+  }
+  if (!events[i].staff)     events[i].staff     = [];
+  if (!events[i].guestbook) events[i].guestbook = [];
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(events[i].department);
+  res.json(events[i]);
+});
+
+app.delete("/api/events/:id", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (!canEditEvent(ev, req.session.user))
+    return res.status(403).json({ error: "Du kan bare slette dine egne events" });
+  const dept = ev.department;
+  writeJSON(EVENTS_FILE, events.filter(function(e) { return e.id !== req.params.id; }));
+  broadcastEventUpdate(dept);
+  res.json({ ok: true });
+});
+
+// ── Lottery API ──────────────────────────────────────────────────
+
+
+
+app.get("/api/events/:id/registrations", auth, function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  res.json(ev.registrations || []);
+});
+
+// ── Lottery API ──────────────────────────────────────────────────
+app.post("/api/events/:id/lottery/draw", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const i = events.findIndex(function(e) { return e.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  const ev = events[i];
+  if (!ev.lottery || !ev.lottery.enabled)
+    return res.status(400).json({ error: "Lotteri er ikke aktivert for dette eventet" });
+  const regs = ev.registrations || [];
+  const prevWinnerIds = new Set((ev.lottery.winners || []).map(function(w) { return w.regId; }));
+  const eligible = regs.filter(function(r) { return !r.anonymized && !prevWinnerIds.has(r.id); });
+  if (!eligible.length)
+    return res.status(400).json({ error: "Ingen kvalifiserte deltagere igjen" });
+  const winner = eligible[Math.floor(Math.random() * eligible.length)];
+  const draw = {
+    regId:   winner.id,
+    name:    winner.name,
+    drawnAt: new Date().toISOString(),
+    drawnBy: req.session.user.email,
+    prize:   ev.lottery.prize || "",
+  };
+  if (!ev.lottery.winners) ev.lottery.winners = [];
+  ev.lottery.winners.push(draw);
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true, winner: draw, remaining: eligible.length - 1 });
+});
+
+app.get("/api/events/:id/lottery/winners", function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  res.json({ winners: (ev.lottery && ev.lottery.winners) || [], lottery: ev.lottery || null });
+});
+
+app.delete("/api/events/:id/lottery/winners", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const i = events.findIndex(function(e) { return e.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  if (events[i].lottery) events[i].lottery.winners = [];
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(events[i].department);
+  res.json({ ok: true });
+});
+
+app.get("/api/events/:id/lottery", function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  const regs    = ev.registrations || [];
+  const lottery = ev.lottery || { enabled: false };
+  const winnerIds = new Set((lottery.winners || []).map(function(w) { return w.regId; }));
+  const eligible  = regs.filter(function(r) { return !r.anonymized && !winnerIds.has(r.id); }).length;
+  res.json({
+    enabled:  !!lottery.enabled,
+    mode:     lottery.mode || "manual",
+    prize:    lottery.prize || "",
+    winners:  lottery.winners || [],
+    lastDraw: lottery.lastDraw || null,
+    total:    regs.length,
+    eligible: eligible,
+  });
+});
+
+// ── Inndatavalidering ─────────────────────────────────────────────
+function validateName(s) {
+  if (!s) return false;
+  return /^[\p{L}\s'\-\.]{1,100}$/u.test(s);
+}
+function validateEmail(s) {
+  if (!s) return false;
+  return /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(s) && s.length <= 200;
+}
+function validatePhone(s) {
+  if (!s) return true;
+  return /^[\d\s+\-().]{0,30}$/.test(s);
+}
+function validateVehicleText(s) {
+  if (!s) return true;
+  return /^[\p{L}\d\s\-]{0,60}$/u.test(s);
+}
+function sanitizeName(s)  { return (s || "").trim().slice(0, 100); }
+function sanitizePhone(s) { return (s || "").replace(/[^\d\s+\-().]/g, "").trim().slice(0, 30); }
+
+app.post("/api/events/:id/register", rateLimit(10, 60000), function(req, res) {
+  const name  = sanitizeName(req.body.name);
+  const email = (req.body.email || "").toLowerCase().trim().slice(0, 200);
+  const phone = sanitizePhone(req.body.phone);
+  if (!name || !email) return res.status(400).json({ error: "Navn og e-post er påkrevd" });
+  if (!validateName(name))  return res.status(400).json({ error: "Navn inneholder ugyldige tegn" });
+  if (!validateEmail(email)) return res.status(400).json({ error: "Ugyldig e-postadresse" });
+  if (!validatePhone(phone)) return res.status(400).json({ error: "Telefonnummer inneholder ugyldige tegn" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Event ikke funnet" });
+  if (!ev.registrations) ev.registrations = [];
+  if (ev.maxParticipants && ev.registrations.length >= ev.maxParticipants)
+    return res.status(400).json({ error: "Fullt – ingen ledige plasser" });
+  if (ev.registrations.find(function(r) { return r.email === email.toLowerCase(); }))
+    return res.status(409).json({ error: "Denne e-postadressen er allerede påmeldt" });
+
+  // Kjøretøydata fra tur-påmelding
+  var _existingPins = new Set((ev.registrations || []).map(function(r) { return r.checkinPin; }));
+  var _pin; do { _pin = String(Math.floor(1000 + Math.random() * 9000)); } while (_existingPins.has(_pin));
+  const _cancelToken = require("crypto").randomBytes(24).toString("hex");
+  const reg = { id: uuid(), name: name, email: email.toLowerCase(), phone: phone, registeredAt: new Date().toISOString(), checkinPin: _pin, cancelToken: _cancelToken };
+  if (req.body.walkin) {
+    reg.walkin = true;
+    reg.checkedIn = true;
+    reg.checkedInAt = new Date().toISOString();
+  }
+  if (req.body.vehicle && req.body.vehicle.make) {
+    const v = req.body.vehicle;
+    const vMake  = (v.make  || "").trim().slice(0, 60);
+    const vModel = (v.model || "").trim().slice(0, 60);
+    if (!validateVehicleText(vMake) || !validateVehicleText(vModel))
+      return res.status(400).json({ error: "Motorsykkelfeltet inneholder ugyldige tegn" });
+    reg.vehicle = {
+      make:  vMake,
+      model: vModel,
+      tank:  Math.max(0, Math.min(200, parseFloat(v.tank) || 0)),
+      l100:  Math.max(0, Math.min(50,  parseFloat(v.l100) || 0)),
+    };
+  }
+  ev.registrations.push(reg);
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  // Send påmeldingsbekreftelse (kun hvis e-post er aktivert i innstillinger)
+  const _defaultTpl = (ev.eventType === "stand") ? "interest" : "registration";
+  const _tplType = (ev.emailTemplate && ev.emailTemplate !== "default") ? ev.emailTemplate : _defaultTpl;
+  const _cancelUrl = "https://" + ev.slug + "." + (getSettings().eventDomain || DOMAIN) + "/avmeld?token=" + _cancelToken;
+  const mail = emailRegConfirmation(Object.assign({}, ev, { emailTemplate: _tplType }), { name, email, checkinPin: _pin, cancelUrl: _cancelUrl }, getSettings());
+  sendEmail({ to: email, subject: mail.subject, html: mail.html, text: mail.text }).catch(() => {});
+  res.json({ ok: true });
+});
+
+// ── Avmelding via token (offentlig) ─────────────────────────────
+app.get("/avmeld", function(req, res) {
+  const token = (req.query.token || "").trim();
+  if (!token) return res.status(400).send(cancelPageHtml(null, null, "missing_token"));
+  const events = readJSON(EVENTS_FILE);
+  let foundEv = null, foundReg = null;
+  events.forEach(function(ev) {
+    (ev.registrations || []).forEach(function(r) {
+      if (r.cancelToken === token && !r.anonymized) { foundEv = ev; foundReg = r; }
+    });
+  });
+  if (!foundEv) return res.send(cancelPageHtml(null, null, "invalid_token"));
+  if (foundReg.cancelledAt) return res.send(cancelPageHtml(foundEv, foundReg, "already_cancelled"));
+  res.send(cancelPageHtml(foundEv, foundReg, "confirm"));
+});
+
+// ── Avmelding via token (POST) ────────────────────────────────────
+app.post("/avmeld", rateLimit(10, 60000), function(req, res) {
+  const token = (req.query.token || req.body.token || "").trim();
+  if (!token) return res.status(400).send(cancelPageHtml(null, null, "missing_token"));
+  const events = readJSON(EVENTS_FILE);
+  let foundEv = null, foundReg = null, evIdx = -1, regIdx = -1;
+  events.forEach(function(ev, ei) {
+    (ev.registrations || []).forEach(function(r, ri) {
+      if (r.cancelToken === token && !r.anonymized) {
+        foundEv = ev; foundReg = r; evIdx = ei; regIdx = ri;
+      }
+    });
+  });
+  if (!foundEv) return res.send(cancelPageHtml(null, null, "invalid_token"));
+  if (foundReg.cancelledAt) return res.send(cancelPageHtml(foundEv, foundReg, "already_cancelled"));
+  // Fjern påmeldingen
+  events[evIdx].registrations.splice(regIdx, 1);
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(foundEv.department);
+  // Send avmeldingsbekreftelse
+  if (foundReg.email) {
+    const mail = emailCancellationConfirmation(foundEv, foundReg, getSettings());
+    sendEmail({ to: foundReg.email, subject: mail.subject, html: mail.html, text: mail.text }).catch(() => {});
+  }
+  res.send(cancelPageHtml(foundEv, foundReg, "done"));
+});
+
+// ── Avmeldingsside HTML ───────────────────────────────────────────
+function cancelPageHtml(ev, reg, state) {
+  const s = getSettings();
+  const siteName = s.siteName || "Events Admin";
+  const accent = s.accentColor || "#FFD100";
+  const token = reg && reg.cancelToken ? reg.cancelToken : "";
+  const messages = {
+    confirm: {
+      title: "Avmeld deg",
+      body: `<p>Du er påmeldt <strong>${escHtml(ev.title)}</strong>.</p>`
+           + `<p style="color:#555;font-size:.9rem">Er du sikker på at du vil avmelde deg?</p>`
+           + `<form method="POST" action="/avmeld?token=${encodeURIComponent(token)}">`
+           + `<button type="submit" style="background:#e53e3e;color:#fff;border:none;padding:.75rem 2rem;`
+           + `border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:1rem">Ja, avmeld meg</button>`
+           + `<a href="https://${escHtml(ev.slug)}.${escHtml(s.eventDomain || DOMAIN)}" `
+           + `style="display:inline-block;margin-left:1rem;color:#888;font-size:.9rem">Nei, gå tilbake</a></form>`,
+    },
+    done: {
+      title: "Avmeldt",
+      body: `<p>Du er nå avmeldt fra <strong>${escHtml(ev.title)}</strong>.</p>`
+           + `<p style="color:#555;font-size:.9rem">En bekreftelse er sendt til ${escHtml(reg.email)}.</p>`,
+    },
+    already_cancelled: {
+      title: "Allerede avmeldt",
+      body: `<p>Denne påmeldingen er allerede avmeldt.</p>`,
+    },
+    invalid_token: {
+      title: "Ugyldig lenke",
+      body: `<p>Lenken er ugyldig eller utløpt.</p>`,
+    },
+    missing_token: {
+      title: "Mangler token",
+      body: `<p>Ingen avmeldingstoken funnet i lenken.</p>`,
+    },
+  };
+  const msg = messages[state] || messages.invalid_token;
+  return `<!DOCTYPE html><html lang="no"><head><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>${escHtml(msg.title)} – ${escHtml(siteName)}</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:"Helvetica Neue",Arial,sans-serif;background:#1a1a1a;color:#e0e0e0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+      .card{background:#2a2a2a;border-radius:12px;max-width:480px;width:100%;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+      .top{background:${escHtml(accent)};padding:1.25rem 2rem}
+      .top h1{font-size:1rem;font-weight:900;color:#1a1a1a;margin:0}
+      .body{padding:2rem}
+      .body h2{margin-bottom:1rem;font-size:1.3rem}
+      .body p{line-height:1.7;color:#ccc}
+      .body strong{color:#fff}
+    </style>
+  </head><body>
+    <div class="card">
+      <div class="top"><h1>${escHtml(siteName)}</h1></div>
+      <div class="body"><h2>${escHtml(msg.title)}</h2>${msg.body}</div>
+    </div>
+  </body></html>`;
+}
+
+// ── Innsjekk via deltaker-PIN ───────────────────────────────────
+app.post("/api/events/:id/checkin-by-pin", rateLimit(30, 60000), function(req, res) {
+  const pin = (req.body.pin || "").trim();
+  if (!pin) return res.status(400).json({ error: "PIN er påkrevd" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Event ikke funnet" });
+  const reg = (ev.registrations || []).find(function(r) { return r.checkinPin === pin && !r.anonymized; });
+  if (!reg) return res.status(404).json({ error: "Ugyldig PIN" });
+  if (reg.checkedIn) return res.json({ ok: true, alreadyCheckedIn: true, name: reg.name });
+  reg.checkedIn = true;
+  reg.checkedInAt = new Date().toISOString();
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true, alreadyCheckedIn: false, name: reg.name });
+});
+
+// ── E-postmaler per avdeling / undergruppe ─────────────────────
+app.get("/api/departments/:id/email-templates", auth, function(req, res) {
+  const s = getSettings();
+  const dept = (s.departments || []).find(function(d) { return d.id === req.params.id; });
+  if (!dept) return res.status(404).json({ error: "Avdeling ikke funnet" });
+  res.json(dept.emailTemplates || {});
+});
+
+app.put("/api/departments/:id/email-templates", auth, function(req, res) {
+  const me = req.session.user;
+  const s  = getSettings();
+  const idx = (s.departments || []).findIndex(function(d) { return d.id === req.params.id; });
+  if (idx === -1) return res.status(404).json({ error: "Avdeling ikke funnet" });
+  if (me.role !== "admin") {
+    var myAccess = getAccessList(readJSON(USERS_FILE).find(function(u) { return u.id === me.id; }) || {});
+    var ok = myAccess.some(function(t) { return t.department === req.params.id && (t.role === "department_manager" || t.role === "avdelingsleder"); });
+    if (!ok) return res.status(403).json({ error: "Ingen tilgang" });
+  }
+  if (!s.departments[idx].emailTemplates) s.departments[idx].emailTemplates = {};
+  ["registration","cancellation","interest","lottery","newUser","passwordReset"].forEach(function(k) {
+    if (req.body[k] !== undefined) s.departments[idx].emailTemplates[k] = req.body[k];
+  });
+  saveSettings(s);
+  res.json(s.departments[idx].emailTemplates);
+});
+
+app.get("/api/departments/:deptId/subgroups/:sgId/email-templates", auth, function(req, res) {
+  const s    = getSettings();
+  const dept = (s.departments || []).find(function(d) { return d.id === req.params.deptId; });
+  if (!dept) return res.status(404).json({ error: "Avdeling ikke funnet" });
+  const sg = (dept.subgroups || []).find(function(x) { return x.id === req.params.sgId; });
+  if (!sg) return res.status(404).json({ error: "Undergruppe ikke funnet" });
+  res.json(sg.emailTemplates || {});
+});
+
+app.put("/api/departments/:deptId/subgroups/:sgId/email-templates", auth, function(req, res) {
+  const me  = req.session.user;
+  const s   = getSettings();
+  const dept = (s.departments || []).find(function(d) { return d.id === req.params.deptId; });
+  if (!dept) return res.status(404).json({ error: "Avdeling ikke funnet" });
+  const sgIdx = (dept.subgroups || []).findIndex(function(x) { return x.id === req.params.sgId; });
+  if (sgIdx === -1) return res.status(404).json({ error: "Undergruppe ikke funnet" });
+  if (me.role !== "admin") {
+    var a = getAccessList(readJSON(USERS_FILE).find(function(u) { return u.id === me.id; }) || {});
+    var ok2 = a.some(function(t) {
+      if (t.department !== req.params.deptId) return false;
+      if (t.role === "department_manager" || t.role === "avdelingsleder") return true;
+      return (t.role === "subgroup_manager" || t.role === "undergruppeansvarlig") && (t.subgroups || []).indexOf(req.params.sgId) !== -1;
+    });
+    if (!ok2) return res.status(403).json({ error: "Ingen tilgang" });
+  }
+  if (!dept.subgroups[sgIdx].emailTemplates) dept.subgroups[sgIdx].emailTemplates = {};
+  ["registration","cancellation","interest","lottery","newUser","passwordReset"].forEach(function(k) {
+    if (req.body[k] !== undefined) dept.subgroups[sgIdx].emailTemplates[k] = req.body[k];
+  });
+  saveSettings(s);
+  res.json(dept.subgroups[sgIdx].emailTemplates);
+});
+
+app.delete("/api/events/:id/registrations/:rid", auth, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  const reg = (ev.registrations || []).find(function(r) { return r.id === req.params.rid; });
+  ev.registrations = ev.registrations.filter(function(r) { return r.id !== req.params.rid; });
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  // Send avmeldingsbekreftelse hvis e-post er aktivert
+  if (reg && reg.email && !reg.anonymized) {
+    const mail = emailCancellationConfirmation(ev, reg, getSettings());
+    sendEmail({ to: reg.email, subject: mail.subject, html: mail.html, text: mail.text }).catch(() => {});
+  }
+  res.json({ ok: true });
+});
+
+// Deltaker krysser av selv (kurs)
+app.post("/api/events/:id/registrations/:rid/checkin", rateLimit(30, 60000), function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  const r = (ev.registrations || []).find(function(r) { return r.id === req.params.rid; });
+  if (!r) return res.status(404).json({ error: "Ikke funnet" });
+  r.checkedIn   = true;
+  r.checkedInAt = new Date().toISOString();
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+// ── Staff PIN verify ─────────────────────────────────────────────
+app.post("/api/events/:id/staff/verify-pin", rateLimit(20, 60000), function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (!ev.staffPin) return res.json({ ok: true }); // No PIN set – always allow
+  if (req.body.pin === ev.staffPin) return res.json({ ok: true });
+  res.status(403).json({ error: "Feil PIN" });
+});
+
+// ── Staff API ────────────────────────────────────────────────────
+app.get("/api/events/:id/staff", auth, function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  res.json(ev.staff || []);
+});
+
+app.post("/api/events/:id/staff", auth, managerOrAdmin, function(req, res) {
+  const name  = req.body.name;
+  const role  = req.body.role || "";
+  const email = (req.body.email || "").trim().toLowerCase();
+  if (!name) return res.status(400).json({ error: "Navn er påkrevd" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (!ev.staff) ev.staff = [];
+
+  // Prevent duplicate staff (same email or same name)
+  if (email && ev.staff.find(function(s) { return s.email && s.email.toLowerCase() === email; }))
+    return res.status(400).json({ error: "Denne personen er allerede lagt til som personal" });
+  if (!email && ev.staff.find(function(s) { return s.name.toLowerCase() === name.toLowerCase(); }))
+    return res.status(400).json({ error: "En person med dette navnet er allerede lagt til" });
+
+  // Auto-add to volunteers if not already there
+  const volunteers = readJSON(VOLUNTEERS_FILE) || [];
+  const alreadyVol = volunteers.find(function(v) {
+    return (email && v.email && v.email.toLowerCase() === email) ||
+           v.name.toLowerCase() === name.toLowerCase();
+  });
+  let volId = alreadyVol ? alreadyVol.id : null;
+  if (!alreadyVol) {
+    const newVol = { id: uuid(), name: name, email: email || "", phone: "", department: ev.department || "", events: [], createdAt: new Date().toISOString(), autoAdded: true };
+    volunteers.push(newVol);
+    volId = newVol.id;
+    writeJSON(VOLUNTEERS_FILE, volunteers);
+  }
+
+  const staffEntry = { id: uuid(), name: name, role: role, checkedIn: false, addedAt: new Date().toISOString() };
+  if (email) staffEntry.email = email;
+  if (volId) staffEntry.volunteerId = volId;
+  ev.staff.push(staffEntry);
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+app.delete("/api/events/:id/staff/:sid", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (!ev.staff) ev.staff = [];
+  ev.staff = ev.staff.filter(function(s) { return s.id !== req.params.sid; });
+  writeJSON(EVENTS_FILE, events);
+  res.json({ ok: true });
+});
+
+// ── Shifts (tidslukker) ───────────────────────────────────────────
+app.get("/api/events/:id/shifts", auth, function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  res.json(ev.shifts || []);
+});
+
+app.post("/api/events/:id/shifts", auth, managerOrAdmin, function(req, res) {
+  const { staffIds, staffId, date, startTime, endTime } = req.body;
+  const ids = Array.isArray(staffIds) ? staffIds : (staffId ? [staffId] : []);
+  if (!ids.length || !date || !startTime || !endTime)
+    return res.status(400).json({ error: "staffIds, date, startTime and endTime are required" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (!ev.shifts) ev.shifts = [];
+  ev.shifts.push({ id: uuid(), staffIds: ids, date, startTime, endTime });
+  writeJSON(EVENTS_FILE, events);
+  res.json({ ok: true });
+});
+
+app.put("/api/events/:id/shifts/:shid", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  const sh = (ev.shifts || []).find(function(s) { return s.id === req.params.shid; });
+  if (!sh) return res.status(404).json({ error: "Tidsluke ikke funnet" });
+  if (req.body.staffIds !== undefined) sh.staffIds = req.body.staffIds;
+  if (req.body.startTime) sh.startTime = req.body.startTime;
+  if (req.body.endTime)   sh.endTime   = req.body.endTime;
+  writeJSON(EVENTS_FILE, events);
+  res.json({ ok: true });
+});
+
+app.delete("/api/events/:id/shifts/:shid", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  ev.shifts = (ev.shifts || []).filter(function(s) { return s.id !== req.params.shid; });
+  writeJSON(EVENTS_FILE, events);
+  res.json({ ok: true });
+});
+
+app.post("/api/events/:id/staff/checkin", rateLimit(30, 60000), function(req, res) {
+  const name       = req.body.name;
+  const role       = req.body.role || "";
+  const department = req.body.department || "";
+  const staffId    = req.body.staffId;
+  const events     = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (!ev.staff) ev.staff = [];
+  if (staffId) {
+    const s = ev.staff.find(function(s) { return s.id === staffId; });
+    if (!s) return res.status(404).json({ error: "Ikke funnet" });
+    s.checkedIn   = true;
+    s.checkedInAt = new Date().toISOString();
+    writeJSON(EVENTS_FILE, events);
+    res.json({ ok: true, id: staffId });
+  } else {
+    if (!name) return res.status(400).json({ error: "Navn er påkrevd" });
+    const newId = uuid();
+    const entry = { id: newId, name: name, role: role, checkedIn: true, addedAt: new Date().toISOString(), checkedInAt: new Date().toISOString() };
+    if (department) entry.department = department;
+    ev.staff.push(entry);
+    writeJSON(EVENTS_FILE, events);
+    res.json({ ok: true, id: newId });
+  }
+});
+
+// ── Samarbeid (collaborators) ────────────────────────────────────
+
+// Helper: check if user belongs to a department (owner or guest)
+function getUserDepartments(user) {
+  if (user.role === "admin") {
+    return (getSettings().departments || []).map(function(a) { return a.id; });
+  }
+  return getAccessList(user).map(function(t) { return t.department; }).filter(Boolean);
+}
+
+// Send invitation to another department
+app.post("/api/events/:id/collaborators", auth, managerOrAdmin, function(req, res) {
+  const departmentId = req.body.departmentId;
+  if (!departmentId) return res.status(400).json({ error: "departmentId is required" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (!canEditEvent(ev, req.session.user))
+    return res.status(403).json({ error: "Ingen tilgang" });
+  if (ev.department === departmentId)
+    return res.status(400).json({ error: "Kan ikke invitere egen avdeling" });
+  if (!ev.collaborators) ev.collaborators = [];
+  if (ev.collaborators.find(function(c) { return c.departmentId === departmentId; }))
+    return res.status(400).json({ error: "Allerede invitert" });
+  ev.collaborators.push({ departmentId, status: "pending", invitedAt: new Date().toISOString() });
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+// Svar på invitasjon (accept/decline)
+app.put("/api/events/:id/collaborators/:deptId", auth, managerOrAdmin, function(req, res) {
+  const status = req.body.status; // "accepted" | "declined"
+  if (!["accepted","declined"].includes(status))
+    return res.status(400).json({ error: "Ugyldig status" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  // Kun leder/admin for den inviterte avdelingen kan svare
+  const myAvds = getUserDepartments(req.session.user);
+  if (!myAvds.includes(req.params.deptId) && req.session.user.role !== "admin")
+    return res.status(403).json({ error: "Ingen tilgang" });
+  const collab = (ev.collaborators || []).find(function(c) { return c.departmentId === req.params.deptId; });
+  if (!collab) return res.status(404).json({ error: "Invitasjon ikke funnet" });
+  collab.status = status;
+  collab.respondedAt = new Date().toISOString();
+  writeJSON(EVENTS_FILE, events);
+  res.json({ ok: true });
+});
+
+// Fjern collaborator (eier eller admin)
+app.delete("/api/events/:id/collaborators/:deptId", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (!canEditEvent(ev, req.session.user) && req.session.user.role !== "admin")
+    return res.status(403).json({ error: "Ingen tilgang" });
+  ev.collaborators = (ev.collaborators || []).filter(function(c) { return c.departmentId !== req.params.deptId; });
+  // Fjern også guestStaff og guestShifts for denne avdelingen
+  if (ev.guestStaff) delete ev.guestStaff[req.params.deptId];
+  if (ev.guestShifts) delete ev.guestShifts[req.params.deptId];
+  writeJSON(EVENTS_FILE, events);
+  res.json({ ok: true });
+});
+
+// ── Guest staff (staff for samarbeidsavdeling) ────────────────────
+app.get("/api/events/:id/gueststaff/:deptId", auth, function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  res.json((ev.guestStaff && ev.guestStaff[req.params.deptId]) || []);
+});
+
+app.post("/api/events/:id/gueststaff/:deptId", auth, managerOrAdmin, function(req, res) {
+  const name = req.body.name, role = req.body.role || "";
+  if (!name) return res.status(400).json({ error: "Navn er påkrevd" });
+  const myAvds = getUserDepartments(req.session.user);
+  if (!myAvds.includes(req.params.deptId) && req.session.user.role !== "admin")
+    return res.status(403).json({ error: "Ingen tilgang til denne avdelingen" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  const accepted = (ev.collaborators || []).find(function(c) { return c.departmentId === req.params.deptId && c.status === "accepted"; });
+  if (!accepted && req.session.user.role !== "admin")
+    return res.status(403).json({ error: "Samarbeid ikke akseptert" });
+  if (!ev.guestStaff) ev.guestStaff = {};
+  if (!ev.guestStaff[req.params.deptId]) ev.guestStaff[req.params.deptId] = [];
+  ev.guestStaff[req.params.deptId].push({ id: uuid(), name, role, checkedIn: false, addedAt: new Date().toISOString() });
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+app.delete("/api/events/:id/gueststaff/:deptId/:sid", auth, managerOrAdmin, function(req, res) {
+  const myAvds = getUserDepartments(req.session.user);
+  if (!myAvds.includes(req.params.deptId) && req.session.user.role !== "admin")
+    return res.status(403).json({ error: "Ingen tilgang" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev || !ev.guestStaff || !ev.guestStaff[req.params.deptId])
+    return res.status(404).json({ error: "Ikke funnet" });
+  ev.guestStaff[req.params.deptId] = ev.guestStaff[req.params.deptId].filter(function(s) { return s.id !== req.params.sid; });
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+// ── Guest shifts ──────────────────────────────────────────────────
+app.get("/api/events/:id/guestshifts/:deptId", auth, function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  res.json((ev.guestShifts && ev.guestShifts[req.params.deptId]) || []);
+});
+
+app.post("/api/events/:id/guestshifts/:deptId", auth, managerOrAdmin, function(req, res) {
+  const { staffIds, date, startTime, endTime } = req.body;
+  const ids = Array.isArray(staffIds) ? staffIds : [];
+  if (!ids.length || !date || !startTime || !endTime)
+    return res.status(400).json({ error: "staffIds, date, startTime and endTime are required" });
+  const myAvds = getUserDepartments(req.session.user);
+  if (!myAvds.includes(req.params.deptId) && req.session.user.role !== "admin")
+    return res.status(403).json({ error: "Ingen tilgang" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (!ev.guestShifts) ev.guestShifts = {};
+  if (!ev.guestShifts[req.params.deptId]) ev.guestShifts[req.params.deptId] = [];
+  ev.guestShifts[req.params.deptId].push({ id: uuid(), staffIds: ids, date, startTime, endTime });
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+app.put("/api/events/:id/guestshifts/:deptId/:shid", auth, managerOrAdmin, function(req, res) {
+  const myAvds = getUserDepartments(req.session.user);
+  if (!myAvds.includes(req.params.deptId) && req.session.user.role !== "admin")
+    return res.status(403).json({ error: "Ingen tilgang" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev || !ev.guestShifts || !ev.guestShifts[req.params.deptId])
+    return res.status(404).json({ error: "Ikke funnet" });
+  const sh = ev.guestShifts[req.params.deptId].find(function(s) { return s.id === req.params.shid; });
+  if (!sh) return res.status(404).json({ error: "Tidsluke ikke funnet" });
+  if (req.body.staffIds !== undefined) sh.staffIds = req.body.staffIds;
+  if (req.body.startTime) sh.startTime = req.body.startTime;
+  if (req.body.endTime)   sh.endTime   = req.body.endTime;
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+app.delete("/api/events/:id/guestshifts/:deptId/:shid", auth, managerOrAdmin, function(req, res) {
+  const myAvds = getUserDepartments(req.session.user);
+  if (!myAvds.includes(req.params.deptId) && req.session.user.role !== "admin")
+    return res.status(403).json({ error: "Ingen tilgang" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev || !ev.guestShifts || !ev.guestShifts[req.params.deptId])
+    return res.status(404).json({ error: "Ikke funnet" });
+  ev.guestShifts[req.params.deptId] = ev.guestShifts[req.params.deptId].filter(function(s) { return s.id !== req.params.shid; });
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+// ── Guestbook API ────────────────────────────────────────────────
+app.post("/api/events/:id/guestbook", rateLimit(5, 60000), function(req, res) {
+  const name    = (req.body.name || "").trim().slice(0, 100);
+  const message = (req.body.message || "").trim().slice(0, 1000);
+  if (!name || !message) return res.status(400).json({ error: "Navn og melding er påkrevd" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (!ev.guestbook) ev.guestbook = [];
+  const gbId = uuid();
+  ev.guestbook.push({ id: gbId, name: name, message: message, approved: false, createdAt: new Date().toISOString() });
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true, id: gbId });
+});
+
+// ── Gjestebok bilde-opplasting via QR ───────────────────────────
+// In-memory token store: token -> { evId, gbId, expires, photoUrl }
+const _gbPhotoTokens = new Map();
+const _gbPhotoSSE    = new Map(); // token -> res
+
+// Opprett token for bildeupplasting
+app.post("/api/events/:id/guestbook/:gid/photo-token", rateLimit(10, 60000), function(req, res) {
+  const evId = req.params.id;
+  const gbId = req.params.gid;
+  const ev   = readJSON(EVENTS_FILE).find(function(e) { return e.id === evId || e.slug === evId; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  const entry = (ev.guestbook || []).find(function(g) { return g.id === gbId; });
+  if (!entry) return res.status(404).json({ error: "Ikke funnet" });
+  const token   = require("crypto").randomBytes(16).toString("hex");
+  const expires = Date.now() + 10 * 60 * 1000; // 10 min
+  _gbPhotoTokens.set(token, { evId: ev.id, gbId, expires });
+  res.json({ token, url: "/gb-photo/" + token });
+});
+
+// SSE – vent på bilde (brukes av QR-modal på event-siden)
+app.get("/api/gb-photo-wait/:token", function(req, res) {
+  const token = req.params.token;
+  if (!_gbPhotoTokens.has(token)) return res.status(404).json({ error: "Ugyldig token" });
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+  _gbPhotoSSE.set(token, res);
+  req.on("close", function() { _gbPhotoSSE.delete(token); });
+});
+
+// Mobilside for bildevalg
+app.get("/gb-photo/:token", function(req, res) {
+  const token = req.params.token;
+  const info  = _gbPhotoTokens.get(token);
+  if (!info || Date.now() > info.expires) {
+    return res.send('<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Utløpt</title><style>body{font-family:sans-serif;background:#1a1a1a;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:2rem}</style></head><body><h2>⏰ Lenken er utløpt</h2><p>Gå tilbake til event-siden og prøv igjen.</p></body></html>');
+  }
+  const s = getSettings();
+  const siteName  = s.siteName || "Events Admin";
+  const logoUrl   = s.logoUrl  || "";
+  const accentCol = (s.colors && s.colors.accent) || "#FFD100";
+  const logoHtml  = logoUrl
+    ? `<img src="${escHtml(logoUrl)}" alt="${escHtml(siteName)}" style="height:40px;object-fit:contain;margin-bottom:1.5rem"/>`
+    : `<div style="background:${escHtml(accentCol)};color:#111;font-weight:900;font-size:1.2rem;padding:5px 16px;border-radius:6px;margin-bottom:1.5rem;display:inline-block">${escHtml(siteName.split(" ")[0])}</div>`;
+
+  res.send(`<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Last opp bilder – ${escHtml(siteName)}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Helvetica Neue",Arial,sans-serif;background:#1a1a1a;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1.25rem;text-align:center}
+h1{font-size:1.25rem;margin-bottom:.4rem}
+.sub{color:#888;font-size:.88rem;margin-bottom:1.75rem;line-height:1.5}
+.pick-zone{border:2px dashed #444;border-radius:12px;padding:2rem 1rem;cursor:pointer;width:100%;max-width:420px;margin-bottom:1.25rem;transition:border-color .2s}
+.pick-zone:hover,.pick-zone:active{border-color:${escHtml(accentCol)}}
+.pick-icon{font-size:2.5rem;margin-bottom:.5rem}
+.pick-label{font-size:.95rem;color:#888}
+.thumb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;width:100%;max-width:420px;margin-bottom:1.25rem}
+.thumb-wrap{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:#2a2a2a}
+.thumb-wrap img{width:100%;height:100%;object-fit:cover}
+.thumb-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;color:#fff;border-radius:50%;width:22px;height:22px;font-size:.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.thumb-status{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(0,0,0,.45)}
+.btn{background:${escHtml(accentCol)};color:#111;font-weight:700;padding:.9rem 1.5rem;border-radius:8px;font-size:1rem;border:none;cursor:pointer;width:100%;max-width:420px;margin-bottom:.75rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.secondary{background:#2a2a2a;color:#fff;border:1px solid #444}
+.status{font-size:.9rem;min-height:1.4rem;margin-bottom:.5rem;max-width:420px}
+.ok{color:#4ade80}.err{color:#f87171}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+${logoHtml}
+<h1>📸 Legg ved bilder</h1>
+<p class="sub">Velg ett eller flere bilder fra kamera eller galleri.<br>De knyttes til kommentaren din i gjesteboken.</p>
+
+<div class="pick-zone" id="pickZone" onclick="document.getElementById('fileInput').click()">
+  <div class="pick-icon">🖼️</div>
+  <div class="pick-label">Trykk for å velge bilder</div>
+</div>
+
+<!-- Ingen capture-attributt = brukeren velger selv kamera eller galleri -->
+<input type="file" id="fileInput" accept="image/*" multiple onchange="onFilesChange(this)"/>
+
+<div class="thumb-grid" id="thumbGrid" style="display:none"></div>
+
+<div class="status" id="status"></div>
+
+<button class="btn" id="addMoreBtn" style="display:none" onclick="document.getElementById('fileInput').click()">➕ Legg til flere bilder</button>
+<button class="btn" id="sendBtn" style="display:none" onclick="sendAllPhotos()">✅ Send alle bilder (<span id="sendCount">0</span>)</button>
+
+<script>
+var selectedFiles = [];
+var token = "${token}";
+
+function onFilesChange(input) {
+  var files = Array.from(input.files);
+  if (!files.length) return;
+  files.forEach(function(f) { selectedFiles.push({ file: f, status: "pending" }); });
+  input.value = "";
+  renderThumbs();
+}
+
+function renderThumbs() {
+  var grid = document.getElementById("thumbGrid");
+  var zone = document.getElementById("pickZone");
+  var sendBtn = document.getElementById("sendBtn");
+  var addBtn  = document.getElementById("addMoreBtn");
+  var countEl = document.getElementById("sendCount");
+
+  if (!selectedFiles.length) {
+    grid.style.display = "none";
+    zone.style.display = "block";
+    sendBtn.style.display = "none";
+    addBtn.style.display  = "none";
+    return;
+  }
+
+  zone.style.display = "none";
+  grid.style.display = "grid";
+  addBtn.style.display  = "block";
+
+  var pending = selectedFiles.filter(function(f){ return f.status === "pending"; }).length;
+  countEl.textContent = pending;
+  sendBtn.style.display = pending > 0 ? "block" : "none";
+
+  grid.innerHTML = "";
+  selectedFiles.forEach(function(item, i) {
+    var wrap = document.createElement("div");
+    wrap.className = "thumb-wrap";
+
+    var img = document.createElement("img");
+    var reader = new FileReader();
+    reader.onload = function(e){ img.src = e.target.result; };
+    reader.readAsDataURL(item.file);
+    wrap.appendChild(img);
+
+    if (item.status === "pending") {
+      var del = document.createElement("button");
+      del.className = "thumb-del";
+      del.textContent = "×";
+      del.onclick = function(e) {
+        e.stopPropagation();
+        selectedFiles.splice(i, 1);
+        renderThumbs();
+      };
+      wrap.appendChild(del);
+    } else if (item.status === "done") {
+      var ov = document.createElement("div");
+      ov.className = "thumb-status";
+      ov.textContent = "✅";
+      wrap.appendChild(ov);
+    } else if (item.status === "error") {
+      var ov2 = document.createElement("div");
+      ov2.className = "thumb-status";
+      ov2.style.color = "#f87171";
+      ov2.textContent = "❌";
+      wrap.appendChild(ov2);
+    } else if (item.status === "sending") {
+      var ov3 = document.createElement("div");
+      ov3.className = "thumb-status";
+      ov3.textContent = "⏳";
+      wrap.appendChild(ov3);
+    }
+
+    grid.appendChild(wrap);
+  });
+}
+
+async function sendAllPhotos() {
+  var pending = selectedFiles.filter(function(f){ return f.status === "pending"; });
+  if (!pending.length) return;
+
+  document.getElementById("sendBtn").disabled = true;
+  document.getElementById("addMoreBtn").disabled = true;
+  document.getElementById("status").innerHTML = "⏳ Sender " + pending.length + " bilde" + (pending.length > 1 ? "r" : "") + "…";
+
+  var ok = 0, fail = 0;
+  for (var i = 0; i < selectedFiles.length; i++) {
+    if (selectedFiles[i].status !== "pending") continue;
+    selectedFiles[i].status = "sending";
+    renderThumbs();
+    var fd = new FormData();
+    fd.append("photo", selectedFiles[i].file);
+    try {
+      var r = await fetch("/api/gb-photo/" + token, { method: "POST", body: fd });
+      var d = await r.json();
+      if (r.ok) { selectedFiles[i].status = "done"; ok++; }
+      else { selectedFiles[i].status = "error"; fail++; }
+    } catch(e) {
+      selectedFiles[i].status = "error"; fail++;
+    }
+    renderThumbs();
+  }
+
+  var st = document.getElementById("status");
+  if (fail === 0) {
+    st.innerHTML = '<span class="ok">✅ ' + ok + ' bilde' + (ok > 1 ? "r" : "") + ' sendt!</span>';
+  } else {
+    st.innerHTML = '<span class="ok">' + ok + ' sendt</span> · <span class="err">' + fail + ' feilet</span>';
+    document.getElementById("sendBtn").disabled = false;
+    document.getElementById("sendBtn").textContent = "🔄 Prøv feilede bilder";
+    // Reset failed to pending so they can be retried
+    selectedFiles.forEach(function(f){ if(f.status === "error") f.status = "pending"; });
+    renderThumbs();
+  }
+  document.getElementById("addMoreBtn").disabled = false;
+}
+</script>
+</body>
+</html>`);
+});
+
+// Motta bilde fra mobil
+const photoUpload = multer({
+  storage: multer.diskStorage({
+    destination: function(req, file, cb) {
+      const dir = path.join(DATA, "gb-photos");
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      cb(null, dir);
+    },
+    filename: function(req, file, cb) {
+      const ext = path.extname(file.originalname).toLowerCase() || ".jpg";
+      cb(null, req.params.token + "_" + Date.now() + ext);
+    }
+  }),
+  fileFilter: function(req, file, cb) { cb(null, /^image\//.test(file.mimetype)); },
+  limits: { fileSize: 10 * 1024 * 1024 }
+});
+
+app.post("/api/gb-photo/:token", rateLimit(20, 60000), photoUpload.single("photo"), function(req, res) {
+  const token = req.params.token;
+  const info  = _gbPhotoTokens.get(token);
+  if (!info || Date.now() > info.expires) return res.status(410).json({ error: "Token utløpt" });
+  if (!req.file) return res.status(400).json({ error: "Ingen fil" });
+
+  const photoUrl = "/gb-photos/" + req.file.filename;
+
+  // Knytt bilde til gjestebok-oppføring
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === info.evId; });
+  if (ev) {
+    const entry = (ev.guestbook || []).find(function(g) { return g.id === info.gbId; });
+    if (entry) {
+      entry.photos = entry.photos || [];
+      entry.photos.push(photoUrl);
+      writeJSON(EVENTS_FILE, events);
+    }
+  }
+
+  // Varsle SSE-klient om hvert bilde (ikke slett SSE, kan komme flere)
+  const sseRes = _gbPhotoSSE.get(token);
+  if (sseRes) {
+    sseRes.write("data: " + JSON.stringify({ ok: true, photoUrl, count: (ev && ev.guestbook && ev.guestbook.find(function(g){return g.id===info.gbId;})) ? ((ev.guestbook.find(function(g){return g.id===info.gbId;})).photos||[]).length : 1 }) + "\n\n");
+  }
+
+  // Token lever videre – slettes ikke etter første bilde
+  // Utløper automatisk etter 10 min (sjekkes ved neste request)
+  res.json({ ok: true, photoUrl });
+});
+
+// Serve gjestebok-bilder
+app.use("/gb-photos", express.static(path.join(DATA, "gb-photos")));
+
+app.get("/api/events/:id/guestbook", auth, function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  res.json(ev.guestbook || []);
+});
+
+app.put("/api/events/:id/guestbook/:gid/approve", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  const g = ev.guestbook.find(function(g) { return g.id === req.params.gid; });
+  if (!g) return res.status(404).json({ error: "Ikke funnet" });
+  g.approved = true;
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+app.delete("/api/events/:id/guestbook/:gid", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (!ev.guestbook) ev.guestbook = [];
+  ev.guestbook = ev.guestbook.filter(function(g) { return g.id !== req.params.gid; });
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+// ── Serie API ────────────────────────────────────────────────────
+// Repeat-typer:
+//   yearly-date     - hvert ar, samme dag+maned (f.eks. 17. mai)
+//   yearly-nodate   - hvert ar, ingen fast dato (f.eks. "MC-treff mai")
+//   weekly          - hver uke, samme ukedag
+//   monthly-date    - hver maned, samme dato (f.eks. alltid den 15.)
+//   monthly-weekday - hver maned, samme ukedag-nr (f.eks. forste tirsdag)
+
+function nextSeriesDate(seriesEntry, fromDate) {
+  var d = new Date(fromDate);
+  var repeat = seriesEntry.repeat;
+  if (repeat === "yearly-date") {
+    d.setFullYear(d.getFullYear() + 1);
+  } else if (repeat === "yearly-nodate") {
+    return null;
+  } else if (repeat === "weekly") {
+    d.setDate(d.getDate() + 7);
+  } else if (repeat === "monthly-date") {
+    d.setMonth(d.getMonth() + 1);
+  } else if (repeat === "monthly-weekday") {
+    var weekday = d.getDay();
+    var weekNum = Math.ceil(d.getDate() / 7);
+    var origMonth = d.getMonth();
+    d.setMonth(d.getMonth() + 1);
+    d.setDate(1);
+    var firstWd = d.getDay();
+    var diff = (weekday - firstWd + 7) % 7;
+    d.setDate(1 + diff + (weekNum - 1) * 7);
+    if (d.getMonth() !== (origMonth + 1) % 12) { d.setDate(d.getDate() - 7); }
+  } else {
+    return null;
+  }
+  return d;
+}
+
+app.get("/api/series", auth, function(req, res) {
+  var series = readJSON(SERIES_F);
+  if (!Array.isArray(series)) series = [];
+  var events = readJSON(EVENTS_FILE);
+  series = series.map(function(s) {
+    var evs = events.filter(function(e) { return e.seriesId === s.id && e.date; });
+    evs.sort(function(a,b) { return new Date(b.date) - new Date(a.date); });
+    var lastDate = evs.length ? evs[0].date : null;
+    var next = (lastDate && s.repeat !== "yearly-nodate") ? nextSeriesDate(s, lastDate) : null;
+    return Object.assign({}, s, {
+      eventCount: events.filter(function(e){return e.seriesId===s.id;}).length,
+      lastDate: lastDate,
+      nextSuggested: next ? next.toISOString().slice(0,16) : null
+    });
+  });
+  res.json(series);
+});
+
+app.post("/api/series", auth, managerOrAdmin, function(req, res) {
+  var series = readJSON(SERIES_F);
+  if (!Array.isArray(series)) series = [];
+  var s = {
+    id: uuid(),
+    name: (req.body.name || "").trim().slice(0, 200),
+    repeat: req.body.repeat || "yearly-nodate",
+    department: req.body.department || null,
+    subgroup: req.body.subgroup || null,
+    sharedGuestbook: true,
+    createdAt: new Date().toISOString(),
+    createdBy: req.session.user.email,
+  };
+  if (!s.name) return res.status(400).json({ error: "Navn er påkrevd" });
+  series.push(s);
+  fs.writeFileSync(SERIES_F, JSON.stringify(series, null, 2));
+  res.json(s);
+});
+
+app.put("/api/series/:id", auth, managerOrAdmin, function(req, res) {
+  var series = readJSON(SERIES_F);
+  var i = series.findIndex(function(s) { return s.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  if (req.body.name        !== undefined) series[i].name        = (req.body.name || "").trim().slice(0, 200);
+  if (req.body.repeat      !== undefined) series[i].repeat      = req.body.repeat;
+  if (req.body.department    !== undefined) series[i].department    = req.body.department || null;
+  if (req.body.subgroup !== undefined) series[i].subgroup = req.body.subgroup || null;
+  fs.writeFileSync(SERIES_F, JSON.stringify(series, null, 2));
+  res.json({ ok: true });
+});
+
+app.delete("/api/series/:id", auth, managerOrAdmin, function(req, res) {
+  var series = readJSON(SERIES_F);
+  fs.writeFileSync(SERIES_F, JSON.stringify(series.filter(function(s){ return s.id !== req.params.id; }), null, 2));
+  var events = readJSON(EVENTS_FILE);
+  events.forEach(function(e) { if (e.seriesId === req.params.id) delete e.seriesId; });
+  writeJSON(EVENTS_FILE, events);
+  res.json({ ok: true });
+});
+
+app.get("/api/series/:id/guestbook", function(req, res) {
+  var series = readJSON(SERIES_F);
+  var seriesEntry = series.find(function(s) { return s.id === req.params.id; });
+  if (!seriesEntry) return res.status(404).json({ error: "Ikke funnet" });
+  var events = readJSON(EVENTS_FILE);
+  var all = [];
+  events.filter(function(e) { return e.seriesId === req.params.id; }).forEach(function(e) {
+    (e.guestbook || []).forEach(function(g) {
+      all.push(Object.assign({}, g, { eventTitle: e.title, eventDate: e.date, eventId: e.id }));
+    });
+  });
+  all.sort(function(a,b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+  res.json(all);
+});
+
+// ── Blokker API ─────────────────────────────────────────────────
+// Data model: { id, department, name, eventType (stand/kurs/tur/any),
+//               dateFrom, dateTo, ansvarligId, note, createdBy }
+
+function readBlocks() {
+  try { return JSON.parse(fs.readFileSync(BLOCKS_F)); } catch(e) { return []; }
+}
+
+// GET /api/blocks?department=id  – all in the department see the blocks
+app.get("/api/blocks", auth, function(req, res) {
+  var blocks = readBlocks();
+  var me = req.session.user;
+  var deptId = req.query.department || null;
+  if (me.role === "admin") {
+    return res.json(deptId ? blocks.filter(function(b){ return b.department === deptId; }) : blocks);
+  }
+  // Avdeling og medlem ser kun sin avdelings blokker
+  var myDeptIds = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {}).map(function(t){ return t.department; });
+  res.json(blocks.filter(function(b){ return myDeptIds.indexOf(b.department) !== -1; }));
+});
+
+// VIKTIG: /check må stå FØR /:id, ellers tolker Express "check" som en :id
+app.get("/api/blocks/check", auth, function(req, res) {
+  var date   = req.query.date;
+  var deptId  = req.query.department;
+  var evType = req.query.eventType || "stand";
+  if (!date || !deptId) return res.json({ conflict: false });
+  var blocks = readBlocks();
+  var d = new Date(date);
+  var hits = blocks.filter(function(b) {
+    if (b.department !== deptId) return false;
+    if (b.eventType !== "any" && b.eventType !== evType) return false;
+    return d >= new Date(b.dateFrom) && d <= new Date(b.dateTo);
+  });
+  res.json({ conflict: hits.length > 0, blocks: hits });
+});
+
+app.post("/api/blocks", auth, managerOrAdmin, function(req, res) {
+  var me = req.session.user;
+  var meAvdeling = me.department || (getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {})[0] || {}).department || null;
+  var blocks = readBlocks();
+  var b = {
+    id:          uuid(),
+    department:    req.body.department || meAvdeling,
+    name:        (req.body.name || "").trim().slice(0, 200),
+    eventType:   req.body.eventType || "any",
+    dateFrom:    req.body.dateFrom || null,
+    dateTo:      req.body.dateTo   || null,
+    ansvarligId: req.body.ansvarligId || null,
+    note:        req.body.note || "",
+    createdBy:   me.email,
+    createdAt:   new Date().toISOString(),
+  };
+  if (!b.name || !b.dateFrom || !b.dateTo)
+    return res.status(400).json({ error: "Navn, startdato og sluttdato er påkrevd" });
+  blocks.push(b);
+  fs.writeFileSync(BLOCKS_F, JSON.stringify(blocks, null, 2));
+  res.json(b);
+});
+
+app.put("/api/blocks/:id", auth, managerOrAdmin, function(req, res) {
+  var blocks = readBlocks();
+  var i = blocks.findIndex(function(b){ return b.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  ["name","eventType","dateFrom","dateTo","ansvarligId","note","department"].forEach(function(k){
+    if (req.body[k] !== undefined) blocks[i][k] = req.body[k];
+  });
+  fs.writeFileSync(BLOCKS_F, JSON.stringify(blocks, null, 2));
+  res.json({ ok: true });
+});
+
+app.delete("/api/blocks/:id", auth, managerOrAdmin, function(req, res) {
+  var blocks = readBlocks();
+  fs.writeFileSync(BLOCKS_F, JSON.stringify(blocks.filter(function(b){ return b.id !== req.params.id; }), null, 2));
+  res.json({ ok: true });
+});
+
+// ── GDPR: Anonymiser gamle påmeldinger ──────────────────────────
+// Leser retentionDays fra settings.json (kan overstyres av env-variabel)
+function getRetentionDays() {
+  if (process.env.GDPR_RETENTION_DAYS) return Number(process.env.GDPR_RETENTION_DAYS);
+  return getSettings().gdprRetentionDays || 365;
+}
+
+function anonymizeOldRegistrations() {
+  const retentionDays = getRetentionDays();
+  const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
+  const events = readJSON(EVENTS_FILE);
+  let count = 0;
+  events.forEach(function(ev) {
+    (ev.registrations || []).forEach(function(r) {
+      if (r.anonymized) return;
+      const regDate = new Date(r.registeredAt).getTime();
+      const evDate  = ev.date ? new Date(ev.date).getTime() : regDate;
+      // Anonymiser hvis BÅDE registreringsdato og eventdato er eldre enn cutoff
+      if (regDate < cutoff && evDate < cutoff) {
+        r.name        = "[slettet]";
+        r.email       = "[slettet]";
+        r.phone       = "";
+        r.checkinPin  = null;
+        r.vehicle     = null;
+        r.anonymized  = true;
+        r.anonymizedAt = new Date().toISOString();
+        count++;
+      }
+    });
+  });
+  if (count > 0) {
+    writeJSON(EVENTS_FILE, events);
+    console.log("GDPR: anonymized " + count + " old registrations (retention: " + retentionDays + " days)");
+  }
+  return count;
+}
+
+// Kjør ved oppstart og deretter én gang per dag
+anonymizeOldRegistrations();
+setInterval(anonymizeOldRegistrations, 24 * 60 * 60 * 1000);
+
+// Manuell trigger for admin
+app.post("/api/admin/gdpr/anonymize", auth, adminOnly, function(req, res) {
+  const count = anonymizeOldRegistrations();
+  res.json({ ok: true, anonymized: count, retentionDays: getRetentionDays() });
+});
+
+app.get("/api/admin/gdpr/status", auth, adminOnly, function(req, res) {
+  const retentionDays = getRetentionDays();
+  const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
+  const events = readJSON(EVENTS_FILE);
+  let pending = 0, anonymized = 0;
+  events.forEach(function(ev) {
+    (ev.registrations || []).forEach(function(r) {
+      if (r.anonymized) { anonymized++; return; }
+      const regDate = new Date(r.registeredAt).getTime();
+      const evDate  = ev.date ? new Date(ev.date).getTime() : regDate;
+      if (regDate < cutoff && evDate < cutoff) pending++;
+    });
+  });
+  res.json({ retentionDays, pending, anonymized });
+});
+
+// ── E-post test-sending (admin) ──────────────────────────────────
+app.post("/api/admin/email/test", auth, adminOnly, async function(req, res) {
+  const s = getSettings();
+  if (!s.emailEnabled) return res.status(400).json({ error: "E-post er ikke aktivert i innstillinger" });
+  const transport = getTransporter();
+  if (!transport) return res.status(400).json({ error: "SMTP er ikke konfigurert – sjekk SMTP_HOST/USER/PASS" });
+  const to = req.body.to || req.session.user.email;
+  const r = await sendEmail({
+    to,
+    subject: "✅ Test – " + (s.siteName || "Events Admin"),
+    html: `<div style="font-family:sans-serif;padding:2rem"><h2>E-postutsending fungerer! 🎉</h2><p>Denne testen ble sendt fra <strong>${s.siteName || "Events Admin"}</strong>.</p><p style="color:#999;font-size:.85rem">Avsender: ${s.emailFrom || "noreply@" + s.eventDomain}</p></div>`,
+    text: "E-postutsending fungerer! Sendt fra " + (s.siteName || "Events Admin"),
+  });
+  if (!r.ok) return res.status(500).json({ error: r.reason });
+  res.json({ ok: true, to, id: r.id });
+});
+app.get("/api/stats", auth, function(req, res) {
+  const events   = readJSON(EVENTS_FILE);
+  const now      = Date.now();
+  const yearStart = new Date(new Date().getFullYear(), 0, 1).getTime();
+  const monthStart= new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
+  const sorted   = events.slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+
+  // Volunteer stats
+  const volunteerMap = new Map();
+  events.forEach(function(ev) {
+    if (!ev.date || new Date(ev.date).getTime() < yearStart) return;
+    (ev.staff || []).forEach(function(s) {
+      if (s.checkedIn && s.name && s.name !== "[slettet]") {
+        const key = s.name.trim().toLowerCase();
+        volunteerMap.set(key, (volunteerMap.get(key) || 0) + 1);
+      }
+    });
+  });
+  const totalAppearances = Array.from(volunteerMap.values()).reduce(function(s,n){ return s+n; }, 0);
+
+  // Event counts by type
+  const evByType = { stand:0, kurs:0, tur:0 };
+  events.forEach(function(ev){ const t=ev.eventType||"stand"; if(evByType[t]!==undefined) evByType[t]++; });
+
+  // This year / this month
+  const evThisYear  = events.filter(function(e){ return e.date && new Date(e.date).getTime() >= yearStart; });
+  const evThisMonth = events.filter(function(e){ return e.date && new Date(e.date).getTime() >= monthStart; });
+
+  // Upcoming events
+  const upcoming = events.filter(function(e){ return e.date && new Date(e.date).getTime() > now; });
+  upcoming.sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
+
+  // Registration stats
+  const totalRegs   = events.reduce(function(s,e){ return s+(e.registrations||[]).length; },0);
+  const regsYear    = evThisYear.reduce(function(s,e){ return s+(e.registrations||[]).length; },0);
+  const checkedIn   = events.reduce(function(s,e){ return s+(e.registrations||[]).filter(function(r){return r.checkedIn;}).length; },0);
+  const checkinRate = totalRegs > 0 ? Math.round(checkedIn/totalRegs*100) : 0;
+  const maxParticipants = events.filter(function(e){ return e.maxParticipants>0; });
+  const avgCapacity  = maxParticipants.length
+    ? Math.round(maxParticipants.reduce(function(s,e){return s+(e.registrations||[]).length/e.maxParticipants;},0)/maxParticipants.length*100)
+    : null;
+
+  // Avg regs per event
+  const avgRegs = events.length ? (totalRegs / events.length).toFixed(1) : 0;
+
+  // Guestbook entries approved
+  const guestbookTotal = events.reduce(function(s,e){ return s+(e.guestbook||[]).filter(function(g){return g.approved;}).length; },0);
+
+  // Walk-ins
+  const walkIns = events.reduce(function(s,e){ return s+(e.registrations||[]).filter(function(r){return r.walkIn;}).length; },0);
+
+  res.json({
+    // Core
+    totalEvents:        events.length,
+    totalRegistrations: totalRegs,
+    activeVolunteers:   volunteerMap.size,
+    totalAppearances:   totalAppearances,
+    // By type
+    eventsStand:  evByType.stand,
+    eventsKurs:   evByType.kurs,
+    eventsTur:    evByType.tur,
+    // Time-based
+    eventsThisYear:  evThisYear.length,
+    eventsThisMonth: evThisMonth.length,
+    regsThisYear:    regsYear,
+    upcomingEvents:  upcoming.length,
+    // Quality
+    checkedInTotal:  checkedIn,
+    checkinRate:     checkinRate,
+    avgRegsPerEvent: avgRegs,
+    avgCapacityFill: avgCapacity,
+    guestbookEntries: guestbookTotal,
+    walkIns:          walkIns,
+    // Recent
+    recentEvents: sorted.slice(0, 5).map(function(e) {
+      return {
+        id: e.id, slug: e.slug, title: e.title, date: e.date,
+        department: e.department || null,
+        registrationCount: (e.registrations || []).length,
+        maxParticipants: e.maxParticipants,
+        staffCount: (e.staff || []).length,
+        staffCheckedIn: (e.staff || []).filter(function(s){ return s.checkedIn; }).length,
+      };
+    }),
+  });
+});
+
+// ── AI Proxy (Claude API) ─────────────────────────────────────────
+const MOCK_AI = !process.env.ANTHROPIC_API_KEY;
+
+app.post("/api/ai/parse-pdf", auth, managerOrAdmin, rateLimit(5, 60000), async function(req, res) {
+  const { base64, fileType, department: deptFromBody, targetYear, subgroups: subgroupsFromBody } = req.body;
+  if (!base64) return res.status(400).json({ error: "Mangler fil-data" });
+
+  if (MOCK_AI) {
+    // Mock uses the actual PDF content (Årshjul 2026 NAF avd. Romerike)
+    const av = deptFromBody || "NAF avd. Romerike";
+    const y = Number(targetYear) || new Date().getFullYear();
+    const ny = y + 1;
+    return res.json({ events: [
+      { title:"Temakveld: fra dødsveier til nullvisjon", date:`${y}-02-12T18:00`, location:"NAF-senteret i Rælingen", description:"Temakveld med Sissel Sanderlin om trafikksikkerhet.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Verdiseminar for russ", date:`${y}-02-24T00:00`, location:"Thon Hotel Arena Lillestrøm", description:"Verdiseminar med Veltepetter, kollisjonsvekter og promillebriller.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Årsmøte NAF MC Romerike", date:`${y}-02-26T18:30`, location:"NAF-senteret i Rælingen", description:"Årsmøte for NAF MC Romerike.", eventType:"stand", department:av, subgroup:null },
+      { title:"MC-messe NOVA spektrum", date:`${y}-02-27T00:00`, location:"NOVA spektrum", description:"MC-messe over to dager.", eventType:"stand", department:av, subgroup:null },
+      { title:"Kickoff, frivillige", date:`${y}-03-02T17:00`, location:"NAF senter Rælingen", description:"Kickoff for frivillige, 17:00–19:00.", eventType:"stand", department:av, subgroup:null },
+      { title:"Senior trafikkurs", date:`${y}-03-09T12:00`, location:"Jessheim/NAF senter Rælingen", description:"Senior trafikkurs 9. og 10. mars.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Klubb-kveld Bullfighter", date:`${y}-03-11T18:00`, location:"Kalbakken", description:"Klubbkveld for MC.", eventType:"stand", department:av, subgroup:null },
+      { title:"Fagkveld", date:`${y}-03-16T18:00`, location:"NAF-senteret i Rælingen", description:"Fagkveld for MC-avdelingen.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Årsmøte NAF avd. Romerike", date:`${y}-03-19T18:00`, location:"Olavsgaard hotel", description:"Årsmøte for NAF avdeling Romerike. Gjelder både Lokalavdeling og MC.", eventType:"stand", department:av, subgroup:null },
+      { title:"Påskeaksjon – Circle K Dal og Berger", date:`${y}-03-27T14:00`, location:"Circle K Dal og Berger", description:"Påskeaksjon 14:00–18:00.", eventType:"stand", department:av, subgroup:null },
+      { title:"Påskeaksjon – Circle K Fetsund", date:`${y}-03-28T10:00`, location:"Circle K Fetsund", description:"Påskeaksjon 10:00–15:00.", eventType:"stand", department:av, subgroup:null },
+      { title:"Senior trafikkurs", date:`${y}-04-16T00:00`, location:"Jessheim/NAF senter Rælingen", description:"Senior trafikkurs for lokalavdeling.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Trygg på glatta", date:`${y}-04-11T10:00`, location:"Øvingsbanen Fet", description:"Trygg på glatta-kurs. Frivillige møter 09:00.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Sikkerhetsdag Bjørkelangen", date:`${y}-04-25T10:00`, location:"Rådhusveien, Bjørkelangen", description:"Sikkerhetsdag med NAFFEN, Veltepetter og Bråstopp.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Åpen dag for alle", date:`${y}-04-27T17:30`, location:"NAF-senter i Rælingen", description:"Åpen dag for MC-interesserte.", eventType:"stand", department:av, subgroup:null },
+      { title:"Nebbenes kro", date:`${y}-05-01T09:00`, location:"Eidsvoll verk", description:"MC-tur til Nebbenes kro.", eventType:"tur", department:av, subgroup:null },
+      { title:"Se oss-aksjon m. NMCU", date:`${y}-05-01T10:00`, location:"Esso Gardermoen", description:"Se oss-aksjon med NMCU.", eventType:"stand", department:av, subgroup:null },
+      { title:"Kjøretur med Tertitten MC", date:`${y}-05-17T08:45`, location:"Joker Blaker", description:"Kjøretur med Tertitten MC.", eventType:"tur", department:av, subgroup:null },
+      { title:"Pinsetur", date:`${y}-05-22T00:00`, location:null, description:"Pinsetur 22.–25. mai.", eventType:"tur", department:av, subgroup:null },
+      { title:"Trafikksikkerhetsdag", date:`${y}-05-30T00:00`, location:"Lillestrøm trafikkstasjon", description:"Trafikksikkerhetsdag.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Motordilla Årnes", date:`${y}-06-06T00:00`, location:"Årnes", description:"Motordilla-arrangement.", eventType:"stand", department:av, subgroup:null },
+      { title:"Sikker på MC – Fetsund", date:`${y}-06-08T18:00`, location:"YX-stasjon Fetsund", description:"Sikker på MC-kurs.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Sikker på MC – Gardermoen", date:`${y}-06-09T00:00`, location:"GA-terminal Gardermoen", description:"Sikker på MC-kurs ved Gardermoen.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Senior trafikkurs", date:`${y}-06-15T00:00`, location:"Jessheim/NAF senter Rælingen", description:"Senior trafikkurs.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Sikker på MC – Bjørkelangen", date:`${y}-06-15T00:00`, location:"Gaustal landhandleri", description:"Sikker på MC-kurs Bjørkelangen.", eventType:"kurs", department:av, subgroup:null },
+      { title:"Eidsvolldagene", date:`${y}-06-18T00:00`, location:"Eidsvoll", description:"Eidsvolldagene 18.–21. juni.", eventType:"stand", department:av, subgroup:null },
+      { title:"MC Landstreff Røros", date:`${y}-07-03T00:00`, location:"Røros", description:"MC landstreff 3.–5. juli.", eventType:"tur", department:av, subgroup:null },
+      { title:"Bike & Beach Horten", date:`${y}-07-24T00:00`, location:"Prestegårdsstranda, Horten", description:"Bike & Beach 24.–26. juli.", eventType:"stand", department:av, subgroup:null },
+      { title:"Fellestreff Hamar", date:`${y}-08-05T00:00`, location:"Avreise Esso Jessheim", description:"Fellestreff til Hamar.", eventType:"tur", department:av, subgroup:null },
+      { title:"Krødern Kro", date:`${y}-08-08T10:00`, location:"Avreise Gardermoen", description:"MC-tur til Krødern Kro.", eventType:"tur", department:av, subgroup:null },
+      { title:"Trollrally Fyresdal", date:`${y}-08-28T00:00`, location:"Fyresdal", description:"Trollrally 28.–30. august.", eventType:"tur", department:av, subgroup:null },
+      { title:"Høsttur Gålå", date:`${y}-09-04T00:00`, location:"Gålå", description:"Høsttur Gålå 4.–6. september.", eventType:"tur", department:av, subgroup:null },
+      { title:"Oktobersamling", date:`${y}-10-10T00:00`, location:"NAF senter Rælingen", description:"Oktobersamling for MC.", eventType:"stand", department:av, subgroup:null },
+      { title:"Refleksaksjonen Romerike", date:`${y}-10-15T00:00`, location:"Romerike", description:"Refleksaksjon for trafikksikkerhet.", eventType:"stand", department:av, subgroup:null },
+      { title:"Oslo Motor Show", date:`${y}-10-23T00:00`, location:"NOVA spektrum", description:"Oslo Motor Show 23.–25. oktober.", eventType:"stand", department:av, subgroup:null },
+      { title:"Julebord MC", date:`${y}-11-21T00:00`, location:null, description:"Julebord for MC-avdelingen.", eventType:"stand", department:av, subgroup:null },
+    ], mock: true });
+  }
+
+  const useYear = Number(targetYear) || new Date().getFullYear();
+  const nextYear = useYear + 1;
+  // Build subgroup context for the prompt
+  const subgroupList = Array.isArray(subgroupsFromBody) && subgroupsFromBody.length
+    ? subgroupsFromBody
+    : [];
+  const subgroupPromptSection = subgroupList.length
+    ? `\n\nAvdelingen har disse undergruppene – bruk id-en fra listen nedenfor:\n${
+        subgroupList.map(function(u){ return '  id: "' + u.id + '" → navn: "' + u.name + '"'; }).join("\n")
+      }\n\nPDF-en kan ha en Kategori-kolonne med verdier som "MC", "Lokalavdeling" eller "Lokalavdeling, MC".\nBruk denne til å sette subgroup: Kategori "MC" → bruk MC-undergruppen. "Lokalavdeling" → bruk lokalavdeling-undergruppen. Begge nevnt eller usikkert → null.\nLegg til \"subgroup\": \"<id>\" i JSON-objektet, eller null.`
+    : '';
+
+  const prompt = `You are an assistant that reads event schedules for motorcycle clubs and extracts event information.
+
+Les denne terminlisten og returner KUN et JSON-array med events. Ingen annen tekst, ingen markdown, ingen forklaring.
+
+Format per event:
+{
+  "title": "short, descriptive title",
+  "date": "YYYY-MM-DDTHH:mm" eller null hvis ukjent,
+  "location": "sted" eller null,
+  "description": "beskrivelse av eventet, maks 2-3 setninger",
+  "eventType": "stand", "kurs" eller "tur",
+  "department": "${deptFromBody || "NAF MC Romerike"}",
+  "subgroup": null
+}${subgroupPromptSection}
+
+Regler:
+- VIKTIG: Bruk alltid år ${useYear} for alle datoer, uansett hva som står i filen – selv om filen sier ${useYear - 1} eller et annet år
+- Unntak: Hvis terminlisten inneholder events tidlig neste år (f.eks. Årsmøte i januar/februar) bruk ${nextYear} for disse
+- For datoperioder (f.eks. 22.-25.05) bruk startdatoen
+- eventType = "kurs" for courses, safety days, workshops. eventType = "tur" for driving tours, trips. Otherwise "stand"
+- Ignorer rene administrative linjer uten event-innhold
+- Bevar norsk tekst som den er`;
+
+  try {
+    let messageContent;
+
+    if (fileType === "excel") {
+      // Excel er konvertert til CSV-tekst på klienten
+      const csvText = decodeURIComponent(escape(atob(base64)));
+      messageContent = [
+        { type: "text", text: "Her er innholdet fra Excel-filen (konvertert til CSV):\n\n" + csvText + "\n\n" + prompt }
+      ];
+    } else {
+      // PDF sendes som base64 dokument
+      messageContent = [
+        { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } },
+        { type: "text", text: prompt }
+      ];
+    }
+
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "anthropic-version": "2023-06-01",
+        "anthropic-beta": "pdfs-2024-09-25",
+        "x-api-key": process.env.ANTHROPIC_API_KEY
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 8000,
+        system: "You are a data extraction assistant. You output ONLY valid JSON arrays, nothing else. No explanations, no markdown, no commentary. Just the raw JSON array starting with [ and ending with ].",
+        messages: [{ role: "user", content: messageContent }]
+      })
+    });
+    const rawResp = await r.text();
+    let data;
+    try { data = JSON.parse(rawResp); }
+    catch(jsonErr) {
+      console.error("[parse-pdf] Non-JSON from Anthropic:", r.status, rawResp.slice(0, 300));
+      return res.status(500).json({ error: "Ugyldig svar fra AI (HTTP " + r.status + "): " + rawResp.slice(0, 120) });
+    }
+    if (!r.ok) {
+      console.error("[parse-pdf] Anthropic error:", r.status, JSON.stringify(data));
+      return res.status(500).json({ error: (data.error && data.error.message) || "AI-feil (HTTP " + r.status + ")" });
+    }
+    const raw = data.content.map(function(c){ return c.text || ""; }).join("").trim();
+    console.log("[parse-pdf] AI response length:", raw.length, "| preview:", raw.slice(0, 100));
+
+    // Extract JSON array robustly
+    // 1. Try stripping code fences first
+    let clean = raw.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim();
+    // 2. Find the outermost [ ... ]
+    const arrStart = clean.indexOf("[");
+    const arrEnd   = clean.lastIndexOf("]");
+    if (arrStart === -1) {
+      console.error("[parse-pdf] No JSON array found. Full response:", raw.slice(0, 500));
+      return res.status(500).json({
+        error: "AI returnerte ikke et JSON-array. Svar: " + raw.slice(0, 150)
+      });
+    }
+    if (arrEnd === -1 || arrEnd <= arrStart) {
+      console.error("[parse-pdf] JSON truncated (no closing bracket). Response length:", raw.length, "| max_tokens may be too low");
+      return res.status(500).json({
+        error: "AI-svaret ble avkortet – for mange events i PDF-en. Kontakt administrator."
+      });
+    }
+    let events;
+    try {
+      events = JSON.parse(clean.slice(arrStart, arrEnd + 1));
+    } catch(pe) {
+      console.error("[parse-pdf] JSON parse error:", pe.message, "| slice:", clean.slice(arrStart, arrStart + 200));
+      return res.status(500).json({ error: "Kunne ikke tolke AI-responsen: " + pe.message });
+    }
+    if (!Array.isArray(events)) {
+      return res.status(500).json({ error: "AI returnerte ikke et array" });
+    }
+    console.log("[parse-pdf] Extracted", events.length, "events");
+    res.json({ events });
+  } catch(e) {
+    console.error("[parse-pdf] Exception:", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ── Members API ─────────────────────────────────────────────────
+app.get("/api/members", auth, function(req, res) {
+  const me = req.session.user;
+  const members = readJSON(MEMBERS_FILE);
+  if (me.role === "admin") return res.json(members);
+  var myDeptIds = getAccessList(me).map(function(t){ return t.department; });
+  if (!myDeptIds.length) return res.json([]);
+  res.json(members.filter(function(m){ return myDeptIds.indexOf(m.department) !== -1; }));
+});
+
+app.post("/api/members/import", auth, function(req, res) {
+  const me = req.session.user;
+  var myAccessImport = getAccessList(me);
+  var isManagerImport = me.role === "admin" || myAccessImport.some(function(t){
+    return (t.role === "department_manager" || t.role === "avdelingsleder") || (t.role === "subgroup_manager" || t.role === "undergruppeansvarlig");
+  });
+  if (!isManagerImport) return res.status(403).json({ error: "Ingen tilgang" });
+
+  var departmentId = me.role === "admin" ? null : (myAccessImport.length ? myAccessImport[0].department : null);
+  if (me.role !== "admin" && !departmentId)
+    return res.status(400).json({ error: "Ingen avdeling knyttet til din konto" });
+
+  const incoming = req.body.members;
+  if (!Array.isArray(incoming)) return res.status(400).json({ error: "Ugyldig format" });
+  const existing = readJSON(MEMBERS_FILE);
+  const emails   = new Set(existing.map(function(m) { return m.email.toLowerCase(); }));
+  var added = 0;
+  incoming.forEach(function(m) {
+    const email = (m.email || "").trim().toLowerCase().slice(0, 200);
+    if (!email || emails.has(email)) return;
+    emails.add(email);
+    existing.push({
+      id: uuid(),
+      name: (m.name || "").trim().slice(0, 100),
+      email: email,
+      phone: (m.phone || "").trim().slice(0, 30),
+      department: departmentId,   // null for admin-import
+      addedAt: new Date().toISOString()
+    });
+    added++;
+  });
+  writeJSON(MEMBERS_FILE, existing);
+  res.json({ ok: true, added: added, total: existing.length });
+});
+
+app.delete("/api/members/:id", auth, function(req, res) {
+  const me = req.session.user;
+  if (me.role !== "admin" && me.role !== "avdelingsleder")
+    return res.status(403).json({ error: "Ingen tilgang" });
+  const members = readJSON(MEMBERS_FILE);
+  const target = members.find(function(m){ return m.id === req.params.id; });
+  if (!target) return res.status(404).json({ error: "Ikke funnet" });
+  if (me.role === "department_manager" || me.role === "avdelingsleder") {
+    var myDeptIds = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {}).map(function(t){ return t.department; });
+    if (myDeptIds.indexOf(target.department) === -1)
+      return res.status(403).json({ error: "Ingen tilgang til dette medlemmet" });
+  }
+  writeJSON(MEMBERS_FILE, members.filter(function(m){ return m.id !== req.params.id; }));
+  res.json({ ok: true });
+});
+
+// ── Wishes API ───────────────────────────────────────────────────
+app.get("/api/wishes", auth, function(req, res) {
+  const wishes = readJSON(WISHES_F);
+  // Avdelingsleder ser kun sine egne, admin ser alle
+  if (req.session.user.role === "admin") return res.json(wishes);
+  res.json(wishes.filter(function(w) { return w.userId === req.session.user.id; }));
+});
+
+app.post("/api/wishes", auth, function(req, res) {
+  const text = (req.body.text || "").trim();
+  if (!text) return res.status(400).json({ error: "Tekst er påkrevd" });
+  const wishes = readJSON(WISHES_F);
+  wishes.unshift({
+    id: uuid(),
+    text: text,
+    userId:   req.session.user.id,
+    userName: req.session.user.name || req.session.user.email,
+    userEmail: req.session.user.email,
+    createdAt: new Date().toISOString(),
+    status: "open",   // open | done | wontfix
+    adminNote: "",
+  });
+  writeJSON(WISHES_F, wishes);
+  res.json({ ok: true });
+});
+
+app.put("/api/wishes/:id", auth, adminOnly, function(req, res) {
+  const wishes = readJSON(WISHES_F);
+  const i = wishes.findIndex(function(w) { return w.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  if (req.body.status    !== undefined) wishes[i].status    = req.body.status;
+  if (req.body.adminNote !== undefined) wishes[i].adminNote = req.body.adminNote;
+  writeJSON(WISHES_F, wishes);
+  res.json({ ok: true });
+});
+
+app.delete("/api/wishes/:id", auth, adminOnly, function(req, res) {
+  writeJSON(WISHES_F, readJSON(WISHES_F).filter(function(w) { return w.id !== req.params.id; }));
+  res.json({ ok: true });
+});
+
+// ── Frivillige ───────────────────────────────────────────────────
+app.get("/api/volunteers", auth, managerOrAdmin, function(req, res) {
+  var all = readJSON(VOLUNTEERS_FILE) || [];
+  var me = req.session.user;
+  if (me.role === "admin") return res.json(all);
+  // Avdelingsleder ser kun egne frivillige
+  var myDeptIds = getAccessList(me).map(function(t){ return t.department; });
+  var myVols = all.filter(function(v) {
+    var volDepts = Array.isArray(v.departments) && v.departments.length
+      ? v.departments : (v.department ? [v.department] : []);
+    if (!volDepts.length) return true;
+    return volDepts.some(function(did) { return myDeptIds.indexOf(did) !== -1; });
+  });
+  res.json(myVols);
+});
+
+app.post("/api/volunteers", auth, managerOrAdmin, function(req, res) {
+  var volName       = (req.body.name || "").trim();
+  var email         = (req.body.email || "").toLowerCase().trim();
+  var phone         = (req.body.phone || "").trim();
+  var volunteerDept = req.body.department || null;
+  if (!volName) return res.status(400).json({ error: "Navn er påkrevd" });
+  var me = req.session.user;
+  if (me.role !== "admin") {
+    var myDeptIds = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {}).map(function(t){ return t.department; });
+    // Bruk egen avdeling hvis ingen er spesifisert
+    if (!volunteerDept) volunteerDept = myDeptIds[0] || null;
+    if (!volunteerDept || myDeptIds.indexOf(volunteerDept) === -1)
+      return res.status(403).json({ error: "Ingen tilgang til denne avdelingen" });
+  }
+  var all = readJSON(VOLUNTEERS_FILE) || [];
+  // Ny modell: departments[] + activeDepartment
+  var departments_in = Array.isArray(req.body.departments) ? req.body.departments : [];
+  if (!departments_in.length && volunteerDept) departments_in = [volunteerDept];
+  var activeDept = req.body.activeDepartment || departments_in[0] || volunteerDept || null;
+  // Sjekk at alle avdelinger er tillatt for ikke-admin
+  if (me.role !== "admin") {
+    var myDeptIds2 = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {}).map(function(t){ return t.department; });
+    if (departments_in.some(function(did) { return myDeptIds2.indexOf(did) === -1; }))
+      return res.status(403).json({ error: "Ingen tilgang til én eller flere avdelinger" });
+    if (!departments_in.length) departments_in = [myDeptIds2[0] || null].filter(Boolean);
+    activeDept = myDeptIds2.includes(activeDept) ? activeDept : (departments_in[0] || null);
+  }
+  var v = {
+    id: uuid(), name: volName, email: email, phone: phone,
+    departments: departments_in,
+    activeDepartment: activeDept,
+    department: activeDept, // bakoverkompatibilitet
+    events: [], createdAt: new Date().toISOString()
+  };
+  all.push(v);
+  writeJSON(VOLUNTEERS_FILE, all);
+  res.json(v);
+});
+
+app.put("/api/volunteers/:id", auth, managerOrAdmin, function(req, res) {
+  var all = readJSON(VOLUNTEERS_FILE) || [];
+  var i = all.findIndex(function(v){ return v.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  var me = req.session.user;
+  if (me.role !== "admin") {
+    var myDeptIds = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {}).map(function(t){ return t.department; });
+    if (myDeptIds.indexOf(all[i].department) === -1) return res.status(403).json({ error: "Ingen tilgang" });
+  }
+  if (req.body.name    !== undefined) all[i].name    = req.body.name.trim();
+  if (req.body.email   !== undefined) all[i].email   = (req.body.email || "").toLowerCase().trim();
+  if (req.body.phone   !== undefined) all[i].phone   = (req.body.phone || "").trim();
+  // Ny modell: departments[] + activeDepartment
+  if (Array.isArray(req.body.departments)) {
+    var depts_upd = req.body.departments;
+    if (me.role !== "admin") {
+      var myDeptIds3 = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {}).map(function(t){ return t.department; });
+      depts_upd = depts_upd.filter(function(did) { return myDeptIds3.indexOf(did) !== -1; });
+    }
+    all[i].departments = depts_upd;
+    var newActive = req.body.activeDepartment || null;
+    if (!newActive || depts_upd.indexOf(newActive) === -1) newActive = depts_upd[0] || null;
+    all[i].activeDepartment = newActive;
+    all[i].department = newActive; // bakoverkompatibilitet
+  }
+  writeJSON(VOLUNTEERS_FILE, all);
+  res.json(all[i]);
+});
+
+app.delete("/api/volunteers/:id", auth, managerOrAdmin, function(req, res) {
+  var all = readJSON(VOLUNTEERS_FILE) || [];
+  var v = all.find(function(x){ return x.id === req.params.id; });
+  if (!v) return res.status(404).json({ error: "Ikke funnet" });
+  var me = req.session.user;
+  if (me.role !== "admin") {
+    var myDeptIds = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {}).map(function(t){ return t.department; });
+    if (myDeptIds.indexOf(v.department) === -1) return res.status(403).json({ error: "Ingen tilgang" });
+  }
+  writeJSON(VOLUNTEERS_FILE, all.filter(function(x){ return x.id !== req.params.id; }));
+  res.json({ ok: true });
+});
+
+app.post("/api/volunteers/:id/events/:evId", auth, managerOrAdmin, function(req, res) {
+  var all = readJSON(VOLUNTEERS_FILE) || [];
+  var i = all.findIndex(function(v){ return v.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  if (!all[i].events) all[i].events = [];
+  if (all[i].events.indexOf(req.params.evId) === -1) all[i].events.push(req.params.evId);
+  writeJSON(VOLUNTEERS_FILE, all);
+  res.json(all[i]);
+});
+
+app.delete("/api/volunteers/:id/events/:evId", auth, managerOrAdmin, function(req, res) {
+  var all = readJSON(VOLUNTEERS_FILE) || [];
+  var i = all.findIndex(function(v){ return v.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  all[i].events = (all[i].events || []).filter(function(e){ return e !== req.params.evId; });
+  writeJSON(VOLUNTEERS_FILE, all);
+  res.json(all[i]);
+});
+
+// ── Dev-logg API (kun DEVLOG_OWNER) ─────────────────────────────
+function devlogAuth(req, res, next) {
+  if (!req.session.user || req.session.user.email !== DEVLOG_OWNER)
+    return res.status(403).json({ error: "Ingen tilgang" });
+  next();
+}
+function readDevlog() {
+  try { return JSON.parse(fs.readFileSync(DEVLOG_F)); }
+  catch(e) { return { entries: [] }; }
+}
+
+app.get("/api/devlog", auth, devlogAuth, function(req, res) {
+  res.json(readDevlog());
+});
+
+app.post("/api/devlog/entries", auth, devlogAuth, function(req, res) {
+  const log = readDevlog();
+  log.entries.unshift({ id: uuid(), createdAt: new Date().toISOString(), title: req.body.title || "", content: req.body.content || "", tags: Array.isArray(req.body.tags) ? req.body.tags : [] });
+  fs.writeFileSync(DEVLOG_F, JSON.stringify(log, null, 2));
+  res.json({ ok: true });
+});
+
+app.put("/api/devlog/entries/:id", auth, devlogAuth, function(req, res) {
+  const log = readDevlog();
+  const i = log.entries.findIndex(function(e) { return e.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  if (req.body.title   !== undefined) log.entries[i].title   = req.body.title;
+  if (req.body.content !== undefined) log.entries[i].content = req.body.content;
+  if (req.body.tags    !== undefined) log.entries[i].tags    = Array.isArray(req.body.tags) ? req.body.tags : [];
+  log.entries[i].updatedAt = new Date().toISOString();
+  fs.writeFileSync(DEVLOG_F, JSON.stringify(log, null, 2));
+  res.json({ ok: true });
+});
+
+app.delete("/api/devlog/entries/:id", auth, devlogAuth, function(req, res) {
+  const log = readDevlog();
+  log.entries = log.entries.filter(function(e) { return e.id !== req.params.id; });
+  fs.writeFileSync(DEVLOG_F, JSON.stringify(log, null, 2));
+  res.json({ ok: true });
+});
+function serveDepartmentPage(dept, req, res) {
+  var events   = readJSON(EVENTS_FILE);
+  var settings = getSettings();
+  var siteName = settings.siteName || "Events Admin";
+  var domain   = DOMAIN;
+  var now      = Date.now();
+  var ago30    = now - 7 * 24 * 60 * 60 * 1000;
+
+  // Filter by department + show 30 days back
+  var filtered = events.filter(function(ev) {
+    if (ev.department !== dept.id) return false;
+    if (!ev.date) return true;
+    return new Date(ev.date).getTime() >= ago30;
+  });
+
+  filtered.sort(function(a, b) {
+    if (!a.date && !b.date) return 0;
+    if (!a.date) return -1; // uten dato øverst
+    if (!b.date) return 1;
+    return new Date(a.date) - new Date(b.date);
+  });
+
+  var subgroups = dept.subgroups || [];
+
+  // Bygg kolonne-data: én per subgroup + én for events uten subgroup
+  var columns = [];
+
+  var utenUg = filtered.filter(function(ev) { return !ev.subgroup; });
+  if (utenUg.length > 0) {
+    columns.push({ id: null, label: subgroups.length > 0 ? "Generelt" : "Arrangementer", events: utenUg });
+  }
+
+  subgroups.forEach(function(ug) {
+    var ugEvents = filtered.filter(function(ev) { return ev.subgroup === ug.id; });
+    if (ugEvents.length > 0) {
+      columns.push({ id: ug.id, label: ug.name, events: ugEvents });
+    }
+  });
+
+  // ── Kort-generator ───────────────────────────────────────────────
+  function evCard(ev) {
+    var hasDate = !!ev.date;
+    var evDate  = hasDate ? new Date(ev.date) : null;
+    var today   = new Date();
+    var todayDate = today.toISOString().slice(0,10);
+
+    // Beregn slutt-tidspunkt
+    // Prioritet: endDate+endTime > endDate > endTime > startdato 23:59
+    var endMs;
+    if (ev.endDate) {
+      var endD = new Date(ev.endDate);
+      if (ev.endTime) {
+        var ep = ev.endTime.split(":");
+        endD.setHours(parseInt(ep[0],10), parseInt(ep[1],10), 0, 0);
+      } else {
+        endD.setHours(23, 59, 59, 999);
+      }
+      endMs = endD.getTime();
+    } else if (evDate) {
+      var endSameDay = new Date(evDate);
+      if (ev.endTime) {
+        var ep2 = ev.endTime.split(":");
+        endSameDay.setHours(parseInt(ep2[0],10), parseInt(ep2[1],10), 0, 0);
+        // Slutter etter midnatt?
+        if (endSameDay <= evDate) endSameDay.setDate(endSameDay.getDate() + 1);
+      } else {
+        endSameDay.setHours(23, 59, 59, 999);
+      }
+      endMs = endSameDay.getTime();
+    }
+
+    var startMs = evDate ? evDate.getTime() : null;
+    var isPast   = startMs ? endMs < now : false;
+    var isActive = startMs && startMs <= now && endMs > now;
+
+    // Dato-kolumnen lyser på alle dager eventet strekker seg over
+    var eventStartDate = hasDate ? ev.date.slice(0,10) : null;
+    var eventEndDate   = ev.endDate || eventStartDate;
+    var dateColLit     = eventStartDate && todayDate >= eventStartDate && todayDate <= eventEndDate;
+
+    var timeStr = (hasDate && ev.date.length > 10) ? evDate.toLocaleTimeString("en-GB", {hour:"2-digit",minute:"2-digit"}) : null;
+    var endStr  = ev.endTime ? ev.endTime.slice(0,5) : null;
+    var yearStr = evDate ? evDate.getFullYear() : null;
+    var typeLabel = ev.eventType === "kurs" ? "Kurs" : ev.eventType === "tur" ? "Tur" : "Stand";
+    var typeCls   = ev.eventType === "kurs" ? "type-kurs" : ev.eventType === "tur" ? "type-tur" : "type-stand";
+    var url       = "https://" + ev.slug + "." + domain;
+    var regs      = (ev.registrations || []).length;
+
+    var cls = "ev-card";
+    if (isPast)    cls += " past";
+    if (isActive)  cls += " active";
+
+    // Minimap og stopp-info for tur-events med rute
+    var minimap = "";
+    if (ev.eventType === "tur" && ev.route && ev.route.days && ev.route.days.length) {
+      var days = ev.route.days;
+
+      // Samle alle steder med koordinater
+      var places = [];
+      days.forEach(function(d) {
+        (d.etapper || []).forEach(function(e) {
+          if (e._lat && e._lon)       places.push({ lat: e._lat,     lon: e._lon,     type: e.type });
+          if (e._fra_lat && e._fra_lon) places.push({ lat: e._fra_lat, lon: e._fra_lon, type: "start" });
+        });
+      });
+      // Deduplicate
+      var seen = new Set();
+      places = places.filter(function(p) {
+        var k = p.lat.toFixed(4) + "," + p.lon.toFixed(4);
+        if (seen.has(k)) return false; seen.add(k); return true;
+      });
+
+      // Stopp-oppsummering per dag
+      var STOP_ICONS = { start:"🚀", stopp:"🅿️", lunsj:"🍽️", middag:"🍷", hotell:"🏨", bensin:"⛽", opplevelse:"🎯", slutt:"🏁" };
+      var dayRows = days.map(function(d, di) {
+        var totalKm = (d.etapper||[]).reduce(function(s,e){ return s+(parseFloat(e.km)||0); }, 0);
+        var stops = (d.etapper||[]).filter(function(e){ return ["lunsj","middag","hotell","opplevelse","stopp","bensin"].includes(e.type); });
+        var stopIcons = stops.map(function(s){ return STOP_ICONS[s.type]||"📍"; }).join("");
+        var opplevelser = stops.filter(function(s){ return s.type === "opplevelse"; }).map(function(s){ return s.notat || s.til || ""; }).filter(Boolean);
+        return '<div style="background:#1a1a1a;border-radius:3px;padding:2px 4px">'
+          + '<div style="color:#d8b4fe;font-weight:700;font-size:.65rem">Dag '+(di+1)+'</div>'
+          + '<div style="color:#666;font-size:.65rem">' + (totalKm > 0 ? Math.round(totalKm)+' km' : '–') + (stopIcons ? ' '+stopIcons : '') + '</div>'
+          + (opplevelser.length ? '<div style="color:#f5c500;font-size:.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(opplevelser[0])+'</div>' : '')
+          + '</div>';
+      }).join("");
+
+      var cols = days.length <= 3 ? days.length : 3;
+
+      // Kart-seksjon: Leaflet minimap hvis koordinater finnes, ellers bilde eller placeholder
+      var mapSection = "";
+      var hasCoords = places.length >= 2;
+      var mapId = "mm-" + ev.id;
+
+      // Fallback: hent koordinater fra stedsnavn hvis de mangler
+      if (!hasCoords && days.length) {
+        var allNames = [];
+        days.forEach(function(d) {
+          (d.etapper||[]).forEach(function(e) {
+            if (e.fra && !allNames.includes(e.fra)) allNames.push(e.fra);
+            if (e.til && !allNames.includes(e.til)) allNames.push(e.til);
+          });
+        });
+        // Bruk cached koordinater fra _geocodeCache på serveren
+        if (!global._geocodeCache) global._geocodeCache = {};
+        allNames.forEach(function(name) {
+          var cached = global._geocodeCache[name];
+          if (cached) places.push({ lat: cached.lat, lon: cached.lon, type: "wpt" });
+        });
+        hasCoords = places.length >= 2;
+        // Trigger async bakgrunns-geocoding uten å blokkere side-rendering
+        if (!hasCoords && allNames.length >= 2) {
+          (async function() {
+            var sleep = function(ms) { return new Promise(function(r){ setTimeout(r,ms); }); };
+            for (var ni = 0; ni < Math.min(allNames.length, 5); ni++) {
+              var nm = allNames[ni];
+              if (global._geocodeCache[nm]) continue;
+              try {
+                var gr = await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+encodeURIComponent(nm), { headers:{ "User-Agent":"EventsAdmin/1.0" } });
+                var gd = await gr.json();
+                if (gd && gd[0]) global._geocodeCache[nm] = { lat: parseFloat(gd[0].lat), lon: parseFloat(gd[0].lon) };
+              } catch(ge) {}
+              await sleep(400);
+            }
+          })();
+        }
+      }
+
+      if (hasCoords) {
+        // Beregn bbox for kartet
+        var lats = places.map(function(p){ return p.lat; });
+        var lons = places.map(function(p){ return p.lon; });
+        var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+        var minLon = Math.min.apply(null, lons), maxLon = Math.max.apply(null, lons);
+        var pad = 0.15;
+        var b = [minLon-pad, minLat-pad, maxLon+pad, maxLat+pad];
+        // Bruk OpenStreetMap static tiles via bbox
+        var staticUrl = "https://www.openstreetmap.org/export/embed.html?bbox="
+          + b[0]+"%2C"+b[1]+"%2C"+b[2]+"%2C"+b[3]
+          + "&layer=mapnik";
+        // Marker-overlay som SVG
+        var viewW = 140, viewH = 90;
+        function toSvg(lat, lon) {
+          var x = (lon - b[0]) / (b[2] - b[0]) * viewW;
+          var y = (1 - (lat - b[1]) / (b[3] - b[1])) * viewH;
+          return { x: Math.round(x), y: Math.round(y) };
+        }
+        var svgDots = places.map(function(p, i) {
+          var pt = toSvg(p.lat, p.lon);
+          var isFirst = i === 0, isLast = i === places.length - 1;
+          var col = isFirst ? "#4ade80" : isLast ? "#f87171" : "#d8b4fe";
+          var r = isFirst || isLast ? 5 : 3;
+          return '<circle cx="'+pt.x+'" cy="'+pt.y+'" r="'+r+'" fill="'+col+'" stroke="#000" stroke-width="1"/>';
+        }).join("");
+        // Draw rough route line
+        var svgLine = '<polyline points="' + places.map(function(p){
+          var pt = toSvg(p.lat, p.lon);
+          return pt.x+","+pt.y;
+        }).join(" ") + '" fill="none" stroke="#d8b4fe" stroke-width="1.5" stroke-opacity="0.7"/>';
+
+        mapSection = '<div style="height:90px;background:#0a0a1a;position:relative;overflow:hidden">'
+          + '<iframe src="' + staticUrl + '" style="width:250%;height:250%;transform:scale(0.4);transform-origin:0 0;border:0;pointer-events:none;filter:brightness(0.7) saturate(0.6)" scrolling="no"></iframe>'
+          + '<svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 '+viewW+' '+viewH+'" xmlns="http://www.w3.org/2000/svg">'
+          + svgLine + svgDots
+          + '</svg>'
+          + '</div>';
+      } else if (ev.image) {
+        mapSection = '<div style="height:90px;overflow:hidden">'
+          + '<img src="' + escHtml(ev.image) + '" style="width:100%;height:100%;object-fit:cover"/>'
+          + '</div>';
+      } else {
+        mapSection = '<div style="height:90px;background:linear-gradient(135deg,#2d1a3a,#1a1200);display:flex;align-items:center;justify-content:center;font-size:2rem">🏍️</div>';
+      }
+
+      minimap = '<div style="display:flex;flex-direction:column;width:150px;min-width:150px;flex-shrink:0;overflow:hidden;border-left:1px solid #2a2a2a">'
+        + mapSection
+        + '<div style="padding:3px 5px;background:#161616;border-top:1px solid #2a2a2a;display:grid;grid-template-columns:repeat('+cols+',1fr);gap:2px">'
+        + dayRows
+        + '</div>'
+        + '</div>';
+
+    } else if (ev.image) {
+      minimap = '<div style="width:140px;min-width:140px;height:90px;flex-shrink:0;overflow:hidden">'
+        + '<img src="' + escHtml(ev.image) + '" style="width:100%;height:100%;object-fit:cover"/>'
+        + '</div>';
+    }
+
+    return '<a class="' + cls + '" href="' + escHtml(url) + '" style="display:flex;align-items:stretch">'
+      + '<div class="ev-date-col"' + (dateColLit ? ' style="background:var(--y)"' : '') + '>'
+      + (evDate
+        ? '<div class="ev-day"' + (dateColLit ? ' style="color:#111"' : '') + '>' + evDate.getDate() + '</div>'
+        + '<div class="ev-month"' + (dateColLit ? ' style="color:#333"' : '') + '>' + evDate.toLocaleDateString("en-GB",{month:"short"}) + '</div>'
+        + '<div class="ev-year"' + (dateColLit ? ' style="color:#555"' : '') + '>' + yearStr + '</div>'
+        : '<div class="ev-day" style="font-size:.7rem;color:#888">Dato</div><div class="ev-month" style="color:#666">kommer</div>')
+      + '</div>'
+      + '<div class="ev-body" style="flex:1;min-width:0">'
+      + '<div class="ev-top"><span class="type-badge ' + typeCls + '">' + typeLabel + '</span>'
+      + (isActive ? '<span class="active-badge">Pågående nå</span>' : '')
+      + (dateColLit && !isActive ? '<span class="today-badge">I dag</span>' : '')
+      + (isPast ? '<span class="past-badge">Avholdt</span>' : '') + '</div>'
+      + '<div class="ev-title">' + escHtml(ev.title) + '</div>'
+      + (timeStr ? '<div class="ev-meta">🕐 ' + timeStr + (endStr ? '–' + endStr : '') + (ev.endDate && ev.endDate !== ev.date.slice(0,10) ? ' (' + new Date(ev.endDate).toLocaleDateString("en-GB",{day:"numeric",month:"short"}) + ')' : '') + '</div>' : '')
+      + (ev.location ? '<div class="ev-meta">📍 ' + escHtml(ev.location) + '</div>' : '')
+      + (regs > 0 && ev.showParticipants ? '<div class="ev-meta">👥 ' + regs + ' registered</div>' : '')
+      + '</div>'
+      + minimap
+      + '<div class="ev-arrow"' + (dateColLit ? ' style="color:var(--y)"' : '') + '>→</div>'
+      + '</a>';
+  }
+
+  // ── Finn pågående og neste aktivitet (header-spotlight) ──────────
+  function getEndMs(ev) {
+    if (!ev.date) return null;
+    if (ev.endDate) {
+      var ed = new Date(ev.endDate);
+      if (ev.endTime) { var p=ev.endTime.split(":"); ed.setHours(+p[0],+p[1],0,0); }
+      else ed.setHours(23,59,59,999);
+      return ed.getTime();
+    }
+    var ed2 = new Date(ev.date);
+    if (ev.endTime) { var p2=ev.endTime.split(":"); ed2.setHours(+p2[0],+p2[1],0,0); if(ed2<=new Date(ev.date)) ed2.setDate(ed2.getDate()+1); }
+    else ed2.setHours(23,59,59,999);
+    return ed2.getTime();
+  }
+
+  // All events for the department (incl. older than 7d for active)
+  var allAvdEvents = events.filter(function(ev) { return ev.department === dept.id && ev.date; });
+  var spotPagaende = allAvdEvents.filter(function(ev) {
+    var sm = new Date(ev.date).getTime();
+    var em = getEndMs(ev);
+    return sm <= now && em && em >= now;
+  });
+  spotPagaende.sort(function(a,b) { return new Date(a.date)-new Date(b.date); });
+
+  var spotKommende = allAvdEvents.filter(function(ev) {
+    return new Date(ev.date).getTime() > now;
+  });
+  spotKommende.sort(function(a,b) { return new Date(a.date)-new Date(b.date); });
+  var spotNeste = spotKommende.length > 0 ? spotKommende[0] : null;
+
+  // ── Spotlight-kort (stor versjon for header) ──────────────────────
+  function spotCard(ev, mode) {
+    // mode: "active" | "next" | "empty-active" | "empty-next"
+    var isEmpty = mode.indexOf("empty") === 0;
+    var isActive = mode === "active";
+    var url = isEmpty ? "#" : "https://" + ev.slug + "." + domain;
+
+    var label = isActive ? "Pågående nå" : "Neste aktivitet";
+    var labelColor = isActive ? "var(--y)" : "#888";
+    var borderColor = isActive ? "var(--y)" : "#2a2a2a";
+    var bgColor = isActive ? "rgba(245,197,0,.06)" : "rgba(255,255,255,.02)";
+    var animCls = isActive ? " spot-pulse" : "";
+
+    if (isEmpty) {
+      var emptyText = isActive ? "Ingen pågående aktivitet" : "Ingen kommende aktiviteter";
+      return '<a href="#" style="display:flex;align-items:stretch;background:' + bgColor + ';border:1px solid #222;border-radius:var(--r);text-decoration:none;color:#fff;overflow:hidden;opacity:.45;cursor:default;flex:1;min-width:0">'
+        + '<div style="width:4px;background:#333;flex-shrink:0"></div>'
+        + '<div style="padding:.85rem 1rem;flex:1;min-width:0">'
+        + '<div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.8px;color:#555;margin-bottom:.35rem">' + label + '</div>'
+        + '<div style="font-size:.85rem;color:#555;font-style:italic">' + emptyText + '</div>'
+        + '</div></a>';
+    }
+
+    var evDate = new Date(ev.date);
+    var dayStr = evDate.getDate();
+    var monStr = evDate.toLocaleDateString("en-GB",{month:"short"});
+    var timeStr = ev.date.length > 10 ? evDate.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}) : null;
+    var endStr  = ev.endTime ? ev.endTime.slice(0,5) : null;
+    var typeLabel = ev.eventType === "kurs" ? "Kurs" : ev.eventType === "tur" ? "Tur" : "Stand";
+    var typeCls   = ev.eventType === "kurs" ? "type-kurs" : ev.eventType === "tur" ? "type-tur" : "type-stand";
+
+    return '<a href="' + escHtml(url) + '" class="spot-card' + animCls + '" style="display:flex;align-items:stretch;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:var(--r);text-decoration:none;color:#fff;overflow:hidden;flex:1;min-width:0;transition:border-color .15s,transform .1s">'
+      + '<div style="width:4px;background:' + labelColor + ';flex-shrink:0' + (isActive ? ';animation:spotbar 2s ease-in-out infinite' : '') + '"></div>'
+      + '<div style="width:52px;background:#1e1e1e;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;padding:.5rem 0;border-right:1px solid #2a2a2a">'
+      + '<div style="font-size:1.5rem;font-weight:900;line-height:1;color:' + labelColor + '">' + dayStr + '</div>'
+      + '<div style="font-size:.6rem;text-transform:uppercase;color:#888;letter-spacing:.4px">' + monStr + '</div>'
+      + '</div>'
+      + '<div style="padding:.7rem .9rem;flex:1;min-width:0">'
+      + '<div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.8px;color:' + labelColor + ';margin-bottom:.2rem;font-weight:700">' + label + '</div>'
+      + '<div style="font-size:.95rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.25rem">' + escHtml(ev.title) + '</div>'
+      + '<div style="display:flex;gap:.3rem;flex-wrap:wrap;align-items:center">'
+      + '<span class="type-badge ' + typeCls + '">' + typeLabel + '</span>'
+      + (timeStr ? '<span style="font-size:.7rem;color:#888">🕐 ' + timeStr + (endStr ? '–'+endStr : '') + '</span>' : '')
+      + (ev.location ? '<span style="font-size:.7rem;color:#888">📍 ' + escHtml(ev.location) + '</span>' : '')
+      + '</div>'
+      + '</div>'
+      + '<div style="display:flex;align-items:center;padding:0 .75rem;color:' + labelColor + ';font-size:.9rem;flex-shrink:0">→</div>'
+      + '</a>';
+  }
+
+  // ── CSS ──────────────────────────────────────────────────────────
+  var colCount = Math.max(1, columns.length);
+  var css = '*{box-sizing:border-box;margin:0;padding:0}'
+    + 'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#111;color:#fff;min-height:100vh}'
+    + ':root{--y:#f5c500;--g:#1e1e1e;--g2:#2a2a2a;--r:8px}'
+    + '.header{background:#1a1a1a;border-bottom:3px solid var(--y);display:flex;align-items:stretch;gap:0;min-height:90px}'
+    + '.header-brand{display:flex;align-items:center;gap:.75rem;flex-shrink:0;padding:.85rem 1.5rem;border-right:1px solid #2a2a2a}'
+    + '.header-logo{font-size:1.5rem;font-weight:900;color:var(--y);letter-spacing:-1px}'
+    + '.header-title{font-size:1rem;font-weight:700;white-space:nowrap;line-height:1.2}'
+    + '.header-sub{font-size:.75rem;color:#888;white-space:nowrap}'
+    + '.header-spotlight{display:flex;gap:5rem;align-items:center;flex:1;justify-content:center}'
+    + '@media(max-width:700px){.header{flex-wrap:wrap}.header-brand{border-right:none;padding-right:0}.header-spotlight{width:100%;flex-direction:column}}'
+    + '.spot-card:hover{border-color:var(--y)!important;transform:translateY(-1px)}'
+    + '@keyframes spotbar{0%,100%{opacity:1}50%{opacity:.4}}'
+    + '@keyframes spotpulse{0%,100%{box-shadow:0 0 0 1px var(--y),0 0 8px 2px rgba(245,197,0,.2)}50%{box-shadow:0 0 0 2px var(--y),0 0 20px 6px rgba(245,197,0,.4)}}'
+    + '.spot-pulse{animation:spotpulse 2s ease-in-out infinite}'
+    + '.container{max-width:1200px;margin:0 auto;padding:1.5rem 1rem}'
+    + '.cols{display:grid;grid-template-columns:repeat(' + colCount + ',1fr);gap:1rem;align-items:start}'
+    + '@media(max-width:640px){.cols{grid-template-columns:1fr}}'
+    + '.col-head{background:var(--g2);border-radius:var(--r) var(--r) 0 0;padding:.6rem 1rem;border-bottom:2px solid var(--y);display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem}'
+    + '.col-head h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.8px;color:var(--y);font-weight:800}'
+    + '.col-count{font-size:.72rem;background:#333;color:#888;padding:1px 7px;border-radius:20px;margin-left:auto}'
+    + '.ev-card{display:flex;align-items:stretch;background:var(--g);border-radius:var(--r);margin-bottom:.6rem;text-decoration:none;color:#fff;overflow:hidden;border:1px solid #2a2a2a;transition:border-color .15s,transform .1s}'
+    + '.ev-card:hover{border-color:var(--y);transform:translateY(-1px)}'
+    + '.ev-card.past{opacity:.55}'
+    + '.ev-card.active{border-color:var(--y);animation:pulse 2s ease-in-out infinite}'
+    + '@keyframes pulse{0%,100%{box-shadow:0 0 0 1px var(--y),0 0 8px 2px rgba(245,197,0,.25)}50%{box-shadow:0 0 0 2px var(--y),0 0 18px 6px rgba(245,197,0,.45)}}'
+    + '.today-badge{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:20px;background:#333;color:var(--y);text-transform:uppercase;letter-spacing:.5px}'
+    + '.active-badge{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:20px;background:var(--y);color:#111;text-transform:uppercase;letter-spacing:.5px;animation:pulse 2s ease-in-out infinite}'
+    + '.ev-date-col{width:52px;min-height:70px;background:#2a2a2a;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;padding:.4rem 0}'
+    + '.ev-day{font-size:1.4rem;font-weight:900;line-height:1;color:var(--y)}'
+    + '.ev-month{font-size:.65rem;text-transform:uppercase;color:#888;letter-spacing:.5px}'
+    + '.ev-year{font-size:.6rem;color:#555}'
+    + '.ev-body{padding:.6rem .75rem;flex:1;min-width:0}'
+    + '.ev-top{display:flex;gap:.3rem;margin-bottom:.3rem;align-items:center;flex-wrap:wrap}'
+    + '.type-badge{font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}'
+    + '.type-stand{background:#1a4a1a;color:#4caf50}'
+    + '.type-kurs{background:#1a2a4a;color:#64b5f6}'
+    + '.type-tur{background:#3a1a4a;color:#c084fc}'
+    + '.past-badge{font-size:.6rem;color:#666;background:#222;padding:2px 6px;border-radius:20px}'
+    + '.ug-badge{font-size:.6rem;color:#aaa;background:#2a2a2a;border:1px solid #3a3a3a;padding:2px 6px;border-radius:20px}'
+    + '.ev-title{font-size:.88rem;font-weight:700;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
+    + '.ev-meta{font-size:.72rem;color:#777;margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
+    + '.ev-arrow{display:flex;align-items:center;padding:0 .6rem;color:#333;font-size:1rem;flex-shrink:0}'
+    + '.ev-card:hover .ev-arrow{color:var(--y)}'
+    + '.empty-col{text-align:center;padding:2rem .5rem;color:#444;font-size:.82rem}'
+    + 'footer{text-align:center;padding:2rem 1rem;font-size:.75rem;color:#333}'  + '.banner-wrap{background:transparent;position:relative;height:100%;display:flex;align-items:stretch;width:100%}'  + '.banner-track{display:flex;will-change:transform;align-items:stretch;height:100%;padding:.5rem 0;box-sizing:border-box;gap:1rem}'  + '#bannerTrack .banner-item{flex:0 0 auto}'  + '.banner-track.no-anim{width:100%;display:flex}'  + '.banner-track.no-anim{animation:none!important}'  + '@keyframes banner-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}'  + '.banner-item{display:flex;align-items:stretch;min-width:0;text-decoration:none;color:#fff;transition:background .15s,transform .1s;height:100%;border-radius:var(--r);overflow:hidden}'  + '.banner-item:hover{background:#1a1a1a}'  + '.banner-item.is-active{border:1px solid var(--y);animation:pulse 2s ease-in-out infinite}'  + '.banner-item.is-next{border:1px solid #2a2a2a}';
+
+  // Check if any tur events have geocoded routes (need Leaflet)
+  var needsLeaflet = allAvdEvents.some(function(ev) {
+    return ev.eventType === "tur" && ev.route && ev.route.days &&
+      ev.route.days.some(function(d) {
+        return (d.etapper||[]).some(function(e) { return e._lat; });
+      });
+  });
+
+  // ── HTML ─────────────────────────────────────────────────────────
+  var html = '<!DOCTYPE html><html lang="no"><head>'
+    + '<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>'
+    + '<title>' + escHtml(dept.name) + ' – ' + escHtml(siteName) + '</title>'
+    + (needsLeaflet ? '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>' : '')
+    + '<style>' + css + '</style>'
+    + (needsLeaflet ? '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>' : '')
+    + '</head><body>'
+    + '<div class="header">'
+    + '<div class="header-brand" style="position:relative;z-index:2;background:#1a1a1a">'
+    + '<div class="header-logo">'+(settings && settings.siteName ? escHtml(settings.siteName.split(' ')[0]) : 'Events')+'</div>'
+    + '<div><div class="header-title">' + escHtml(dept.name) + '</div><div class="header-sub">' + escHtml(siteName) + '</div></div>'
+    + '</div>'
+    + '<div id="bannerSlot" data-cols="' + colCount + '" style="flex:1;overflow:hidden">'
+    + '<!-- BANNER -->'
+    + (function() {
+        // Build banner items: all active first, then upcoming (up to 3)
+        var bannerItems = [];
+        spotPagaende.forEach(function(ev) { bannerItems.push({ ev: ev, mode: "active" }); });
+        var nesteSlice = spotKommende.slice(0, 1); // always exactly 1 next
+        nesteSlice.forEach(function(ev) { bannerItems.push({ ev: ev, mode: "next" }); });
+
+        function bannerItem(ev, mode) {
+          var isActive = mode === "active";
+          var evDate   = new Date(ev.date);
+          var timeStr  = ev.date.length > 10 ? evDate.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}) : null;
+          var endStr   = ev.endTime ? ev.endTime.slice(0,5) : null;
+          var url      = "https://" + ev.slug + "." + domain;
+          var typeLabel = ev.eventType === "kurs" ? "Kurs" : ev.eventType === "tur" ? "Tur" : "Stand";
+          var typeCls   = ev.eventType === "kurs" ? "type-kurs" : ev.eventType === "tur" ? "type-tur" : "type-stand";
+          // Date column – yellow background on active (same as ev-card dateColLit)
+          var dateBg   = isActive ? "background:var(--y)" : "";
+          var dayColor = isActive ? "color:#111" : "";
+          var monColor = isActive ? "color:#111;opacity:.8" : "";
+          var arrColor = isActive ? "color:var(--y)" : "";
+          return '<a href="' + escHtml(url) + '" class="ev-card banner-item ' + (isActive ? "active is-active" : "is-next") + '">'
+            + '<div class="ev-date-col" ' + (isActive ? 'style="' + dateBg + '"' : '') + '>'
+            +   '<div class="ev-day" ' + (isActive ? 'style="' + dayColor + '"' : '') + '>' + evDate.getDate() + '</div>'
+            +   '<div class="ev-month" ' + (isActive ? 'style="' + monColor + '"' : '') + '>'
+            +     evDate.toLocaleDateString("en-GB",{month:"short"})
+            +   '</div>'
+            + '</div>'
+            + '<div class="ev-body" style="flex:1;min-width:0">'
+            +   '<div class="ev-top">'
+            +     '<span class="type-badge ' + typeCls + '">' + typeLabel + '</span>'
+            +     (isActive ? '<span class="active-badge">Pågående nå</span>' : '<span class="today-badge">Kommende</span>')
+            +   '</div>'
+            +   '<div class="ev-title">' + escHtml(ev.title) + '</div>'
+            +   (timeStr ? '<div class="ev-meta">🕐 ' + timeStr + (endStr ? '–'+endStr : '') + '</div>' : '')
+            +   (ev.location ? '<div class="ev-meta">📍 ' + escHtml(ev.location) + '</div>' : '')
+            + '</div>'
+            + '<div class="ev-arrow" ' + (isActive ? 'style="' + arrColor + '"' : '') + '>→</div>'
+            + '</a>';
+        }
+
+        // No active events – show dimmed placeholder + next event
+        if (bannerItems.length === 0) {
+          var emptyItem = '<a href="#" class="ev-card banner-item is-next" style="opacity:.4;cursor:default;pointer-events:none">'
+            + '<div class="ev-date-col" style="background:#1a1a1a">'
+            + '<div style="font-size:1.6rem;line-height:1;color:#444">–</div>'
+            + '</div>'
+            + '<div class="ev-body" style="flex:1;min-width:0;display:flex;align-items:center">'
+            + '<div style="font-size:.82rem;color:#555;font-style:italic">Ingen pågående aktivitet</div>'
+            + '</div>'
+            + '</a>';
+          var nextItem = spotNeste ? bannerItem(spotNeste, 'next') : '';
+          var trackHtml = '<div class="banner-track no-anim">' + emptyItem + nextItem + '</div>';
+          return '<style>.banner-item{flex:1 1 0;min-width:0}</style>'
+            + '<div class="banner-wrap" id="bannerWrap">'
+            + trackHtml
+            + '</div>';
+        }
+
+        var itemsHtml = bannerItems.map(function(b){ return bannerItem(b.ev, b.mode); }).join("");
+
+        // If only 1 item, no scroll needed
+        var needsScroll = spotPagaende.length >= 2;
+        var trackStyle = needsScroll
+          ? 'class="banner-track" id="bannerTrack"'
+          : 'class="banner-track no-anim"';
+
+        // Duplicate items for seamless loop when scrolling
+        var trackContent = needsScroll ? (itemsHtml + itemsHtml) : itemsHtml;
+
+        return '<div class="banner-wrap" id="bannerWrap">'
+          + '<div ' + trackStyle + '>' + trackContent + '</div>'
+          + '</div>'
+          + '<style>.banner-item{flex:1 1 0;min-width:0}</style>'
+          + (needsScroll ? '<script>'
+            + '(function(){'
+            + 'var wrap=document.getElementById("bannerWrap");'
+            + 'var track=document.getElementById("bannerTrack");'
+            + 'if(!wrap||!track)return;'
+            + 'var items=track.querySelectorAll(".banner-item");'
+            + 'var half=Math.floor(items.length/2);'
+            + 'var itemW=items[0]?items[0].getBoundingClientRect().width:300;'
+            + 'var totalW=(itemW+16)*half;'
+            + 'var dur=Math.max(8,half*6);'
+            // Pause on hover
+            + 'var paused=false;'
+            + 'var pos=0;var last=null;'
+            + 'function step(ts){'
+            + '  if(!last)last=ts;'
+            + '  if(!paused)pos+=(ts-last)/1000*(totalW/dur);'
+            + '  if(pos>=totalW)pos-=totalW;'
+            + '  track.style.transform="translateX(-"+pos.toFixed(2)+"px)";'
+            + '  last=ts;'
+            + '  requestAnimationFrame(step);'
+            + '}'
+            + 'wrap.addEventListener("mouseenter",function(){paused=true;});'
+            + 'wrap.addEventListener("mouseleave",function(){paused=false;last=null;});'
+            + 'requestAnimationFrame(step);'
+            + '})();'
+            + '<\/script>' : '');
+      })()
+    + '</div>'   // close banner slot
+    + '</div>'   // close header
+    + '<div class="container">';
+
+  if (filtered.length === 0) {
+    html += '<div style="text-align:center;padding:4rem 1rem;color:#444">'
+      + '<div style="font-size:2.5rem;margin-bottom:.75rem">📅</div>'
+      + '<p>Ingen kommende arrangementer</p></div>';
+  } else {
+    html += '<div class="cols">';
+    columns.forEach(function(kol) {
+      var tidligere = kol.events.filter(function(ev) { return ev.date && getEndMs(ev) < now; });
+      var pagaende  = kol.events.filter(function(ev) { return ev.date && new Date(ev.date).getTime() <= now && getEndMs(ev) >= now; });
+      var kommende  = kol.events.filter(function(ev) { return !ev.date || new Date(ev.date).getTime() > now; });
+
+      function byDate(a,b) {
+        if (!a.date && !b.date) return 0;
+        if (!a.date) return -1;
+        if (!b.date) return 1;
+        return new Date(a.date) - new Date(b.date);
+      }
+      tidligere.sort(byDate);
+      pagaende.sort(byDate);
+      kommende.sort(byDate);
+
+      var kommendeCount = pagaende.length + kommende.length;
+      html += '<div>'
+        + '<div class="col-head"><h2>' + escHtml(kol.label) + '</h2>'
+        + '<span class="col-count">' + kommendeCount + ' kommende</span></div>';
+
+      if (tidligere.length === 0 && pagaende.length === 0 && kommende.length === 0) {
+        html += '<div class="empty-col">Ingen arrangementer</div>';
+      }
+      if (tidligere.length > 0) {
+        html += '<div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;color:#444;margin:.75rem 0 .4rem;border-bottom:1px solid #222;padding-bottom:.3rem">Tidligere</div>';
+        tidligere.forEach(function(ev) { html += evCard(ev); });
+      }
+      if (pagaende.length > 0) {
+        html += '<div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;color:#888;margin:.75rem 0 .4rem;border-bottom:1px solid #333;padding-bottom:.3rem">Pågående nå</div>';
+        pagaende.forEach(function(ev) { html += evCard(ev); });
+      }
+      if (kommende.length > 0) {
+        if (pagaende.length > 0 || tidligere.length > 0) {
+          html += '<div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;color:#444;margin:.75rem 0 .4rem;border-bottom:1px solid #222;padding-bottom:.3rem">Kommende</div>';
+        }
+        kommende.forEach(function(ev) { html += evCard(ev); });
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  html += '</div><footer>' + escHtml(siteName) + ' · ' + escHtml(dept.name) + '</footer>'
+    + '<script>\n'
+    + '(function(){\n'
+    // SSE: koble til og reload ved events_updated for denne avdelingen
+    + '  var DEPT_ID = ' + JSON.stringify(dept.id) + ';\n'
+    + '  var es;\n'
+    + '  function connect() {\n'
+    + '    es = new EventSource("/api/events/stream?department=" + DEPT_ID);\n'
+    + '    es.onmessage = function(e) {\n'
+    + '      try {\n'
+    + '        var msg = JSON.parse(e.data);\n'
+    + '        if (msg.type === "events_updated") location.reload();\n'
+    + '      } catch(err) {}\n'
+    + '    };\n'
+    + '    es.onerror = function() {\n'
+    + '      es.close();\n'
+    + '      setTimeout(connect, 5000);\n'
+    + '    };\n'
+    + '  }\n'
+    + '  connect();\n'
+    // Reload ved visibility (komme tilbake fra bakgrunn med eventuell statusendring)
+    + '  var EVENTS = ' + JSON.stringify(allAvdEvents.map(function(ev) {
+        return { start: new Date(ev.date).getTime(), end: (function() {
+          if (ev.endDate) { var d=new Date(ev.endDate); if(ev.endTime){var p=ev.endTime.split(":");d.setHours(+p[0],+p[1],0,0);} else d.setHours(23,59,59,999); return d.getTime(); }
+          var d2=new Date(ev.date); if(ev.endTime){var p2=ev.endTime.split(":");d2.setHours(+p2[0],+p2[1],0,0);} else d2.setHours(23,59,59,999); return d2.getTime();
+        })() };
+      })) + ';\n'
+    + '  function statusOf(ev, now) { if(now<ev.start)return"neste"; if(now<=ev.end)return"pagaende"; return"tidligere"; }\n'
+    + '  var lastStatuses = EVENTS.map(function(ev){return statusOf(ev,Date.now());});\n'
+    + '  // Sjekk hvert minutt om et event har skiftet status basert på klokken\n'
+    + '  setInterval(function() {\n'
+    + '    var now = Date.now();\n'
+    + '    var changed = EVENTS.some(function(ev,i){return statusOf(ev,now)!==lastStatuses[i];});\n'
+    + '    if (changed) location.reload();\n'
+    + '  }, 60000);\n'
+    + '  document.addEventListener("visibilitychange", function() {\n'
+    + '    if (document.visibilityState === "visible") {\n'
+    + '      var now = Date.now();\n'
+    + '      var changed = EVENTS.some(function(ev,i){return statusOf(ev,now)!==lastStatuses[i];});\n'
+    + '      if (changed) { location.reload(); return; }\n'
+    + '      if (!es || es.readyState === 2) connect();\n'  // reconnect om SSE er stengt
+    + '    }\n'
+    + '  });\n'
+    + '})();\n'
+    + '<\/script>\n'
+    + '</body></html>';
+  res.send(html);
+}
+
+// ── Public event page ────────────────────────────────────────────
+function serveEventPage(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.slug === req.eventSlug; });
+  if (!ev) return res.status(404).send(notFoundPage(req.eventSlug));
+
+  // Sjekk om eventet er merket som offentlig
+  // Ikke-offentlige events krever at bruker er innlogget i admin (session)
+  if (!ev.isPublic && !req.session.user) {
+    return res.status(401).send(authWallPage(ev));
+  }
+
+  const isAuthenticated = !!req.session.user;
+  res.send(buildEventPage(ev, isAuthenticated));
+}
+
+function authWallPage(ev) {
+  var title = ev ? escHtml(ev.title) : "Arrangement";
+  return '<!DOCTYPE html><html lang="no"><head><meta charset="UTF-8"/>'
+    + '<meta name="viewport" content="width=device-width,initial-scale=1"/>'
+    + '<title>' + title + ' – Krever innlogging</title>'
+    + '<style>body{font-family:"Helvetica Neue",Arial,sans-serif;background:#1a1a1a;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}'
+    + '.box{max-width:400px;width:100%;text-align:center}'
+    + '.logo{background:#FFD100;color:#111;font-weight:900;font-size:1.4rem;padding:6px 14px;border-radius:6px;display:inline-block;margin-bottom:1.5rem}'
+    + 'h1{font-size:1.4rem;margin-bottom:.5rem}'
+    + 'p{color:#888;font-size:.9rem;margin-bottom:1.5rem;line-height:1.6}'
+    + '.btn{display:inline-block;background:#FFD100;color:#111;font-weight:700;padding:.75rem 2rem;border-radius:6px;text-decoration:none;font-size:1rem}'
+    + '</style></head><body>'
+    + '<div class="box">'
+    + '<div class="logo">'+(s ? escHtml((s.siteName||'Events').split(' ')[0]) : 'Events')+'</div>'
+    + '<h1>' + title + '</h1>'
+    + '<p>Dette arrangementet er ikke offentlig tilgjengelig.<br>Logg inn med din NAF-konto for å se siden.</p>'
+    + '<a href="https://' + escHtml(ADMIN_DOMAIN) + '" class="btn">🔒 Logg inn</a>'
+    + '</div></body></html>';
+}
+
+function notFoundPage(slug) {
+  return '<!DOCTYPE html><html><head><title>Ikke funnet</title>'
+    + '<style>body{font-family:sans-serif;text-align:center;padding:5rem;background:#1a1a1a;color:#fff}'
+    + 'h1{color:#FFD100}a{color:#FFD100}</style></head>'
+    + '<body><h1>'+(getSettings().siteName||'Events Admin')+'</h1><p>Finner ikke eventet <strong>' + escHtml(slug) + '</strong>.</p>'
+    + '<a href="https://' + escHtml(ADMIN_DOMAIN) + '">← Back</a></body></html>';
+}
+
+function buildEventPage(ev, isAuthenticated) {
+  return ev.eventType === "kurs" ? buildKursPage(ev, isAuthenticated) : ev.eventType === "tur" ? buildTurPage(ev, isAuthenticated) : buildStandPage(ev, isAuthenticated);
+}
+
+// ── Shared helpers ────────────────────────────────────────────────
+function sharedCSS() {
+  return '<style>\n'
+    + ':root{--y:#FFD100;--b:#1A1A1A;--g:#2A2A2A;--g2:#3A3A3A;--red:#E2001A}\n'
+    + '*{box-sizing:border-box;margin:0;padding:0}\n'
+    + 'body{font-family:"Helvetica Neue",Arial,sans-serif;background:var(--b);color:#fff;min-height:100vh;display:flex;flex-direction:column}\n'
+    + 'header{background:var(--g);border-bottom:3px solid var(--y);padding:1rem 2rem;display:flex;align-items:center;gap:12px;position:relative;transition:border-color .3s}\n'
+    + 'header.offline{border-bottom:none;}\n'
+    + 'header.offline::after{content:"";position:absolute;bottom:0;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,var(--y) 0,var(--y) 12px,var(--red) 12px,var(--red) 24px);background-size:24px 4px;animation:stripe-move .5s linear infinite;}\n'
+    + '@keyframes stripe-move{from{background-position:0 0}to{background-position:24px 0}}\n'
+    + '.badge{background:var(--y);color:var(--b);font-weight:900;font-size:1.1rem;padding:4px 10px;border-radius:4px}\n'
+    + '.hero{position:relative;height:280px;overflow:hidden;background:var(--g2)}\n'
+    + '.hero img{width:100%;height:100%;object-fit:cover;opacity:.7}\n'
+    + '.hero-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:2rem;background:linear-gradient(transparent,rgba(0,0,0,.85))}\n'
+    + '.hero h1{font-size:2rem;font-weight:900;line-height:1.1}\n'
+    + '.hero h1 span{color:var(--y)}\n'
+    + '.type-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700;text-transform:uppercase;margin-bottom:.5rem}\n'
+    + '.type-stand{background:#1a3a1a;color:#7dff7d;border:1px solid #2d6a2d}\n'
+    + '.type-kurs{background:#1a2a3a;color:#7dc8ff;border:1px solid #2d4a6a}\n'
+    + '.type-tur{background:#2d1a3a;color:#d8b4fe;border:1px solid #5b3a7a}\n'
+    + '.meta{display:flex;gap:1.5rem;margin-top:.75rem;font-size:.9rem;opacity:.85;flex-wrap:wrap}\n'
+    + '.container{max-width:960px;margin:0 auto;padding:2rem 1.5rem;flex:1}\n'
+    + '.tabs{display:flex;gap:0;border-bottom:2px solid var(--g2);margin-bottom:2rem}\n'
+    + '.tab{padding:10px 24px;cursor:pointer;font-weight:700;font-size:.9rem;color:#888;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}\n'
+    + '.tab:hover{color:#ccc}\n'
+    + '.tab.active{color:var(--y);border-color:var(--y)}\n'
+    + '.tab-panel{display:none}\n'
+    + '.tab-panel.active{display:block}\n'
+    + '.card{background:var(--g);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem}\n'
+    + '.card h2{font-size:1rem;text-transform:uppercase;letter-spacing:.5px;color:var(--y);margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--g2)}\n'
+    + 'p{line-height:1.7;color:#ddd}\n'
+    + 'label{display:block;font-size:.8rem;color:#aaa;margin:.6rem 0 3px}\n'
+    + 'input,textarea{width:100%;padding:9px 12px;background:var(--b);border:1px solid #555;border-radius:6px;color:#fff;font-size:.95rem;font-family:inherit}\n'
+    + 'input:focus,textarea:focus{outline:none;border-color:var(--y)}\n'
+    + 'textarea{resize:vertical;min-height:80px}\n'
+    + '.btn{display:inline-block;padding:10px 20px;background:var(--y);color:var(--b);font-weight:900;font-size:.95rem;border:none;border-radius:6px;cursor:pointer;margin-top:.75rem;transition:filter .2s}\n'
+    + '.btn:hover{filter:brightness(1.1)}\n'
+    + '.btn-ghost{background:transparent;border:1px solid #555;color:#ccc;padding:7px 16px;border-radius:6px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s}\n'
+    + '.btn-ghost:hover{border-color:var(--y);color:var(--y)}\n'
+    + '.msg{padding:.75rem 1rem;border-radius:6px;margin-top:.75rem;font-size:.9rem}\n'
+    + '.msg.ok{background:#1a3a1a;border:1px solid #2d6a2d;color:#7dff7d}\n'
+    + '.msg.err{background:#3a1a1a;border:1px solid #6a2d2d;color:#ff7d7d}\n'
+    + '.spots{font-size:.85rem;margin-top:.5rem;color:#888}\n'
+    + '.spots.low{color:var(--y)}\n'
+    // Deltakerliste (kurs)
+    + '.reg-list{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.25rem}\n'
+    + '.reg-item{display:flex;align-items:center;justify-content:space-between;background:var(--b);border-radius:6px;padding:.6rem 1rem}\n'
+    + '.reg-item .rname{font-weight:600}\n'
+    + '.reg-item .checked-in{color:var(--y);font-size:.85rem}\n'
+    + '.checkin-btn{background:var(--y);color:var(--b);border:none;border-radius:4px;padding:5px 12px;font-size:.85rem;font-weight:700;cursor:pointer}\n'
+    + '.search-wrap{position:relative;margin-bottom:1rem}\n'
+    + '.search-wrap input{padding-left:2rem}\n'
+    + '.search-icon{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:#555;font-size:.9rem}\n'
+    // Personal (staff)
+    + '.staff-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.25rem}\n'
+    + '.staff-item{display:flex;align-items:center;justify-content:space-between;background:var(--b);border-radius:6px;padding:.6rem 1rem}\n'
+    + '.staff-item .name{font-weight:600}\n'
+    + '.staff-item .role-tag{font-size:.8rem;color:#888}\n'
+    + '.staff-item .checked{color:var(--y);font-size:.85rem}\n'
+    // Guestbook
+    + '.gb-entries{display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem}\n'
+    + '.gb-entry{background:var(--b);border-radius:6px;padding:1rem}\n'
+    + '.gb-entry .gb-name{font-weight:700;color:var(--y);margin-bottom:.25rem}\n'
+    + '.gb-entry .gb-msg{color:#ccc;font-size:.95rem;line-height:1.6}\n'
+    + '.gb-entry .gb-date{font-size:.75rem;color:#555;margin-top:.4rem}\n'
+    + '.gb-entry .gb-photos a img{transition:transform .15s}\n'
+    + '.gb-entry .gb-photos a img:hover{transform:scale(1.05)}\n'
+    + '.empty-state{color:#555;text-align:center;padding:1.5rem;font-size:.9rem}\n'
+    // Footer
+    + '.ev-footer{background:var(--g2);border-top:1px solid #333;padding:.75rem 2rem;display:flex;justify-content:flex-end;align-items:center}\n'
+    + '.staff-link{background:none;border:none;color:#444;font-size:.78rem;cursor:pointer;padding:4px 8px;border-radius:4px;transition:color .2s;letter-spacing:.3px}\n'
+    + '.staff-link:hover{color:#888}\n'
+    + '.naf-dot{background:#FFD100;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5)}\n'
+    // PIN overlay
+    + '.pin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:center;justify-content:center;padding:1rem}\n'
+    + '.pin-overlay.open{display:flex}\n'
+    + '.pin-box{background:var(--g);border-radius:10px;width:100%;max-width:340px;overflow:hidden;box-shadow:0 12px 50px rgba(0,0,0,.6);animation:pop .2s}\n'
+    + '.staff-box{max-width:520px}\n'
+    + '@keyframes pop{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}\n'
+    + '.pin-head{background:var(--g2);border-bottom:2px solid var(--y);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center}\n'
+    + '.pin-head h3{font-size:.95rem;font-weight:700;color:var(--y)}\n'
+    + '.pin-close{background:none;border:none;color:#888;font-size:1.4rem;cursor:pointer}\n'
+    + '.pin-body{padding:1.5rem}\n'
+    + '.pin-input{text-align:center;font-size:1.8rem;letter-spacing:.5rem;font-weight:700}\n'
+    + '.offline-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:200;background:#b45309;color:#fff;padding:8px 1rem;font-size:.85rem;font-weight:700;align-items:center;justify-content:center;gap:.5rem;}\n'
+    + '.sync-msg{display:none;position:fixed;bottom:1rem;right:1rem;background:#1a3a1a;color:#7dff7d;border:1px solid #2d6a2d;padding:.6rem 1rem;border-radius:6px;font-size:.85rem;font-weight:600;z-index:200;}\n'
+    + '</style>\n';
+}
+
+function sharedHero(ev) {
+  var settings  = getSettings();
+  var deptLabel   = null;
+  if (ev.department) {
+    var deptObj = (settings.departments || []).find(function(a) { return a.id === ev.department; });
+    deptLabel = deptObj ? deptObj.name : null;
+  }
+  var ugNavn = null;
+  if (ev.subgroup && ev.department) {
+    var deptObj2 = (settings.departments || []).find(function(a) { return a.id === ev.department; });
+    var ugObj   = deptObj2 ? (deptObj2.subgroups || []).find(function(u) { return u.id === ev.subgroup; }) : null;
+    ugNavn = ugObj ? ugObj.name : null;
+  }
+  var typeLabel = ev.eventType === "kurs" ? "Kurs" : ev.eventType === "tur" ? "Tur" : "Stand";
+  var typeCls   = ev.eventType === "kurs" ? "type-kurs" : ev.eventType === "tur" ? "type-tur" : "type-stand";
+  return '<div id="offlineBar" class="offline-bar">📵 Frakoblet – handlinger synkroniseres når du er online</div>\n'
+    + '<div id="syncMsg" class="sync-msg"></div>\n'
+    + '<div class="hero">\n'
+    + (ev.image ? '<img src="' + escHtml(ev.image) + '" alt="' + escHtml(ev.title) + '"/>' : '<div style="height:100%;background:linear-gradient(135deg,#2a2a2a,#1a1a1a)"></div>')
+    + '\n<div class="hero-overlay">\n'
+    + '<span class="type-badge ' + typeCls + '">' + typeLabel + '</span>\n'
+    + '<h1>' + escHtml(ev.title) + '</h1>\n'
+    + '<div class="meta">'
+    + (ev.date
+      ? '<span>📅 ' + new Date(ev.date).toLocaleDateString("nb-NO",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) + (ev.date.length > 10 ? ' kl. ' + new Date(ev.date).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}) : '') + '</span>'
+      : '<span style="color:#f5c500">📅 Date not set</span>')
+    + (ev.location ? '<span>📍 ' + escHtml(ev.location) + '</span>' : '')
+    + (deptLabel ? '<span>🏢 ' + escHtml(deptLabel) + (ugNavn ? ' · ' + escHtml(ugNavn) : '') + '</span>' : '')
+    + '</div>\n</div>\n</div>\n';
+}
+
+function sharedPinAndStaffOverlay(ev) {
+  const hasPin    = !!ev.staffPin;
+  const staffList = ev.staff || [];
+  const settings  = getSettings();
+  const depts     = settings.departments || [];
+
+  const staffRows = staffList.length ? staffList.map(function(s) {
+    return '<div class="staff-item" id="si-' + escHtml(s.id) + '" data-name="' + escHtml((s.name||"").toLowerCase()) + '">'
+      + '<div><div class="name">' + escHtml(s.name) + '</div>'
+      + (s.role ? '<div class="role-tag">' + escHtml(s.role) + '</div>' : '')
+      + (s.department ? '<div style="font-size:.75rem;color:#888">' + escHtml(s.department) + '</div>' : '')
+      + '</div>'
+      + (s.checkedIn
+        ? '<span class="checked">✔ Sjekket inn' + (s.checkedInAt ? ' ' + new Date(s.checkedInAt).toLocaleTimeString('nb-NO',{hour:'2-digit',minute:'2-digit'}) : '') + '</span>'
+        : '<button class="checkin-btn" onclick="checkIn(\'' + escHtml(s.id) + '\')">Sjekk inn</button>')
+      + '</div>';
+  }).join("") : '<p class="empty-state">Ingen forhåndsregistrert personell ennå.</p>';
+
+  const deptOptions = depts.length
+    ? '<label>Avdeling</label>'
+      + '<select id="sDept" style="width:100%;margin-bottom:.75rem">'
+      + '<option value="">– Velg avdeling –</option>'
+      + depts.map(function(d){ return '<option value="' + escHtml(d.name) + '">' + escHtml(d.name) + '</option>'; }).join("")
+      + '</select>'
+    : '';
+
+  return '<footer class="ev-footer">\n'
+    + '<button class="staff-link" onclick="openStaffPanel()">👔 Personell</button>\n'
+    + '</footer>\n'
+    + '<div class="pin-overlay" id="pinOverlay">\n'
+    + '<div class="pin-box">\n'
+    + '<div class="pin-head"><h3>Personalinngang</h3><button class="pin-close" onclick="closePinOverlay()">×</button></div>\n'
+    + '<div class="pin-body">\n'
+    + (hasPin
+      ? '<p style="color:#aaa;font-size:.9rem;margin-bottom:1rem;text-align:center">Skriv inn PIN-kode for å fortsette</p>'
+        + '<div id="pinErr" class="msg err" style="display:none;margin-bottom:.75rem"></div>'
+        + '<input class="pin-input" type="password" id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="10" placeholder="••••" autocomplete="off"/>'
+        + '<button class="btn" style="width:100%;justify-content:center;margin-top:1rem" onclick="verifyPin()">Bekreft</button>'
+      : '<p style="color:#aaa;text-align:center;margin-bottom:1rem">Velkommen til personalinngang</p>'
+        + '<button class="btn" style="width:100%;justify-content:center" onclick="unlockStaff()">Gå til innsjekk</button>')
+    + '</div>\n</div>\n</div>\n'
+    + '<div class="pin-overlay" id="staffOverlay">\n'
+    + '<div class="pin-box staff-box">\n'
+    + '<div class="pin-head"><h3>👔 Personell – innsjekk</h3><button class="pin-close" onclick="closeStaffOverlay()">×</button></div>\n'
+    + '<div class="pin-body">\n'
+
+    // Søkefelt
+    + (staffList.length
+      ? '<input type="search" id="staffSearch" placeholder="🔍 Søk etter navn…" oninput="filterStaffList(this.value)"'
+        + ' style="width:100%;margin-bottom:.75rem;padding:8px 12px;border-radius:6px;border:1px solid #444;background:#1e1e1e;color:#fff;font-size:.9rem"/>\n'
+      : '')
+    + '<div class="staff-list" id="staffList">' + staffRows + '</div>\n'
+
+    // Skillelinje og registrering
+    + '<hr style="border-color:#333;margin:1.25rem 0"/>\n'
+    + '<h2 style="font-size:.9rem;text-transform:uppercase;letter-spacing:.5px;color:var(--y);margin-bottom:1rem">Ikke på listen? Registrer deg</h2>\n'
+    + '<div id="staffMsg"></div>\n'
+    + '<label>Navn *</label><input id="sName" type="text" placeholder="Ola Nordmann"/>\n'
+    + '<label>Rolle / funksjon</label><input id="sRole" type="text" placeholder="Vakt, guide, teknikk…"/>\n'
+    + deptOptions
+    + '<button class="btn" onclick="selfCheckIn()">Registrer meg som personell</button>\n'
+    + '</div>\n</div>\n</div>\n';
+}
+
+function sharedJS(ev) {
+  const hasPin = !!ev.staffPin;
+  return '<script>\n'
+    + 'var EV_ID = "' + ev.id + '";\n'
+    + 'var PHOTO_BASE_URL = "https://' + ADMIN_DOMAIN + '";\n'
+    + 'var EV_SLUG = "' + escHtml(ev.slug) + '";\n'
+    + 'var HAS_PIN = ' + (hasPin ? 'true' : 'false') + ';\n'
+    + 'function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}\n'
+
+    // ── Offline DB (IndexedDB via wrapper) ──────────────────────────
+    + '(function(){\n'
+    + 'var DB_NAME="naf-ev-"+EV_ID, DB_VER=1, _db=null;\n'
+    + 'function openDB(cb){\n'
+    + '  if(_db)return cb(_db);\n'
+    + '  var r=indexedDB.open(DB_NAME,DB_VER);\n'
+    + '  r.onupgradeneeded=function(e){\n'
+    + '    var db=e.target.result;\n'
+    + '    if(!db.objectStoreNames.contains("snapshot"))db.createObjectStore("snapshot",{keyPath:"id"});\n'
+    + '    if(!db.objectStoreNames.contains("queue"))db.createObjectStore("queue",{keyPath:"id",autoIncrement:true});\n'
+    + '  };\n'
+    + '  r.onsuccess=function(e){_db=e.target.result;cb(_db);};\n'
+    + '  r.onerror=function(){cb(null);};\n'
+    + '}\n'
+    + 'window.dbSaveSnapshot=function(snap){\n'
+    + '  openDB(function(db){if(!db)return;\n'
+    + '    var tx=db.transaction("snapshot","readwrite");\n'
+    + '    tx.objectStore("snapshot").put(snap);\n'
+    + '  });\n'
+    + '};\n'
+    + 'window.dbGetSnapshot=function(cb){\n'
+    + '  openDB(function(db){if(!db)return cb(null);\n'
+    + '    var tx=db.transaction("snapshot","readonly");\n'
+    + '    var r=tx.objectStore("snapshot").get(EV_ID);\n'
+    + '    r.onsuccess=function(){cb(r.result||null);};\n'
+    + '    r.onerror=function(){cb(null);};\n'
+    + '  });\n'
+    + '};\n'
+    + 'window.dbEnqueue=function(op){\n'
+    + '  openDB(function(db){if(!db)return;\n'
+    + '    var tx=db.transaction("queue","readwrite");\n'
+    + '    tx.objectStore("queue").add(op);\n'
+    + '  });\n'
+    + '};\n'
+    + 'window.dbGetQueue=function(cb){\n'
+    + '  openDB(function(db){if(!db)return cb([]);\n'
+    + '    var tx=db.transaction("queue","readonly");\n'
+    + '    var r=tx.objectStore("queue").getAll();\n'
+    + '    r.onsuccess=function(){cb(r.result||[]);};\n'
+    + '    r.onerror=function(){cb([]);};\n'
+    + '  });\n'
+    + '};\n'
+    + 'window.dbClearQueue=function(){\n'
+    + '  openDB(function(db){if(!db)return;\n'
+    + '    var tx=db.transaction("queue","readwrite");\n'
+    + '    tx.objectStore("queue").clear();\n'
+    + '  });\n'
+    + '};\n'
+
+    // ── Online/offline-indikator og synk ────────────────────────────
+    + 'window._isOnline=navigator.onLine;\n'
+    + 'function updateOnlineUI(){\n'
+    + '  var bar=document.getElementById("offlineBar");\n'
+    + '  var hdr=document.querySelector("header");\n'
+    + '  if(bar)bar.style.display=navigator.onLine?"none":"flex";\n'
+    + '  if(hdr){if(navigator.onLine){hdr.classList.remove("offline");}else{hdr.classList.add("offline");}}\n'
+    + '  window._isOnline=navigator.onLine;\n'
+    + '  if(navigator.onLine)syncQueue();\n'
+    + '}\n'
+    + 'window.addEventListener("online",updateOnlineUI);\n'
+    + 'window.addEventListener("offline",updateOnlineUI);\n'
+
+    // ── Synk kø til server ──────────────────────────────────────────
+    + 'async function syncQueue(){\n'
+    + '  dbGetQueue(async function(ops){\n'
+    + '    if(!ops.length)return;\n'
+    + '    try{\n'
+    + '      var r=await fetch("/api/events/"+EV_ID+"/sync",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ops:ops})});\n'
+    + '      if(r.ok){dbClearQueue();showSyncMsg("✓ "+ops.length+" handling"+(ops.length>1?"er":"")+" synket");}\n'
+    + '    }catch(e){}\n'
+    + '  });\n'
+    + '}\n'
+    + 'function showSyncMsg(txt){\n'
+    + '  var el=document.getElementById("syncMsg");\n'
+    + '  if(!el)return;\n'
+    + '  el.textContent=txt;el.style.display="block";\n'
+    + '  setTimeout(function(){el.style.display="none";},4000);\n'
+    + '}\n'
+
+    // ── Felles hjelpefunksjoner ─────────────────────────────────────
+    + 'window.showTab=function(t,el){document.querySelectorAll(".tab-panel").forEach(function(p){p.classList.remove("active")});document.querySelectorAll(".tab").forEach(function(b){b.classList.remove("active")});document.getElementById("tab-"+t).classList.add("active");el.classList.add("active");}\n'
+    + 'window.openStaffPanel=function(){document.getElementById("pinOverlay").classList.add("open");}\n'
+    + 'window.closePinOverlay=function(){document.getElementById("pinOverlay").classList.remove("open");if(document.getElementById("pinInput"))document.getElementById("pinInput").value="";if(document.getElementById("pinErr"))document.getElementById("pinErr").style.display="none";}\n'
+    + 'window.closeStaffOverlay=function(){document.getElementById("staffOverlay").classList.remove("open");}\n'
+    + 'window.unlockStaff=function(){closePinOverlay();document.getElementById("staffOverlay").classList.add("open");}\n'
+
+    // ── PIN-verifisering (støtter offline – PIN er ikke i snapshot) ──
+    + 'window.verifyPin=async function(){\n'
+    + '  var pin=document.getElementById("pinInput").value;\n'
+    + '  var errEl=document.getElementById("pinErr");\n'
+    + '  errEl.style.display="none";\n'
+    + '  if(!pin){errEl.textContent="Skriv inn PIN-kode";errEl.style.display="block";return;}\n'
+    + '  if(!navigator.onLine){errEl.textContent="Internett er påkrevd for PIN-verifisering";errEl.style.display="block";return;}\n'
+    + '  var res=await fetch("/api/events/"+EV_ID+"/staff/verify-pin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:pin})});\n'
+    + '  if(res.ok){unlockStaff();}else{errEl.textContent="Feil PIN-kode – prøv igjen";errEl.style.display="block";document.getElementById("pinInput").value="";}\n'
+    + '}\n'
+    + 'if(document.getElementById("pinInput")){document.getElementById("pinInput").addEventListener("keydown",function(e){if(e.key==="Enter")verifyPin();});}\n'
+
+    // ── Staff innsjekking (online eller offline-kø) ─────────────────
+    + 'window.checkIn=async function(staffId){\n'
+    + '  var ts=new Date().toISOString();\n'
+    + '  var el=document.getElementById("si-"+staffId);\n'
+    + '  if(el)el.querySelector(".checkin-btn").outerHTML=\'<span class="checked">✔ Sjekket inn</span>\';\n'
+    + '  // Oppdater snapshot lokalt\n'
+    + '  dbGetSnapshot(function(snap){if(snap&&snap.staff){var s=snap.staff.find(function(x){return x.id===staffId;});if(s){s.checkedIn=true;s.checkedInAt=ts;}dbSaveSnapshot(snap);}});\n'
+    + '  if(navigator.onLine){\n'
+    + '    await fetch("/api/events/"+EV_ID+"/staff/checkin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({staffId:staffId})});\n'
+    + '  }else{\n'
+    + '    dbEnqueue({type:"checkin_staff",staffId:staffId,ts:ts});\n'
+    + '  }\n'
+    + '}\n'
+    + 'window.filterStaffList=function(q){\n'
+    + '  var items=document.querySelectorAll("#staffList .staff-item");\n'
+    + '  var lq=(q||"").toLowerCase().trim();\n'
+    + '  items.forEach(function(el){\n'
+    + '    el.style.display=(!lq||el.dataset.name.includes(lq))?"":"none";\n'
+    + '  });\n'
+    + '}\n'
+    + 'window.selfCheckIn=async function(){\n'
+    + '  var msg=document.getElementById("staffMsg");\n'
+    + '  var name=document.getElementById("sName").value.trim();\n'
+    + '  var role=document.getElementById("sRole").value.trim();\n'
+    + '  var deptEl=document.getElementById("sDept");\n'
+    + '  var dept=deptEl?deptEl.value.trim():"";\n'
+    + '  if(!name){msg.innerHTML=\'<div class="msg err">Navn er påkrevd</div>\';return;}\n'
+    + '  var ts=new Date().toISOString();\n'
+    + '  if(navigator.onLine){\n'
+    + '    var res=await fetch("/api/events/"+EV_ID+"/staff/checkin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name,role:role,department:dept})});\n'
+    + '    var d=await res.json();\n'
+    + '    if(res.ok){\n'
+    + '      msg.innerHTML=\'<div class="msg ok">✓ Du er registrert som personell!</div>\';\n'
+    + '      document.getElementById("sName").value="";\n'
+    + '      document.getElementById("sRole").value="";\n'
+    + '      if(deptEl)deptEl.value="";\n'
+    + '      // Legg til i listen umiddelbart\n'
+    + '      var list=document.getElementById("staffList");\n'
+    + '      if(list&&d.id){\n'
+    + '        var item=document.createElement("div");\n'
+    + '        item.className="staff-item";\n'
+    + '        item.id="si-"+d.id;\n'
+    + '        item.dataset.name=name.toLowerCase();\n'
+    + '        item.innerHTML=\'<div><div class="name">\'+esc(name)+\'</div>\''
+    + '          +(role?\'<div class="role-tag">\'+esc(role)+\'</div>\':\'\')\n'
+    + '          +(dept?\'<div style="font-size:.75rem;color:#888">\'+esc(dept)+\'</div>\':\'\')\n'
+    + '          +\'</div><span class="checked">✔ Sjekket inn</span>\';\n'
+    + '        list.appendChild(item);\n'
+    + '      }\n'
+    + '    }else{msg.innerHTML=\'<div class="msg err">✗ \'+esc(d.error||"Feil")+\'</div>\';}\n'
+    + '  }else{\n'
+    + '    dbEnqueue({type:"self_checkin_staff",name:name,role:role,department:dept,ts:ts});\n'
+    + '    msg.innerHTML=\'<div class="msg ok">✓ Lagret – synkroniseres når du er online</div>\';\n'
+    + '    document.getElementById("sName").value="";\n'
+    + '    document.getElementById("sRole").value="";\n'
+    + '    if(deptEl)deptEl.value="";\n'
+    + '  }\n'
+    + '}\n'
+
+    // ── Gjestebok (online eller offline-kø) ─────────────────────────
+    + 'window.submitComment=async function(){\n'
+    + '  var msg=document.getElementById("gbMsg");\n'
+    + '  var name=document.getElementById("gbName").value.trim();\n'
+    + '  var message=document.getElementById("gbMessage").value.trim();\n'
+    + '  if(!name||!message){msg.innerHTML=\'<div class="msg err">Navn og melding er påkrevd</div>\';return;}\n'
+    + '  var ts=new Date().toISOString();\n'
+    + '  if(navigator.onLine){\n'
+    + '    var res=await fetch("/api/events/"+EV_ID+"/guestbook",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name,message:message})});\n'
+    + '    var d=await res.json();\n'
+    + '    if(res.ok){\n'
+    + '      document.getElementById("gbName").value="";\n'
+    + '      document.getElementById("gbMessage").value="";\n'
+    + '      msg.innerHTML=\'<div class="msg ok">✓ Takk! Kommentaren godkjennes av administrator.</div>\';\n'
+    + '      if(d.id) showQrOffer(d.id);\n'
+    + '    }else{msg.innerHTML=\'<div class="msg err">✗ \'+d.error+\'</div>\';}\n'
+    + '  }else{\n'
+    + '    dbEnqueue({type:"guestbook",name:name,message:message,ts:ts});\n'
+    + '    msg.innerHTML=\'<div class="msg ok">✓ Lagret – synkroniseres når du er online</div>\';\n'
+    + '    document.getElementById("gbName").value="";\n'
+    + '    document.getElementById("gbMessage").value="";\n'
+    + '  }\n'
+    + '}\n'
+    + 'window.showQrOffer=function(gbId){\n'
+    + '  var container=document.getElementById("gbQrArea");\n'
+    + '  if(!container)return;\n'
+    + '  var btn=document.createElement("button");\n'
+    + '  btn.className="btn";\n'
+    + '  btn.style.cssText="background:#1a2a3a;border:2px solid #4a8abf;color:#7dc8ff;margin-top:.75rem;display:flex;align-items:center;gap:.6rem;justify-content:center;width:100%;padding:.7rem 1rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer";\n'
+    + '  btn.textContent="📸 Legg ved bilde via QR-kode";\n'
+    + '  btn.onclick=function(){openQrModal(gbId);};\n'
+    + '  container.innerHTML="";\n'
+    + '  container.appendChild(btn);\n'
+    + '}\n'
+    + 'window.openQrModal=async function(gbId){\n'
+    + '  var r=await fetch("/api/events/"+EV_ID+"/guestbook/"+gbId+"/photo-token",{method:"POST"});\n'
+    + '  var d=await r.json();\n'
+    + '  if(!r.ok||!d.token){alert("Kunne ikke generere QR-kode");return;}\n'
+    + '  var fullUrl=(typeof PHOTO_BASE_URL!=="undefined"?PHOTO_BASE_URL:window.location.origin)+d.url;\n'
+    + '  // Bygg modal med DOM\n'
+    + '  var ov=document.createElement("div");\n'
+    + '  ov.style.cssText="position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:1rem";\n'
+    + '  var box=document.createElement("div");\n'
+    + '  box.style.cssText="background:#1e1e1e;border-radius:12px;padding:1.75rem;max-width:320px;width:100%;text-align:center;border:1px solid #333";\n'
+    + '  var h3=document.createElement("h3");\n'
+    + '  h3.style.marginBottom=".5rem";\n'
+    + '  h3.textContent="📸 Skann for å laste opp bilde";\n'
+    + '  var desc=document.createElement("p");\n'
+    + '  desc.style.cssText="color:#888;font-size:.85rem;margin-bottom:1.25rem";\n'
+    + '  desc.textContent="Åpner kamera på mobilen din. Gyldig i 10 min.";\n'
+    + '  var qrDiv=document.createElement("div");\n'
+    + '  qrDiv.id="qrCanvas";\n'
+    + '  qrDiv.style.cssText="margin:0 auto 1.25rem;width:200px;height:200px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center";\n'
+    + '  var status=document.createElement("div");\n'
+    + '  status.id="qrStatus";\n'
+    + '  status.style.cssText="font-size:.85rem;color:#888;margin-bottom:1rem";\n'
+    + '  status.textContent="Venter på bilde…";\n'
+    + '  var closeBtn=document.createElement("button");\n'
+    + '  closeBtn.style.cssText="background:#2a2a2a;border:1px solid #444;color:#aaa;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:.9rem";\n'
+    + '  closeBtn.textContent="Lukk";\n'
+    + '  var sse=null;\n'
+    + '  closeBtn.onclick=function(){if(sse)sse.close();ov.remove();};\n'
+    + '  box.appendChild(h3);box.appendChild(desc);box.appendChild(qrDiv);box.appendChild(status);box.appendChild(closeBtn);\n'
+    + '  ov.appendChild(box);\n'
+    + '  document.body.appendChild(ov);\n'
+    + '  // Last QR-bibliotek\n'
+    + '  function initQR(){\n'
+    + '    new QRCode(qrDiv,{text:fullUrl,width:200,height:200,colorDark:"#000000",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});\n'
+    + '  }\n'
+    + '  if(window.QRCode){initQR();}\n'
+    + '  else{\n'
+    + '    var s=document.createElement("script");\n'
+    + '    s.src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";\n'
+    + '    s.onload=initQR;\n'
+    + '    document.head.appendChild(s);\n'
+    + '  }\n'
+    + '  // SSE – vent på bilde\n'
+    + '  sse=new EventSource("/api/gb-photo-wait/"+d.token);\n'
+    + '  sse.onmessage=function(e){\n'
+    + '    try{\n'
+    + '      var info=JSON.parse(e.data);\n'
+    + '      if(info.ok){\n'
+    + '        var cnt=info.count||1;\n'
+    + '        status.style.color="#4ade80";\n'
+    + '        status.textContent="✅ "+cnt+" bilde"+(cnt>1?"r":"")+" mottatt!";\n'
+    + '        qrDiv.innerHTML="";\n'
+    + '        var img=document.createElement("img");\n'
+    + '        img.src=info.photoUrl;\n'
+    + '        img.style.cssText="width:200px;height:200px;object-fit:cover;border-radius:8px";\n'
+    + '        qrDiv.appendChild(img);\n'
+    + '      }\n'
+    + '    }catch(ex){}\n'
+    + '  };\n'
+    + '}\n'
+
+    // ── Last snapshot ved oppstart og synk kø ──────────────────────
+    + 'window.addEventListener("DOMContentLoaded",function(){\n'
+    + '  updateOnlineUI();\n'
+    + '  if(navigator.onLine){\n'
+    + '    fetch("/api/events/"+EV_ID+"/snapshot").then(function(r){return r.json();}).then(function(snap){dbSaveSnapshot(snap);}).catch(function(){});\n'
+    + '    syncQueue();\n'
+    + '  }\n'
+    + '  // Service Worker\n'
+    + '  if("serviceWorker" in navigator){\n'
+    + '    navigator.serviceWorker.register("/sw.js").catch(function(){});\n'
+    + '  }\n'
+    + '});\n'
+    + '})();\n'
+    + '<\/script>\n';
+}
+
+// ── Stand page ────────────────────────────────────────────────────
+function buildStandPage(ev, isAuthenticated) {
+  const settings = getSettings();
+  const regs = ev.registrations || [];
+  const approvedComments = (ev.guestbook || []).filter(function(g) { return g.approved; });
+  const lottery = ev.lottery || null;
+  const lotteryEnabled = lottery && lottery.enabled;
+
+  const gbRows = approvedComments.length ? approvedComments.map(function(g) {
+    var photosHtml = (g.photos && g.photos.length)
+      ? '<div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem">'
+        + g.photos.map(function(p){ return '<a href="'+p+'" target="_blank"><img src="'+p+'" style="height:80px;width:80px;object-fit:cover;border-radius:6px;border:1px solid #333"/></a>'; }).join("")
+        + '</div>'
+      : "";
+    return '<div class="gb-entry"><div class="gb-name">' + escHtml(g.name) + '</div>'
+      + '<div class="gb-msg">' + escHtml(g.message).replace(/\n/g,"<br>") + '</div>'
+      + photosHtml
+      + '<div class="gb-date">' + new Date(g.createdAt).toLocaleDateString("nb-NO",{day:"numeric",month:"long",year:"numeric"}) + '</div></div>';
+  }).join("") : '<p class="empty-state">Ingen kommentarer ennå.</p>';
+
+  const contactEmail = escHtml(settings.contactEmail || '');
+  const siteName     = escHtml(settings.siteName || 'NAF');
+
+  const lotteryCss = lotteryEnabled ? (
+    '.lottery-box{background:linear-gradient(135deg,#1a0a2e,#0d1a0d);border:2px solid var(--y);border-radius:12px;padding:2rem;text-align:center;position:relative;overflow:hidden}\n'
+    + '.lottery-box::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(245,197,0,.08),transparent 70%);pointer-events:none}\n'
+    + '.lottery-drum{font-size:4rem;margin:.5rem 0;display:block;transition:transform .1s}\n'
+    + '.lottery-drum.spinning{animation:drum-spin .08s linear infinite}\n'
+    + '@keyframes drum-spin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}\n'
+    + '.winner-reveal{background:#1a3a1a;border:2px solid #4ade80;border-radius:10px;padding:1.25rem 1.5rem;margin:1.25rem 0;animation:winner-pop .4s cubic-bezier(.175,.885,.32,1.275)}\n'
+    + '@keyframes winner-pop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}\n'
+    + '.winner-name{font-size:1.6rem;font-weight:900;color:#4ade80;letter-spacing:.5px}\n'
+    + '.winner-prize{font-size:.9rem;color:#aaa;margin-top:.3rem}\n'
+    + '.winner-time{font-size:.75rem;color:#555;margin-top:.2rem}\n'
+    + '.past-winners{margin-top:1.5rem;text-align:left}\n'
+    + '.past-winner-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem .75rem;background:#111;border-radius:6px;margin-bottom:.35rem;font-size:.85rem}\n'
+    + '.countdown-ring{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:#888;margin-top:.75rem}\n'
+    + '.lottery-counter{display:inline-block;background:#1a0a2e;color:var(--y);border:1px solid #5b3a7a;border-radius:20px;padding:3px 12px;font-size:.8rem;font-weight:700}\n'
+  ) : '';
+
+  return '<!DOCTYPE html>\n<html lang="no">\n<head>\n<meta charset="UTF-8"/>\n'
+    + '<meta name="viewport" content="width=device-width,initial-scale=1"/>\n'
+    + '<title>' + escHtml(ev.title) + ' \u2013 ' + siteName + '</title>\n'
+    + sharedCSS()
+    + '<style>\n'
+    + '.stand-signup{background:linear-gradient(135deg,var(--g),#222);border:2px solid var(--y);border-radius:10px;padding:2rem;margin-bottom:1.5rem;text-align:center}\n'
+    + '.stand-signup h2{font-size:1.4rem;color:var(--y);margin-bottom:.5rem}\n'
+    + '.stand-signup p{font-size:.95rem;color:#bbb;margin-bottom:1.5rem}\n'
+    + '.stand-signup input{text-align:center;font-size:1.1rem;margin-bottom:.5rem}\n'
+    + '.stand-signup .btn{width:100%;font-size:1.1rem;padding:14px;margin-top:.5rem}\n'
+    + '.info-block{background:var(--g);border-left:4px solid var(--y);border-radius:0 8px 8px 0;padding:1.25rem 1.5rem;margin-bottom:1rem}\n'
+    + '.info-block h3{color:var(--y);font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.4rem}\n'
+    + '.counter{display:inline-block;background:#1a3a1a;color:#7dff7d;border:1px solid #2d6a2d;border-radius:20px;padding:4px 14px;font-size:.85rem;font-weight:700;margin-top:.5rem}\n'
+    + lotteryCss
+    + '</style>\n'
+    + '</head>\n<body>\n'
+    + '<header><span class="badge" style="background:var(--y);color:#111;padding:4px 10px;font-weight:900;border-radius:4px">'+(getSettings().siteName||'Events Admin')+'</span></header>\n'
+    + sharedHero(ev)
+    + '<div class="container">\n'
+    + '<div class="tabs">'
+    + '<div class="tab active" onclick="showTab(\'info\',this)">\u2139\ufe0f Informasjon</div>'
+    + '<div class="tab" onclick="showTab(\'pamelding\',this)">\ud83d\udce7 Hold meg oppdatert</div>'
+    + (lotteryEnabled ? '<div class="tab" onclick="showTab(\'lottery\',this)">\ud83c\udfb0 Lotteri</div>' : '')
+    + '<div class="tab" onclick="showTab(\'guestbook\',this)">\u270d\ufe0f Gjestebok</div>'
+    + '</div>\n'
+
+    // Tab: Informasjon
+    + '<div class="tab-panel active" id="tab-info">\n'
+    + (ev.description ? '<div class="info-block"><h3>Om standen</h3><p>' + escHtml(ev.description).replace(/\n/g,"<br>") + '</p></div>\n' : '')
+    + '<div class="info-block"><h3>\ud83d\udccd Sted &amp; tid</h3>'
+    + '<p>' + (ev.location ? escHtml(ev.location) : 'Sted ikke oppgitt') + '</p>'
+    + (ev.date ? '<p style="margin-top:.4rem;color:#aaa;font-size:.9rem">\ud83d\udcc5 ' + new Date(ev.date).toLocaleDateString("nb-NO",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) + '</p>' : '')
+    + '</div>\n'
+    + '<div style="text-align:center;margin-top:1.5rem">'
+    + '<p style="color:#888;font-size:.9rem;margin-bottom:.75rem">Vil du motta informasjon fra denne standen?</p>'
+    + '<button class="btn" onclick="showTab(\'pamelding\',document.querySelector(\'.tab:nth-child(2)\'))" style="font-size:1rem">\ud83d\udce7 Meld meg p\u00e5 e-postlisten</button>'
+    + '</div>\n'
+    + '</div>\n'
+
+    // Tab: P\u00e5melding
+    + '<div class="tab-panel" id="tab-pamelding">\n'
+    + '<div class="stand-signup">\n'
+    + '<h2>\ud83d\udce7 Hold deg oppdatert</h2>\n'
+    + (lotteryEnabled
+        ? '<p>Meld deg p\u00e5 og motta informasjon \u2013 og delta i <strong style="color:var(--y)">lodtrekningen</strong>!</p>\n'
+        : '<p>Meld deg p\u00e5 og motta informasjon vi deler fra denne standen direkte p\u00e5 e-post.</p>\n')
+    + '<div id="regMsg"></div>\n'
+    + '<label style="text-align:left">Navn *</label><input id="rName" type="text" placeholder="Ditt navn" autocomplete="name"/>\n'
+    + '<label style="text-align:left">E-post *</label><input id="rEmail" type="email" placeholder="din@epost.no" autocomplete="email"/>\n'
+    + '<label style="text-align:left">Telefon <span style="color:#666;font-weight:400">(valgfritt)</span></label><input id="rPhone" type="tel" placeholder="+47 000 00 000" autocomplete="tel"/>\n'
+    + '<button class="btn" onclick="registerStand()">\u2705 Meld meg p\u00e5' + (lotteryEnabled ? ' og delta i lotteri' : '') + '</button>\n'
+    + '<p style="font-size:.75rem;color:#666;margin-top:1rem;line-height:1.5">\ud83d\udd12 Vi lagrer kun navn og e-post for \u00e5 sende deg informasjon. Data deles ikke med tredjepart og slettes automatisk etter arrangementet. '
+    + (contactEmail ? '<a href="mailto:' + contactEmail + '" style="color:#888">Kontakt oss</a> for innsyn eller sletting.' : '')
+    + '</p>\n</div>\n'
+    + (regs.length > 0
+        ? '<p style="text-align:center;color:#555;font-size:.85rem"><span class="counter">\u2705 ' + regs.length + ' p\u00e5meldte</span>'
+          + (lotteryEnabled ? ' <span class="lottery-counter">\ud83c\udfb0 ' + (regs.length - (lottery.winners || []).length) + ' med i trekningen</span>' : '')
+          + '</p>\n'
+        : '')
+    + '</div>\n'
+
+    // Tab: Lotteri
+    + (lotteryEnabled ? (
+        '<div class="tab-panel" id="tab-lottery">\n'
+      + '<div class="lottery-box">\n'
+      + '<div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.8px;color:var(--y);font-weight:700;margin-bottom:.25rem">\ud83c\udfb0 Lodtrekning</div>\n'
+      + (lottery.prize ? '<div style="font-size:.9rem;color:#ccc;margin-bottom:.75rem">Premie: <strong style="color:var(--y)">' + escHtml(lottery.prize) + '</strong></div>\n' : '')
+      + '<span class="lottery-drum" id="lotteryDrum">\ud83c\udfb1</span>\n'
+      + '<div id="lotteryWinner"></div>\n'
+      + (lottery.mode !== 'manual' ? '<div class="countdown-ring">\u23f1 Neste trekning om <span id="lotteryCountdown" style="color:var(--y);font-weight:700;margin:0 .2rem">\u2013</span></div>\n' : '')
+      + '<div style="margin-top:1rem;font-size:.85rem;color:#666" id="lotteryEligible"></div>\n'
+      + '</div>\n'
+      + '<div class="past-winners" id="pastWinnersWrap" style="display:none">\n'
+      + '<div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.6px;color:#555;margin-bottom:.5rem">Tidligere vinnere</div>\n'
+      + '<div id="pastWinnersList"></div>\n'
+      + '</div>\n'
+      + '</div>\n'
+    ) : '')
+
+    // Tab: Gjestebok
+    + '<div class="tab-panel" id="tab-guestbook">\n'
+    + '<div class="card"><h2>Gjestebok</h2><div class="gb-entries">' + gbRows + '</div>'
+    + '<hr style="border-color:#333;margin-bottom:1.25rem"/>'
+    + '<h2 style="margin-bottom:1rem">Legg igjen en kommentar</h2>'
+    + '<div id="gbMsg"></div>'
+    + '<label>Navn *</label><input id="gbName" type="text" placeholder="Ola Nordmann"/>'
+    + '<label>Melding *</label><textarea id="gbMessage" placeholder="Skriv din kommentar\u2026"></textarea>'
+    + '<button class="btn" onclick="submitComment()">Send kommentar</button>'
+    + '<div id="gbQrArea" style="margin-top:.5rem"></div>'
+    + '<p style="font-size:.8rem;color:#555;margin-top:.5rem">Kommentarer godkjennes av administrator f\u00f8r de vises.</p>'
+    + '</div>\n</div>\n'
+    + '</div>\n'
+    + sharedPinAndStaffOverlay(ev)
+    + sharedJS(ev)
+    + '<script>\n'
+    + 'async function registerStand(){'
+    +   'var msg=document.getElementById("regMsg");'
+    +   'var name=document.getElementById("rName").value.trim();'
+    +   'var email=document.getElementById("rEmail").value.trim();'
+    +   'var phone=document.getElementById("rPhone").value.trim();'
+    +   'if(!name||!email){msg.innerHTML=\'<div class="msg err">Navn og e-post er p\u00e5krevd</div>\';return;}'
+    +   'msg.innerHTML=\'<div class="msg" style="color:#aaa">Sender\u2026</div>\';'
+    +   'var res=await fetch("/api/events/"+EV_ID+"/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name,email:email,phone:phone})});'
+    +   'var d=await res.json();'
+    +   'if(res.ok){'
+    +     'msg.innerHTML=\'<div class="msg ok">\u2705 Takk, \'+esc(name)+\'! Du vil motta informasjon p\u00e5 \'+esc(email)+\'<\/div>\';'
+    +     'document.getElementById("rName").value="";'
+    +     'document.getElementById("rEmail").value="";'
+    +     'document.getElementById("rPhone").value="";'
+    +   '}else{msg.innerHTML=\'<div class="msg err">\u2717 \'+d.error+\'<\/div>\';}'
+    + '}\n'
+    + (lotteryEnabled ? (
+        'var LOTTERY_AUTO_MS=' + (lottery.mode==='auto30'?1800000:lottery.mode==='auto120'?7200000:3600000) + ';\n'
+      + 'async function loadWinners(){'
+      +   'var r=await fetch("/api/events/"+EV_ID+"/lottery/winners");'
+      +   'if(!r.ok)return;'
+      +   'var d=await r.json();'
+      +   'var winners=d.winners||[];'
+      +   'var totalRegs=document.querySelectorAll(".reg-added").length+' + regs.length + ';'
+      +   'var el=document.getElementById("lotteryEligible");'
+      +   'if(el)el.textContent=(totalRegs-winners.length)+" deltakere med i trekningen";'
+      +   'var wrap=document.getElementById("pastWinnersWrap");'
+      +   'var list=document.getElementById("pastWinnersList");'
+      +   'if(winners.length&&wrap&&list){'
+      +     'wrap.style.display="";'
+      +     'list.innerHTML=winners.slice().reverse().map(function(w){'
+      +       'return \'<div class="past-winner-row"><span>\ud83c\udfc6 \'+esc(w.name)+\'<\/span><span style="color:#555;font-size:.75rem">\'+new Date(w.drawnAt).toLocaleTimeString("nb-NO",{hour:"2-digit",minute:"2-digit"})+\'<\/span><\/div>\';'
+      +     '}).join("");'
+      +   '}'
+      +   'if(winners.length){'
+      +     'var last=winners[winners.length-1];'
+      +     'var wDiv=document.getElementById("lotteryWinner");'
+      +     'if(wDiv&&!wDiv.dataset.shown){'
+      +       'wDiv.dataset.shown=last.regId;'
+      +       'wDiv.innerHTML=\'<div class="winner-reveal"><div class="winner-name">\ud83c\udf89 \'+esc(last.name)+\'!<\/div>\''
+      +         '+(last.prize?\'<div class="winner-prize">Premie: \'+esc(last.prize)+\'<\/div>\':\'\')'
+      +         '+\'<div class="winner-time">Trukket \'+new Date(last.drawnAt).toLocaleTimeString("nb-NO",{hour:"2-digit",minute:"2-digit"})+\'<\/div><\/div>\';'
+      +     '}'
+      +   '}'
+      + '}\n'
+      + (lottery.mode !== 'manual' ? (
+          'var _nextDraw=Date.now()+LOTTERY_AUTO_MS;\n'
+        + 'setInterval(function(){'
+        +   'var cd=document.getElementById("lotteryCountdown");if(!cd)return;'
+        +   'var ms=_nextDraw-Date.now();if(ms<=0){cd.textContent="Trekker n\u00e5\u2026";return;}'
+        +   'var m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000);'
+        +   'cd.textContent=(m>0?m+"m ":"")+s+"s";'
+        + '},1000);\n'
+      ) : '')
+      + '(function(){'
+      +   'var es=new EventSource("/api/events/stream?department=' + escHtml(ev.department||'') + '");'
+      +   'es.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==="events_updated")loadWinners();}catch(ex){}};'
+      +   'es.onerror=function(){es.close();setTimeout(function(){location.reload();},5000);};'
+      + '})();\n'
+      + 'loadWinners();\n'
+    ) : '')
+    + '<\/script>\n'
+    + '</body>\n</html>';
+}
+
+// ── Kurs page ─────────────────────────────────────────────────────
+function buildKursPage(ev, isAuthenticated) {
+  const regs      = ev.registrations || [];
+  const spotsLeft = ev.maxParticipants ? ev.maxParticipants - regs.length : null;
+  const full      = spotsLeft !== null && spotsLeft <= 0;
+  const settings  = getSettings();
+  const approvedComments = (ev.guestbook || []).filter(function(g) { return g.approved; });
+
+  const checkedIn = regs.filter(function(r) { return r.checkedIn; }).length;
+  const total     = regs.length;
+
+  const regRows = regs.length ? regs.map(function(r) {
+    return '<div class="reg-item" id="ri-' + escHtml(r.id) + '">'
+      + '<div><div class="rname">' + escHtml(r.name) + '</div>'
+      + (r.email ? '<div style="font-size:.78rem;color:#666">' + escHtml(r.email) + '</div>' : '')
+      + '</div>'
+      + (r.checkedIn
+        ? '<span class="checked-in">✔ Møtt opp' + (r.checkedInAt ? ' ' + new Date(r.checkedInAt).toLocaleTimeString("nb-NO",{hour:"2-digit",minute:"2-digit"}) : '') + '</span>'
+        : '<button class="checkin-btn" onclick="regCheckIn(\'' + escHtml(r.id) + '\')">Jeg er her!</button>')
+      + '</div>';
+  }).join("") : '<p class="empty-state">Ingen forhåndsregistrerte deltakere ennå.</p>';
+
+  const gbRows = approvedComments.length ? approvedComments.map(function(g) {
+    var photosHtml = (g.photos && g.photos.length)
+      ? '<div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem">'
+        + g.photos.map(function(p){ return '<a href="'+p+'" target="_blank"><img src="'+p+'" style="height:80px;width:80px;object-fit:cover;border-radius:6px;border:1px solid #333"/></a>'; }).join("")
+        + '</div>'
+      : "";
+    return '<div class="gb-entry"><div class="gb-name">' + escHtml(g.name) + '</div>'
+      + '<div class="gb-msg">' + escHtml(g.message).replace(/\n/g,"<br>") + '</div>'
+      + photosHtml
+      + '<div class="gb-date">' + new Date(g.createdAt).toLocaleDateString("nb-NO",{day:"numeric",month:"long",year:"numeric"}) + '</div></div>';
+  }).join("") : '<p class="empty-state">Ingen kommentarer ennå.</p>';
+
+  return '<!DOCTYPE html>\n<html lang="no">\n<head>\n<meta charset="UTF-8"/>\n'
+    + '<meta name="viewport" content="width=device-width,initial-scale=1"/>\n'
+    + '<title>' + escHtml(ev.title) + ' – ' + escHtml(settings.siteName||'NAF') + '</title>\n'
+    + sharedCSS()
+    + '<style>\n'
+    + '.oppmote-header{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}\n'
+    + '.stat-box{background:var(--g);border-radius:8px;padding:1.25rem;text-align:center}\n'
+    + '.stat-box .num{font-size:2.5rem;font-weight:900;color:var(--y);line-height:1}\n'
+    + '.stat-box .lbl{font-size:.8rem;color:#888;margin-top:.3rem;text-transform:uppercase;letter-spacing:.5px}\n'
+    + '.stat-box.green .num{color:#4ade80}\n'
+    + '.progress-bar{height:6px;background:var(--g2);border-radius:3px;margin:1rem 0 1.5rem;overflow:hidden}\n'
+    + '.progress-fill{height:100%;background:var(--y);border-radius:3px;transition:width .5s}\n'
+    + '.kurs-info{background:var(--g);border-left:4px solid #7dc8ff;border-radius:0 8px 8px 0;padding:1.25rem 1.5rem;margin-bottom:1rem}\n'
+    + '.kurs-info h3{color:#7dc8ff;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.4rem}\n'
+    + '.walkin-section{background:var(--g);border-radius:8px;padding:1.5rem;margin-top:1.5rem;border-top:2px dashed #444}\n'
+    + '.walkin-section h3{color:#aaa;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:1rem}\n'
+    + '</style>\n'
+    + '</head>\n<body>\n'
+    + '<header><span class="badge" style="background:var(--y);color:#111;padding:4px 10px;font-weight:900;border-radius:4px">'+(getSettings().siteName||'Events Admin')+'</span></header>\n'
+    + sharedHero(ev)
+    + '<div class="container">\n'
+    + '<div class="tabs">'
+    + '<div class="tab active" onclick="showTab(\'oppmote\',this)">✅ Oppmøte</div>'
+    + (isAuthenticated ? '<div class="tab" onclick="showTab(\'pinsjekk\',this)">🔑 Sjekk inn</div>' : '')
+    + '<div class="tab" onclick="showTab(\'info\',this)">ℹ️ Informasjon</div>'
+    + '<div class="tab" onclick="showTab(\'pamelding\',this)">📋 Påmelding</div>'
+    + '<div class="tab" onclick="showTab(\'guestbook\',this)">✍️ Gjestebok</div>'
+    + '</div>\n'
+
+    // ── Tab: Oppmøte (FØRSTE – dette er pad-visningen) ──
+    + '<div class="tab-panel active" id="tab-oppmote">\n'
+    + '<div class="oppmote-header">'
+    + '<div class="stat-box green"><div class="num" id="checkinCount">' + checkedIn + '</div><div class="lbl">Møtt opp</div></div>'
+    + '<div class="stat-box"><div class="num">' + total + '</div><div class="lbl">Registrerte</div></div>'
+    + '</div>'
+    + '<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:' + (total > 0 ? Math.round(checkedIn/total*100) : 0) + '%"></div></div>'
+    + '<div class="card">\n'
+    + '<div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="regSearch" placeholder="Søk på navn…" oninput="filterRegs()" autocomplete="off"/></div>'
+    + '<div class="reg-list" id="regList">' + regRows + '</div>'
+    + '</div>\n'
+    + '<div class="walkin-section">\n'
+    + '<h3>🚶 Ikke i listen? Walk-in</h3>'
+    + '<div id="walkInMsg"></div>'
+    + '<label>Navn *</label><input id="wiName" type="text" placeholder="Ola Nordmann" autocomplete="name"/>'
+    + '<label>E-post *</label><input id="wiEmail" type="email" placeholder="ola@example.com" autocomplete="email"/>'
+    + '<label>Telefon</label><input id="wiPhone" type="tel" placeholder="+47 000 00 000"/>'
+    + '<button class="btn" onclick="walkIn()">Registrer og kryss av</button>'
+    + '</div>\n'
+    + '</div>\n'
+
+    // ── Tab: Informasjon ──
+    + (isAuthenticated ?
+        '<div class="tab-panel" id="tab-pinsjekk" style="display:none">\n'
+      + '<div class="card" style="max-width:400px;margin:2rem auto">\n'
+      + '<h2 style="text-align:center;margin-bottom:1.5rem">🔑 Innsjekk med PIN</h2>\n'
+      + '<div id="pinCheckinMsg"></div>\n'
+      + '<div id="pinCheckinResult" style="display:none;text-align:center;padding:1.5rem 0">\n'
+      + '<div style="font-size:2rem;margin-bottom:.5rem">✅</div>\n'
+      + '<div id="pinCheckinName" style="font-size:1.3rem;font-weight:900;color:var(--y);margin-bottom:.5rem"></div>\n'
+      + '<div id="pinCheckinStatus" style="font-size:.9rem;color:#888"></div>\n'
+      + '<button class="btn btn-y" style="margin-top:1.25rem;width:100%" onclick="pinCheckinReset()">✓ Sjekk inn neste</button>\n'
+      + '</div>\n'
+      + '<div id="pinCheckinForm">\n'
+      + '<label style="text-align:center;display:block;color:#888;margin-bottom:.75rem">Skriv inn 4-sifret PIN</label>\n'
+      + '<input id="pinCheckinInput" type="tel" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"'
+      + ' style="text-align:center;font-size:2.5rem;letter-spacing:1rem;font-weight:900;padding:.75rem;margin-bottom:.75rem"'
+      + ' onkeyup="if(this.value.length===4)doPinCheckin()"/>\n'
+      + '<button class="btn btn-y" style="width:100%;justify-content:center" onclick="doPinCheckin()">Søk opp</button>\n'
+      + '</div>\n'
+      + '</div>\n'
+      + '</div>\n' : '')
+    + '<div class="tab-panel" id="tab-info">\n'
+    + (ev.description ? '<div class="kurs-info"><h3>Om kurset</h3><p>' + escHtml(ev.description).replace(/\n/g,"<br>") + '</p></div>\n' : '')
+    + '<div class="kurs-info"><h3>📍 Sted & tid</h3>'
+    + '<p>' + (ev.location ? escHtml(ev.location) : 'Sted ikke oppgitt') + '</p>'
+    + (ev.date ? '<p style="margin-top:.4rem;color:#aaa;font-size:.9rem">📅 ' + new Date(ev.date).toLocaleDateString("nb-NO",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) + '</p>' : '')
+    + (spotsLeft !== null ? '<p style="margin-top:.75rem" class="spots' + (spotsLeft <= 5 && spotsLeft > 0 ? ' low' : '') + '">'
+        + (full ? '⚠️ Kurset er fullt' : spotsLeft + ' ledige plasser') + '</p>' : '')
+    + '</div>\n'
+    + '</div>\n'
+
+    // ── Tab: Påmelding ──
+    + (isAuthenticated ?
+        '<div class="tab-panel" id="tab-pinsjekk" style="display:none">\n'
+      + '<div class="card" style="max-width:400px;margin:2rem auto">\n'
+      + '<h2 style="text-align:center;margin-bottom:1.5rem">🔑 Innsjekk med PIN</h2>\n'
+      + '<div id="pinCheckinMsg"></div>\n'
+      + '<div id="pinCheckinResult" style="display:none;text-align:center;padding:1.5rem 0">\n'
+      + '<div style="font-size:2rem;margin-bottom:.5rem">✅</div>\n'
+      + '<div id="pinCheckinName" style="font-size:1.3rem;font-weight:900;color:var(--y);margin-bottom:.5rem"></div>\n'
+      + '<div id="pinCheckinStatus" style="font-size:.9rem;color:#888"></div>\n'
+      + '<button class="btn btn-y" style="margin-top:1.25rem;width:100%" onclick="pinCheckinReset()">✓ Sjekk inn neste</button>\n'
+      + '</div>\n'
+      + '<div id="pinCheckinForm">\n'
+      + '<label style="text-align:center;display:block;color:#888;margin-bottom:.75rem">Skriv inn 4-sifret PIN</label>\n'
+      + '<input id="pinCheckinInput" type="tel" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"'
+      + ' style="text-align:center;font-size:2.5rem;letter-spacing:1rem;font-weight:900;padding:.75rem;margin-bottom:.75rem"'
+      + ' onkeyup="if(this.value.length===4)doPinCheckin()"/>\n'
+      + '<button class="btn btn-y" style="width:100%;justify-content:center" onclick="doPinCheckin()">Søk opp</button>\n'
+      + '</div>\n'
+      + '</div>\n'
+      + '</div>\n' : '')
+    + '<div class="tab-panel" id="tab-pamelding">\n'
+    + '<div class="card"><h2>📋 Forhåndsmelding</h2>'
+    + (full
+      ? '<p style="color:var(--red)">⚠️ Kurset er dessverre fullt.</p>'
+      : '<p style="color:#aaa;font-size:.9rem;margin-bottom:1.25rem">Meld deg på for å sikre plass – og for å motta info om kurset.</p>'
+        + '<div id="regMsg"></div>'
+        + '<label>Navn *</label><input id="rName" type="text" placeholder="Ola Nordmann" autocomplete="name"/>'
+        + '<label>E-post *</label><input id="rEmail" type="email" placeholder="ola@example.com" autocomplete="email"/>'
+        + '<label>Telefon</label><input id="rPhone" type="tel" placeholder="+47 000 00 000"/>'
+        + '<button class="btn" onclick="registerKurs()">✅ Meld meg på</button>'
+        + '<p style="font-size:.75rem;color:#555;margin-top:.75rem;line-height:1.5">🔒 Data lagres kun for å administrere kurset og anonymiseres automatisk etter arrangementet.</p>')
+    + '</div>\n</div>\n'
+
+    // ── Tab: Gjestebok ──
+    + '<div class="tab-panel" id="tab-guestbook">\n'
+    + '<div class="card"><h2>Gjestebok</h2><div class="gb-entries">' + gbRows + '</div>'
+    + '<hr style="border-color:#333;margin-bottom:1.25rem"/>'
+    + '<h2 style="margin-bottom:1rem">Legg igjen en kommentar</h2>'
+    + '<div id="gbMsg"></div>'
+    + '<label>Navn *</label><input id="gbName" type="text" placeholder="Ola Nordmann"/>'
+    + '<label>Melding *</label><textarea id="gbMessage" placeholder="Skriv din kommentar…"></textarea>'
+    + '<button class="btn" onclick="submitComment()">Send kommentar</button>'
+    + '<div id="gbQrArea" style="margin-top:.5rem"></div>'
+    + '<p style="font-size:.8rem;color:#555;margin-top:.5rem">Kommentarer godkjennes av administrator før de vises.</p>'
+    + '</div>\n</div>\n'
+
+    + '</div>\n'
+    + sharedPinAndStaffOverlay(ev)
+    + sharedJS(ev)
+    + '<script>\n'
+    // Check-in: updates counter + progress bar live
+    + 'async function regCheckIn(rid){'
+    +   'var ts=new Date().toISOString();'
+    +   'var el=document.getElementById("ri-"+rid);'
+    +   'if(el){var btn=el.querySelector(".checkin-btn");if(btn)btn.outerHTML=\'<span class="checked-in">✔ Møtt opp \'+ts.substr(11,5)+\'</span>\';}'
+    +   'var c=parseInt(document.getElementById("checkinCount").textContent||"0")+1;'
+    +   'document.getElementById("checkinCount").textContent=c;'
+    +   'var total=document.getElementById("regList").querySelectorAll(".reg-item").length;'
+    +   'document.getElementById("progressFill").style.width=Math.min(100,Math.round(c/Math.max(1,total)*100))+"%";'
+    +   'if(navigator.onLine){await fetch("/api/events/"+EV_ID+"/registrations/"+rid+"/checkin",{method:"POST",headers:{"Content-Type":"application/json"}});}'
+    +   'else{dbEnqueue({type:"checkin_reg",regId:rid,ts:ts});}'
+    + '}\n'
+    // Walk-in: adds to list + auto-checks in
+    + 'async function walkIn(){'
+    +   'var msg=document.getElementById("walkInMsg");'
+    +   'var name=document.getElementById("wiName").value.trim();'
+    +   'var email=document.getElementById("wiEmail").value.trim();'
+    +   'var phone=document.getElementById("wiPhone").value.trim();'
+    +   'if(!name||!email){msg.innerHTML=\'<div class="msg err">Navn og e-post er påkrevd</div>\';return;}'
+    +   'if(navigator.onLine){'
+    +     'var res=await fetch("/api/events/"+EV_ID+"/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name,email:email,phone:phone,walkin:true})});'
+    +     'var d=await res.json();'
+    +     'if(res.ok){'
+    +       'msg.innerHTML=\'<div class="msg ok">✔ \'+esc(name)+\' er registrert og avkrysset!</div>\';'
+    +       'document.getElementById("wiName").value="";document.getElementById("wiEmail").value="";document.getElementById("wiPhone").value="";'
+    +       'var c=parseInt(document.getElementById("checkinCount").textContent||"0")+1;'
+    +       'document.getElementById("checkinCount").textContent=c;'
+    +       'var item=document.createElement("div");item.className="reg-item";'
+    +       'item.innerHTML=\'<div><div class="rname">\'+esc(name)+\'</div><div style="font-size:.78rem;color:#666">\'+esc(email)+\'</div></div><span class="checked-in">✔ Walk-in</span>\';'
+    +       'document.getElementById("regList").appendChild(item);'
+    +     '}else{msg.innerHTML=\'<div class="msg err">✗ \'+d.error+\'</div>\';}'
+    +   '}else{'
+    +     'dbEnqueue({type:"register",name:name,email:email,phone:phone,walkin:true,ts:new Date().toISOString()});'
+    +     'msg.innerHTML=\'<div class="msg ok">✔ Lagret – synkroniseres når du er online</div>\';'
+    +   '}'
+    + '}\n'
+    // Kurs registration (pre-register tab)
+    + 'async function registerKurs(){'
+    +   'var msg=document.getElementById("regMsg");'
+    +   'var name=document.getElementById("rName").value.trim();'
+    +   'var email=document.getElementById("rEmail").value.trim();'
+    +   'var phone=document.getElementById("rPhone").value.trim();'
+    +   'if(!name||!email){msg.innerHTML=\'<div class="msg err">Navn og e-post er påkrevd</div>\';return;}'
+    +   'var res=await fetch("/api/events/"+EV_ID+"/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name,email:email,phone:phone})});'
+    +   'var d=await res.json();'
+    +   'if(res.ok){msg.innerHTML=\'<div class="msg ok">✅ Du er påmeldt kurset!</div>\';document.getElementById("rName").value="";document.getElementById("rEmail").value="";document.getElementById("rPhone").value="";}'
+    +   'else{msg.innerHTML=\'<div class="msg err">✗ \'+d.error+\'</div>\';}'
+    + '}\n'
+    + 'function filterRegs(){var q=document.getElementById("regSearch").value.toLowerCase();document.querySelectorAll(".reg-item").forEach(function(el){var name=el.querySelector(".rname").textContent.toLowerCase();el.style.display=name.includes(q)?"":"none";});}\n'
+    + '<\/script>\n'
+    + (isAuthenticated ?
+        '<script>\n'
+      + 'async function doPinCheckin(){\n'
+      + '  var pin=document.getElementById("pinCheckinInput").value.trim();\n'
+      + '  if(pin.length!==4)return;\n'
+      + '  var msg=document.getElementById("pinCheckinMsg");\n'
+      + '  msg.innerHTML="";\n'
+      + '  try{\n'
+      + '    var r=await fetch("/api/events/"+EV_ID+"/checkin-by-pin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:pin})});\n'
+      + '    var d=await r.json();\n'
+      + '    if(!r.ok||!d.ok){msg.textContent="Ugyldig PIN \u2013 pr\u00f8v igjen";msg.style.color="#ff7d7d";document.getElementById("pinCheckinInput").value="";return;}\n'
+      + '    document.getElementById("pinCheckinForm").style.display="none";\n'
+      + '    document.getElementById("pinCheckinResult").style.display="block";\n'
+      + '    document.getElementById("pinCheckinName").textContent=d.name;\n'
+      + '    document.getElementById("pinCheckinStatus").textContent=d.alreadyCheckedIn?"Allerede sjekket inn":"Klar for innsjekk";\n'
+      + '  }catch(e){msg.textContent="Nettverksfeil";msg.style.color="#ff7d7d";}\n'
+      + '}\n'
+      + 'function pinCheckinReset(){\n'
+      + '  document.getElementById("pinCheckinInput").value="";\n'
+      + '  document.getElementById("pinCheckinMsg").innerHTML="";\n'
+      + '  document.getElementById("pinCheckinForm").style.display="block";\n'
+      + '  document.getElementById("pinCheckinResult").style.display="none";\n'
+      + '  document.getElementById("pinCheckinInput").focus();\n'
+      + '}\n'
+      + '<\/script>\n' : '')
+    + '</body>\n</html>';
+}
+
+
+// ── MC database for registration forms ────────────────────────────
+const MC_DB_SERVER = [
+  {make:"BMW",model:"R 1250 GS",tank:20,l100:6.0},{make:"BMW",model:"R 1250 GS Adventure",tank:30,l100:6.2},
+  {make:"BMW",model:"F 850 GS",tank:15,l100:5.5},{make:"BMW",model:"F 750 GS",tank:13,l100:5.2},
+  {make:"BMW",model:"R 1250 RT",tank:25,l100:6.0},{make:"BMW",model:"S 1000 XR",tank:20,l100:6.5},
+  {make:"Honda",model:"Africa Twin CRF1100",tank:18.8,l100:5.8},{make:"Honda",model:"CB500X",tank:17.5,l100:5.0},
+  {make:"Honda",model:"NC750X",tank:14.1,l100:4.5},{make:"Honda",model:"CB1000R",tank:16.2,l100:6.0},
+  {make:"Honda",model:"GL1800 Gold Wing",tank:21.1,l100:7.0},{make:"Honda",model:"CMX500 Rebel",tank:11.1,l100:4.8},
+  {make:"Kawasaki",model:"Versys 1000",tank:21,l100:6.2},{make:"Kawasaki",model:"Versys 650",tank:21,l100:5.5},
+  {make:"Kawasaki",model:"Z900",tank:17,l100:6.5},{make:"Kawasaki",model:"Ninja 650",tank:15,l100:5.2},
+  {make:"Kawasaki",model:"Ninja 1000SX",tank:19,l100:6.5},{make:"Kawasaki",model:"W800",tank:15,l100:5.5},
+  {make:"Yamaha",model:"Ténéré 700",tank:16,l100:5.5},{make:"Yamaha",model:"Tracer 9",tank:18,l100:6.0},
+  {make:"Yamaha",model:"Tracer 7",tank:16,l100:5.5},{make:"Yamaha",model:"MT-09",tank:14,l100:6.2},
+  {make:"Yamaha",model:"MT-07",tank:13,l100:5.5},{make:"Yamaha",model:"FJR1300",tank:25,l100:7.0},
+  {make:"Suzuki",model:"V-Strom 1050",tank:20,l100:6.0},{make:"Suzuki",model:"V-Strom 650",tank:20,l100:5.5},
+  {make:"Suzuki",model:"GSX-S750",tank:16,l100:6.0},{make:"Suzuki",model:"SV650",tank:14.5,l100:5.2},
+  {make:"Triumph",model:"Tiger 1200",tank:20,l100:6.5},{make:"Triumph",model:"Tiger 900",tank:20,l100:5.8},
+  {make:"Triumph",model:"Bonneville T120",tank:14.5,l100:5.5},{make:"Triumph",model:"Scrambler 1200",tank:16,l100:5.8},
+  {make:"Ducati",model:"Multistrada V4",tank:22,l100:7.0},{make:"Ducati",model:"Multistrada V2",tank:20,l100:6.5},
+  {make:"KTM",model:"1290 Super Adventure S",tank:23,l100:7.0},{make:"KTM",model:"890 Adventure",tank:20,l100:6.0},
+  {make:"Harley-Davidson",model:"Road Glide",tank:22.7,l100:8.5},{make:"Harley-Davidson",model:"Pan America 1250",tank:21.4,l100:7.5},
+  {make:"Indian",model:"Scout",tank:12.5,l100:7.0},{make:"Indian",model:"Challenger",tank:22,l100:8.0},
+  {make:"Moto Guzzi",model:"V85 TT",tank:23,l100:6.0},{make:"Royal Enfield",model:"Himalayan 450",tank:17,l100:4.5},
+  {make:"Husqvarna",model:"Norden 901",tank:19,l100:5.8},{make:"CF Moto",model:"800MT",tank:19,l100:5.5},
+];
+
+const MC_DB_OPTIONS = (function() {
+  const groups = {};
+  MC_DB_SERVER.forEach(function(m) { if (!groups[m.make]) groups[m.make]=[]; groups[m.make].push(m); });
+  return Object.keys(groups).sort().map(function(make) {
+    return '<optgroup label="' + make + '">'
+      + groups[make].map(function(m) {
+          const r = Math.floor((m.tank/m.l100)*100*0.85);
+          return '<option value="' + make + '|||' + m.model + '|||' + m.tank + '|||' + m.l100 + '">'
+            + m.model + ' (' + r + ' km)</option>';
+        }).join('')
+      + '</optgroup>';
+  }).join('');
+})();
+
+function buildTurPage(ev, isAuthenticated) {
+  const route  = ev.route || { days: [] };
+  const days   = route.days || [];
+  const approvedComments = (ev.guestbook || []).filter(function(g) { return g.approved; });
+  const regs   = ev.registrations || [];
+  const full   = ev.maxParticipants ? regs.length >= ev.maxParticipants : false;
+
+  const ICONS = { start:"🚀", stopp:"🅿️", lunsj:"🍽️", middag:"🍷", hotell:"🏨", bensin:"⛽", opplevelse:"🎯", slutt:"🏁" };
+  const LABELS = { start:"Start", stopp:"Rasteplass", lunsj:"Lunsj", middag:"Middag", hotell:"Hotell", bensin:"Bensinstopp", opplevelse:"Opplevelse", slutt:"Slutt" };
+
+  const allPlaces = [];
+  const allEtappes = []; // [{fra, til, profile}] in order
+  days.forEach(function(d, di) {
+    const _dayTotal = (d.etapper || []).filter(function(e){ return e.fra && e.til; }).length;
+    let _dayEi = 0;
+    (d.etapper || []).forEach(function(e) {
+      if (e.fra && !allPlaces.includes(e.fra)) allPlaces.push(e.fra);
+      if (e.til && !allPlaces.includes(e.til)) allPlaces.push(e.til);
+      if (e.fra && e.til) {
+        allEtappes.push({ fra: e.fra, til: e.til, profile: e.profile || "driving",
+          dayIndex: di, etappeIndex: _dayEi, totalInDay: _dayTotal });
+        _dayEi++;
+      }
+    });
+  });
+
+  const ruteHtml = days.length ? days.map(function(d, di) {
+    const dato = d.dato ? new Date(d.dato).toLocaleDateString("nb-NO",{weekday:"long",day:"numeric",month:"long"}) : "Dag " + (di+1);
+    const totalKm = (d.etapper||[]).reduce(function(s,e){ return s + (parseFloat(e.km)||0); }, 0);
+    return '<div class="day-card">'
+      + '<div class="day-head"><span class="day-num">Dag ' + (di+1) + '</span><span class="day-date">' + escHtml(dato) + '</span>'
+      + (totalKm > 0 ? '<span class="day-km">' + totalKm.toFixed(0) + ' km</span>' : '')
+      + '</div>'
+      + '<div class="etapper">'
+      + (d.etapper||[]).map(function(e, ei) {
+        const isLast = ei === (d.etapper.length - 1);
+        return '<div class="etappe' + (isLast ? " last" : "") + '">'
+          + '<div class="etappe-icon">' + (ICONS[e.type]||"📍") + '</div>'
+          + '<div class="etappe-connector">' + (isLast ? "" : '<div class="connector-line"></div>') + '</div>'
+          + '<div class="etappe-body">'
+          + '<div class="etappe-type">' + (LABELS[e.type]||e.type) + '</div>'
+          + (e.fra && e.til ? '<div class="etappe-route">' + escHtml(e.fra) + ' → ' + escHtml(e.til) + '</div>'
+            : e.fra ? '<div class="etappe-route">' + escHtml(e.fra) + '</div>'
+            : e.til ? '<div class="etappe-route">→ ' + escHtml(e.til) + '</div>' : '')
+          + (e.km ? '<div class="etappe-km">📏 ' + e.km + ' km</div>' : '')
+          + (e.notat ? '<div class="etappe-notat">' + escHtml(e.notat) + '</div>' : '')
+          + '</div></div>';
+      }).join("")
+      + '</div></div>';
+  }).join("") : '<p class="empty-state">Ingen ruteinformasjon lagt til ennå.</p>';
+
+  const gbRows = approvedComments.length ? approvedComments.map(function(g) {
+    var photosHtml = (g.photos && g.photos.length)
+      ? '<div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem">'
+        + g.photos.map(function(p){ return '<a href="'+p+'" target="_blank"><img src="'+p+'" style="height:80px;width:80px;object-fit:cover;border-radius:6px;border:1px solid #333"/></a>'; }).join("")
+        + '</div>'
+      : "";
+    return '<div class="gb-entry"><div class="gb-name">' + escHtml(g.name) + '</div>'
+      + '<div class="gb-msg">' + escHtml(g.message).replace(/\n/g,"<br>") + '</div>'
+      + photosHtml
+      + '<div class="gb-date">' + new Date(g.createdAt).toLocaleDateString("nb-NO",{day:"numeric",month:"long",year:"numeric"}) + '</div></div>';
+  }).join("") : '<p class="empty-state">Ingen kommentarer ennå – vær den første!</p>';
+
+  const checkedIn  = regs.filter(function(r) { return r.checkedIn; }).length;
+  const hasMap = allPlaces.length >= 2;
+  const settings = getSettings();
+  const siteName = escHtml(settings.siteName || 'NAF');
+
+  return '<!DOCTYPE html>\n<html lang="no">\n<head>\n<meta charset="UTF-8"/>\n'
+    + '<meta name="viewport" content="width=device-width,initial-scale=1"/>\n'
+    + '<title>' + escHtml(ev.title) + ' – ' + siteName + '</title>\n'
+    + sharedCSS()
+    + (hasMap ? '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>\n' : '')
+    + '<style>\n'
+    // Route day cards – purple theme for tur
+    + '.day-card{background:#1e1e1e;border:1px solid #2d1a3a;border-radius:10px;margin-bottom:1.25rem;overflow:hidden}\n'
+    + '.day-head{display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;background:#2a1a3a;flex-wrap:wrap}\n'
+    + '.day-num{font-weight:800;color:#d8b4fe;font-size:.9rem}\n'
+    + '.day-date{color:#ccc;font-size:.85rem;flex:1}\n'
+    + '.day-km{background:#3d1f5a;color:#d8b4fe;border-radius:20px;padding:2px 10px;font-size:.75rem;font-weight:700}\n'
+    + '.etapper{padding:.75rem 1rem}\n'
+    + '.etappe{display:grid;grid-template-columns:32px 16px 1fr;gap:0 .5rem;margin-bottom:.1rem}\n'
+    + '.etappe.last{margin-bottom:0}\n'
+    + '.etappe-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:#2a1a3a;border-radius:50%;flex-shrink:0}\n'
+    + '.etappe-connector{display:flex;flex-direction:column;align-items:center;padding-top:4px}\n'
+    + '.connector-line{width:2px;background:#3d1f5a;flex:1;min-height:16px}\n'
+    + '.etappe-body{padding:.35rem 0 .75rem .25rem}\n'
+    + '.etappe-type{font-size:.72rem;font-weight:700;color:#9b72cf;text-transform:uppercase;letter-spacing:.05em}\n'
+    + '.etappe-route{font-size:.92rem;color:#eee;margin:.15rem 0}\n'
+    + '.etappe-km{font-size:.78rem;color:#888;margin-top:.1rem}\n'
+    + '.etappe-notat{font-size:.8rem;color:#aaa;background:#222;border-radius:4px;padding:.3rem .6rem;margin-top:.3rem;border-left:2px solid #5b3a7a}\n'
+    + '#map{height:320px;border-radius:8px;margin-bottom:1.5rem;border:1px solid #2d1a3a}\n'
+    // Driver stats
+    + '.driver-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1.5rem}\n'
+    + '.dstat{background:var(--g);border-radius:8px;padding:1rem;text-align:center}\n'
+    + '.dstat .num{font-size:2rem;font-weight:900;color:#d8b4fe;line-height:1}\n'
+    + '.dstat.green .num{color:#4ade80}\n'
+    + '.dstat .lbl{font-size:.75rem;color:#888;margin-top:.25rem;text-transform:uppercase;letter-spacing:.4px}\n'
+    // Oppmøte list
+    + '.driver-item{display:flex;align-items:center;justify-content:space-between;background:var(--b);border-radius:6px;padding:.6rem 1rem;margin-bottom:.4rem}\n'
+    + '.driver-item .dname{font-weight:600}\n'
+    + '.driver-item .dmc{font-size:.75rem;color:#9b72cf;margin-top:.1rem}\n'
+    + '.driver-item .checked-in{color:#4ade80;font-size:.85rem}\n'
+    + '.checkin-btn{background:#2d1a3a;color:#d8b4fe;border:1px solid #5b3a7a;border-radius:4px;padding:5px 12px;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s}\n'
+    + '.checkin-btn:hover{background:#5b3a7a}\n'
+    // Vehicle select
+    + '.mc-select{width:100%;background:#2a2a2a;border:1px solid #444;color:#eee;border-radius:6px;padding:.45rem .6rem;font-size:.85rem;margin-bottom:.5rem}\n'
+    + '.mc-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;margin-bottom:.4rem}\n'
+    + '.mc-grid2{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.25rem}\n'
+    + '.range-preview{font-size:.78rem;color:#4ade80;padding:.4rem .5rem;align-self:center}\n'
+    + '.walkin-section{background:var(--g);border-radius:8px;padding:1.5rem;margin-top:1.5rem;border-top:2px dashed #3d1f5a}\n'
+    + '.walkin-section h3{color:#9b72cf;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:1rem}\n'
+    + '</style>\n'
+    + '</head>\n<body>\n'
+    + '<header><span class="badge" style="background:var(--y);color:#111;padding:4px 10px;font-weight:900;border-radius:4px">'+(getSettings().siteName||'Events Admin')+'</span></header>\n'
+    + sharedHero(ev)
+    + '<div class="container">\n'
+    + '<div class="tabs">'
+    + '<div class="tab active" onclick="showTab(\'rute\',this)">🗺️ Reiserute</div>'
+    + '<div class="tab" onclick="showTab(\'forere\',this)">🏍️ Førere</div>'
+    + (isAuthenticated ? '<div class="tab" onclick="showTab(\'pinsjekk\',this)">🔑 Sjekk inn</div>' : '')
+    + '<div class="tab" onclick="showTab(\'pamelding\',this)">📋 Påmelding</div>'
+    + '<div class="tab" onclick="showTab(\'info\',this)">ℹ️ Info</div>'
+    + '<div class="tab" onclick="showTab(\'guestbook\',this)">✍️ Gjestebok</div>'
+    + '</div>\n'
+
+    // ── Tab: Reiserute ──
+    + '<div class="tab-panel active" id="tab-rute">\n'
+    + (hasMap ? '<div id="map"></div>\n' : '')
+    + ruteHtml
+    + (allPlaces.length >= 2
+        ? '<div style="margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:.6rem">'
+          + '<button onclick="openNavPicker()" style="background:#1a2a1a;border:1px solid #2d6a2d;color:#4ade80;padding:.6rem 1.1rem;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:.5rem">🧭 Start navigasjon</button>'
+          + '</div>\n'
+        : '')
+    + '</div>\n'
+
+    // ── Tab: Førere / oppmøte ──
+    + '<div class="tab-panel" id="tab-forere">\n'
+    + '<div class="driver-stats">'
+    + '<div class="dstat green"><div class="num" id="checkinCount">' + checkedIn + '</div><div class="lbl">Møtt opp</div></div>'
+    + '<div class="dstat"><div class="num">' + regs.length + '</div><div class="lbl">Påmeldte</div></div>'
+    + '<div class="dstat"><div class="num">' + regs.filter(function(r){ return r.vehicle && r.vehicle.make; }).length + '</div><div class="lbl">MC registrert</div></div>'
+    + '</div>'
+    + '<div class="card">\n'
+    + '<div class="search-wrap"><span class="search-icon">🔍</span><input type="text" id="regSearch" placeholder="Søk på navn…" oninput="filterRegs()" autocomplete="off"/></div>'
+    + '<div id="regList">'
+    + (regs.length ? regs.map(function(r) {
+        return '<div class="driver-item" id="ri-' + escHtml(r.id) + '">'
+          + '<div><div class="dname">' + escHtml(r.name) + '</div>'
+          + (r.vehicle && r.vehicle.make ? '<div class="dmc">🏍️ ' + escHtml(r.vehicle.make) + ' ' + escHtml(r.vehicle.model||'') + '</div>' : '<div class="dmc" style="color:#555">MC ikke oppgitt</div>')
+          + '</div>'
+          + (r.checkedIn
+            ? '<span class="checked-in">✔ ' + (r.checkedInAt ? new Date(r.checkedInAt).toLocaleTimeString("nb-NO",{hour:"2-digit",minute:"2-digit"}) : 'Møtt opp') + '</span>'
+            : '<button class="checkin-btn" onclick="regCheckIn(\'' + escHtml(r.id) + '\')">Møtt opp!</button>')
+          + '</div>';
+      }).join("")
+      : '<p class="empty-state">Ingen forhåndsmeldte ennå.</p>')
+    + '</div>\n</div>\n'
+    + '<div class="walkin-section">\n'
+    + '<h3>🚶 Walk-in – møter opp uten påmelding</h3>'
+    + '<div id="walkInMsg"></div>'
+    + '<label>Navn *</label><input id="wiName" type="text" placeholder="Ola Nordmann" autocomplete="name"/>'
+    + '<label>E-post *</label><input id="wiEmail" type="email" placeholder="ola@example.com" autocomplete="email"/>'
+    + '<label>Telefon</label><input id="wiPhone" type="tel" placeholder="+47 000 00 000"/>'
+    + '<label style="margin-top:.6rem">🏍️ Motorsykkel <span style="color:#555;font-weight:400;font-size:.8rem">(valgfritt)</span></label>'
+    + '<input id="wiMC" type="text" placeholder="F.eks. Honda Africa Twin" style="font-size:.85rem"/>'
+    + '<button class="btn" onclick="walkIn()" style="background:#5b3a7a;color:#fff">Registrer og kryss av</button>'
+    + '</div>\n'
+    + '</div>\n'
+
+    // ── Tab: Påmelding ──
+    + (isAuthenticated ?
+        '<div class="tab-panel" id="tab-pinsjekk" style="display:none">\n'
+      + '<div class="card" style="max-width:400px;margin:2rem auto">\n'
+      + '<h2 style="text-align:center;margin-bottom:1.5rem">🔑 Innsjekk med PIN</h2>\n'
+      + '<div id="pinCheckinMsg"></div>\n'
+      + '<div id="pinCheckinResult" style="display:none;text-align:center;padding:1.5rem 0">\n'
+      + '<div style="font-size:2rem;margin-bottom:.5rem">✅</div>\n'
+      + '<div id="pinCheckinName" style="font-size:1.3rem;font-weight:900;color:var(--y);margin-bottom:.5rem"></div>\n'
+      + '<div id="pinCheckinStatus" style="font-size:.9rem;color:#888"></div>\n'
+      + '<button class="btn btn-y" style="margin-top:1.25rem;width:100%" onclick="pinCheckinReset()">✓ Sjekk inn neste</button>\n'
+      + '</div>\n'
+      + '<div id="pinCheckinForm">\n'
+      + '<label style="text-align:center;display:block;color:#888;margin-bottom:.75rem">Skriv inn 4-sifret PIN</label>\n'
+      + '<input id="pinCheckinInput" type="tel" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"'
+      + ' style="text-align:center;font-size:2.5rem;letter-spacing:1rem;font-weight:900;padding:.75rem;margin-bottom:.75rem"'
+      + ' onkeyup="if(this.value.length===4)doPinCheckin()"/>\n'
+      + '<button class="btn btn-y" style="width:100%;justify-content:center" onclick="doPinCheckin()">Søk opp</button>\n'
+      + '</div>\n'
+      + '</div>\n'
+      + '</div>\n' : '')
+    + '<div class="tab-panel" id="tab-pamelding">\n'
+    + '<div class="card"><h2>📋 Forhåndsmelding</h2>'
+    + (full
+      ? '<p style="color:var(--red)">⚠️ Turen er dessverre full.</p>'
+      : '<p style="color:#aaa;font-size:.9rem;margin-bottom:1.25rem">Meld deg på forhånd – oppgi gjerne motorsykkel så planlegger kan beregne bensinstopp.</p>'
+        + '<div id="regMsg"></div>'
+        + '<label>Navn *</label><input id="rName" type="text" placeholder="Ola Nordmann" autocomplete="name"/>'
+        + '<label>E-post *</label><input id="rEmail" type="email" placeholder="ola@example.com" autocomplete="email"/>'
+        + '<label>Telefon</label><input id="rPhone" type="tel" placeholder="+47 000 00 000"/>'
+        + '<label style="margin-top:.75rem;display:block;font-weight:600;color:#ccc">🏍️ Motorsykkel <span style="color:#555;font-weight:400;font-size:.8rem">(anbefalt)</span></label>'
+        + '<p style="font-size:.78rem;color:#666;margin:.2rem 0 .5rem">Brukes til å planlegge bensinstopp.</p>'
+        + '<select class="mc-select" id="rVehicleSelect" onchange="onTurVehicleSelect(this.value)">'
+        + '<option value="">— Velg modell —</option>'
+        + MC_DB_OPTIONS
+        + '</select>'
+        + '<div class="mc-grid3">'
+        + '<input id="rVehicleMake"  type="text"   placeholder="Merke"       style="font-size:.83rem" oninput="updateTurVehicleRange()"/>'
+        + '<input id="rVehicleModel" type="text"   placeholder="Modell"      style="font-size:.83rem" oninput="updateTurVehicleRange()"/>'
+        + '<input id="rVehicleTank"  type="number" placeholder="Tank (L)"  min="1" max="100" step="0.1" style="font-size:.83rem" oninput="updateTurVehicleRange()"/>'
+        + '</div>'
+        + '<div class="mc-grid2">'
+        + '<input id="rVehicleL100"  type="number" placeholder="Forbruk (L/100km)" min="1" max="30" step="0.1" style="font-size:.83rem" oninput="updateTurVehicleRange()"/>'
+        + '<div id="turVehicleRange" class="range-preview"></div>'
+        + '</div>'
+        + '<button class="btn" style="margin-top:.75rem" onclick="registerTur()">✅ Meld meg på</button>'
+        + '<p style="font-size:.75rem;color:#555;margin-top:.75rem;line-height:1.5">🔒 Vi lagrer kun navn, e-post, telefon og kjøretøyinfo for å administrere turen. Data anonymiseres automatisk etter arrangementet.</p>')
+    + '</div>\n</div>\n'
+
+    // ── Tab: Info ──
+    + (isAuthenticated ?
+        '<div class="tab-panel" id="tab-pinsjekk" style="display:none">\n'
+      + '<div class="card" style="max-width:400px;margin:2rem auto">\n'
+      + '<h2 style="text-align:center;margin-bottom:1.5rem">🔑 Innsjekk med PIN</h2>\n'
+      + '<div id="pinCheckinMsg"></div>\n'
+      + '<div id="pinCheckinResult" style="display:none;text-align:center;padding:1.5rem 0">\n'
+      + '<div style="font-size:2rem;margin-bottom:.5rem">✅</div>\n'
+      + '<div id="pinCheckinName" style="font-size:1.3rem;font-weight:900;color:var(--y);margin-bottom:.5rem"></div>\n'
+      + '<div id="pinCheckinStatus" style="font-size:.9rem;color:#888"></div>\n'
+      + '<button class="btn btn-y" style="margin-top:1.25rem;width:100%" onclick="pinCheckinReset()">✓ Sjekk inn neste</button>\n'
+      + '</div>\n'
+      + '<div id="pinCheckinForm">\n'
+      + '<label style="text-align:center;display:block;color:#888;margin-bottom:.75rem">Skriv inn 4-sifret PIN</label>\n'
+      + '<input id="pinCheckinInput" type="tel" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"'
+      + ' style="text-align:center;font-size:2.5rem;letter-spacing:1rem;font-weight:900;padding:.75rem;margin-bottom:.75rem"'
+      + ' onkeyup="if(this.value.length===4)doPinCheckin()"/>\n'
+      + '<button class="btn btn-y" style="width:100%;justify-content:center" onclick="doPinCheckin()">Søk opp</button>\n'
+      + '</div>\n'
+      + '</div>\n'
+      + '</div>\n' : '')
+    + '<div class="tab-panel" id="tab-info">\n'
+    + (ev.description ? '<div class="card"><p>' + escHtml(ev.description).replace(/\n/g,"<br>") + '</p></div>\n' : '')
+    + '<div class="card">'
+    + '<p>' + (ev.location ? '📍 ' + escHtml(ev.location) : 'Sted ikke oppgitt') + '</p>'
+    + (ev.date ? '<p style="margin-top:.4rem;color:#aaa;font-size:.9rem">📅 ' + new Date(ev.date).toLocaleDateString("nb-NO",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) + '</p>' : '')
+    + '</div>\n</div>\n'
+
+    // ── Tab: Gjestebok ──
+    + '<div class="tab-panel" id="tab-guestbook">\n'
+    + '<div class="card"><h2>Gjestebok</h2><div class="gb-entries">' + gbRows + '</div>'
+    + '<hr style="border-color:#333;margin-bottom:1.25rem"/>'
+    + '<h2 style="margin-bottom:1rem">Legg igjen en kommentar</h2>'
+    + '<div id="gbMsg"></div>'
+    + '<label>Navn *</label><input id="gbName" type="text" placeholder="Ola Nordmann"/>'
+    + '<label>Melding *</label><textarea id="gbMessage" placeholder="Skriv din kommentar…"></textarea>'
+    + '<button class="btn" onclick="submitComment()">Send kommentar</button>'
+    + '<div id="gbQrArea" style="margin-top:.5rem"></div>'
+    + '<p style="font-size:.8rem;color:#555;margin-top:.5rem">Kommentarer godkjennes av administrator før de vises.</p>'
+    + '</div>\n</div>\n'
+
+    + '</div>\n'
+    + sharedPinAndStaffOverlay(ev)
+    + sharedJS(ev)
+    + (hasMap ? '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>\n' : '')
+    + '<script>\nvar PLACES = ' + JSON.stringify(allPlaces) + ';\n'
+    + 'var ETAPPES = ' + JSON.stringify(allEtappes) + ';\n'
+    + 'var ROUTE_START_HUE = 200;\n'
+    + 'var ROUTE_PROFILE = ' + JSON.stringify(ev.routeProfile || 'driving') + ';\n'
+    + 'var GH_KEY = ' + JSON.stringify(GH_KEY) + ';\n'
+    + 'function openNavPicker(){\n'
+    + '  var start = PLACES[0], dest = PLACES[PLACES.length-1];\n'
+    + '  if(!start||!dest){alert("Ingen ruteinformasjon tilgjengelig");return;}\n'
+    + '  // Build URLs for different map apps\n'
+    + '  var enc = encodeURIComponent;\n'
+    + '  var apps = [\n'
+    + '    { name:"🍎 Apple Maps",     url:"maps://maps.apple.com/?saddr="+enc(start)+"&daddr="+enc(dest),         ua:/iPhone|iPad|Macintosh/ },\n'
+    + '    { name:"🗺 Google Maps",    url:"https://www.google.com/maps/dir/"+enc(start)+"/"+enc(dest),            ua:/./ },\n'
+    + '    { name:"🧭 Waze",           url:"https://waze.com/ul?ll=&navigate=yes&q="+enc(dest),                   ua:/./ },\n'
+    + '    { name:"📱 Here WeGo",     url:"https://share.here.com/r/"+enc(start)+","+enc(dest),                   ua:/./ },\n'
+    + '    { name:"🤖 Google Maps App",url:"comgooglemaps://?saddr="+enc(start)+"&daddr="+enc(dest)+"&directionsmode=driving", ua:/Android|iPhone/ },\n'
+    + '  ];\n'
+    + '  // Filter to relevant apps for this platform\n'
+    + '  var ua = navigator.userAgent;\n'
+    + '  var isIOS = /iPhone|iPad/.test(ua);\n'
+    + '  var isAndroid = /Android/.test(ua);\n'
+    + '  var isMobile = isIOS||isAndroid;\n'
+    + '  // Build modal\n'
+    + '  var ov = document.createElement("div");\n'
+    + '  ov.style.cssText = "position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center;padding:1rem";\n'
+    + '  var box = document.createElement("div");\n'
+    + '  box.style.cssText = "background:#1e1e1e;border-radius:12px 12px 12px 12px;padding:1.25rem;width:100%;max-width:420px;box-shadow:0 -4px 40px #000c";\n'
+    + '  var h = document.createElement("div");\n'
+    + '  h.style.cssText = "font-weight:800;font-size:1rem;margin-bottom:.25rem";\n'
+    + '  h.textContent = "🧭 Start navigasjon";\n'
+    + '  var sub = document.createElement("div");\n'
+    + '  sub.style.cssText = "font-size:.78rem;color:#666;margin-bottom:1rem";\n'
+    + '  sub.textContent = start + " → " + dest;\n'
+    + '  box.appendChild(h); box.appendChild(sub);\n'
+    + '  var showApps = [\n'
+    + '    { name:"🗺️ Google Maps",    url:"https://www.google.com/maps/dir/"+enc(start)+"/"+enc(dest) },\n'
+    + '    { name:"🧭 Waze",           url:"https://waze.com/ul?q="+enc(dest)+"&navigate=yes" },\n'
+    + '    { name:"📍 HERE WeGo",      url:"https://share.here.com/r/"+enc(start)+","+enc(dest) },\n'
+    + '  ];\n'
+    + '  if(isIOS) showApps.unshift({ name:"🍎 Apple Maps", url:"maps://maps.apple.com/?saddr="+enc(start)+"&daddr="+enc(dest) });\n'
+    + '  showApps.forEach(function(a){\n'
+    + '    var btn = document.createElement("a");\n'
+    + '    btn.href = a.url;\n'
+    + '    btn.target = "_blank";\n'
+    + '    btn.rel = "noopener";\n'
+    + '    btn.style.cssText = "display:flex;align-items:center;padding:.75rem 1rem;background:#141414;border:1px solid #2a2a2a;border-radius:8px;margin-bottom:.5rem;font-weight:600;font-size:.95rem;color:#eee;text-decoration:none";\n'
+    + '    btn.textContent = a.name;\n'
+    + '    btn.onclick = function(){ ov.remove(); };\n'
+    + '    box.appendChild(btn);\n'
+    + '  });\n'
+    + '  var close = document.createElement("button");\n'
+    + '  close.textContent = "Avbryt";\n'
+    + '  close.style.cssText = "width:100%;padding:.7rem;background:#2a2a2a;border:1px solid #444;border-radius:8px;color:#aaa;font-size:.9rem;cursor:pointer;margin-top:.25rem";\n'
+    + '  close.onclick = function(){ ov.remove(); };\n'
+    + '  box.appendChild(close);\n'
+    + '  ov.appendChild(box);\n'
+    + '  ov.onclick = function(e){ if(e.target===ov) ov.remove(); };\n'
+    + '  document.body.appendChild(ov);\n'
+    + '}\n'
+    + 'function onTurVehicleSelect(v){if(!v)return;var p=v.split("|||");document.getElementById("rVehicleMake").value=p[0]||"";document.getElementById("rVehicleModel").value=p[1]||"";document.getElementById("rVehicleTank").value=p[2]||"";document.getElementById("rVehicleL100").value=p[3]||"";updateTurVehicleRange();}\n'
+    + 'function updateTurVehicleRange(){var t=parseFloat(document.getElementById("rVehicleTank").value)||0;var l=parseFloat(document.getElementById("rVehicleL100").value)||0;var el=document.getElementById("turVehicleRange");if(el&&t&&l)el.textContent="≈"+(Math.floor(t/l*100*0.85))+" km rekkevidde";else if(el)el.textContent="";}\n'
+    + 'async function registerTur(){'
+    +   'var msg=document.getElementById("regMsg");'
+    +   'var name=document.getElementById("rName").value.trim();'
+    +   'var email=document.getElementById("rEmail").value.trim();'
+    +   'var phone=document.getElementById("rPhone").value.trim();'
+    +   'if(!name||!email){msg.innerHTML=\'<div class="msg err">Navn og e-post er påkrevd</div>\';return;}'
+    +   'var vehicle={make:document.getElementById("rVehicleMake").value.trim(),model:document.getElementById("rVehicleModel").value.trim(),tank:parseFloat(document.getElementById("rVehicleTank").value)||0,l100:parseFloat(document.getElementById("rVehicleL100").value)||0};'
+    +   'if(!vehicle.make)vehicle=null;'
+    +   'var res=await fetch("/api/events/"+EV_ID+"/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name,email:email,phone:phone,vehicle:vehicle})});'
+    +   'var d=await res.json();'
+    +   'if(res.ok){msg.innerHTML=\'<div class="msg ok">✅ Du er påmeldt turen!\'+( vehicle&&vehicle.make?" MC: "+vehicle.make+" "+vehicle.model:"")+"<\/div>";document.getElementById("rName").value="";document.getElementById("rEmail").value="";document.getElementById("rPhone").value="";}'
+    +   'else{msg.innerHTML=\'<div class="msg err">✗ \'+d.error+\'<\/div>\';}'
+    + '}\n'
+    + 'async function regCheckIn(rid){'
+    +   'var ts=new Date().toISOString();'
+    +   'var el=document.getElementById("ri-"+rid);'
+    +   'if(el){var btn=el.querySelector(".checkin-btn");if(btn)btn.outerHTML=\'<span class="checked-in">✔ \'+ts.substr(11,5)+\'<\/span>\';}'
+    +   'var c=parseInt(document.getElementById("checkinCount").textContent||"0")+1;'
+    +   'document.getElementById("checkinCount").textContent=c;'
+    +   'if(navigator.onLine){await fetch("/api/events/"+EV_ID+"/registrations/"+rid+"/checkin",{method:"POST",headers:{"Content-Type":"application/json"}});}'
+    +   'else{dbEnqueue({type:"checkin_reg",regId:rid,ts:ts});}'
+    + '}\n'
+    + 'async function walkIn(){'
+    +   'var msg=document.getElementById("walkInMsg");'
+    +   'var name=document.getElementById("wiName").value.trim();'
+    +   'var email=document.getElementById("wiEmail").value.trim();'
+    +   'var phone=document.getElementById("wiPhone").value.trim();'
+    +   'var mc=document.getElementById("wiMC").value.trim();'
+    +   'if(!name||!email){msg.innerHTML=\'<div class="msg err">Navn og e-post er påkrevd</div>\';return;}'
+    +   'var vehicle=mc?{make:mc,model:"",tank:0,l100:0}:null;'
+    +   'var res=await fetch("/api/events/"+EV_ID+"/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name,email:email,phone:phone,walkin:true,vehicle:vehicle})});'
+    +   'var d=await res.json();'
+    +   'if(res.ok){'
+    +     'msg.innerHTML=\'<div class="msg ok">✔ \'+esc(name)+\' er registrert og avkrysset!</div>\';'
+    +     'document.getElementById("wiName").value="";document.getElementById("wiEmail").value="";document.getElementById("wiPhone").value="";document.getElementById("wiMC").value="";'
+    +     'var c=parseInt(document.getElementById("checkinCount").textContent||"0")+1;'
+    +     'document.getElementById("checkinCount").textContent=c;'
+    +     'var item=document.createElement("div");item.className="driver-item";'
+    +     'item.innerHTML=\'<div><div class="dname">\'+esc(name)+\'<\/div>\'+( mc?\'<div class="dmc">🏍️ \'+esc(mc)+\'<\/div>\':\'\')+\'<\/div><span class="checked-in">✔ Walk-in<\/span>\';'
+    +     'document.getElementById("regList").prepend(item);'
+    +   '}else{msg.innerHTML=\'<div class="msg err">✗ \'+d.error+\'<\/div>\';}'
+    + '}\n'
+    + 'function filterRegs(){var q=document.getElementById("regSearch").value.toLowerCase();document.querySelectorAll(".driver-item").forEach(function(el){var name=el.querySelector(".dname").textContent.toLowerCase();el.style.display=name.includes(q)?"":"none";});}\n'
+    + (hasMap ? buildMapScript() : '')
+    + '<\/script>\n'
+
+    + (isAuthenticated ?
+        '<script>\n'
+      + 'async function doPinCheckin(){\n'
+      + '  var pin=document.getElementById("pinCheckinInput").value.trim();\n'
+      + '  if(pin.length!==4)return;\n'
+      + '  var msg=document.getElementById("pinCheckinMsg");\n'
+      + '  msg.innerHTML="";\n'
+      + '  try{\n'
+      + '    var r=await fetch("/api/events/"+EV_ID+"/checkin-by-pin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pin:pin})});\n'
+      + '    var d=await r.json();\n'
+      + '    if(!r.ok||!d.ok){msg.textContent="Ugyldig PIN \u2013 pr\u00f8v igjen";msg.style.color="#ff7d7d";document.getElementById("pinCheckinInput").value="";return;}\n'
+      + '    document.getElementById("pinCheckinForm").style.display="none";\n'
+      + '    document.getElementById("pinCheckinResult").style.display="block";\n'
+      + '    document.getElementById("pinCheckinName").textContent=d.name;\n'
+      + '    document.getElementById("pinCheckinStatus").textContent=d.alreadyCheckedIn?"Allerede sjekket inn":"Klar for innsjekk";\n'
+      + '  }catch(e){msg.textContent="Nettverksfeil";msg.style.color="#ff7d7d";}\n'
+      + '}\n'
+      + 'function pinCheckinReset(){\n'
+      + '  document.getElementById("pinCheckinInput").value="";\n'
+      + '  document.getElementById("pinCheckinMsg").innerHTML="";\n'
+      + '  document.getElementById("pinCheckinForm").style.display="block";\n'
+      + '  document.getElementById("pinCheckinResult").style.display="none";\n'
+      + '  document.getElementById("pinCheckinInput").focus();\n'
+      + '}\n'
+      + '<\/script>\n' : '')
+    + '</body>\n</html>';
+}
+
+function buildMapScript() {
+  // Inline JS injected into the public event/snapshot page.
+  // PLACES, ETAPPES, ROUTE_PROFILE, GH_KEY are injected as vars before this script runs.
+  return 'window.addEventListener("load",function(){\n'
+    + '  if(!window.L)return;\n'
+    + '  var map=L.map("map");\n'
+    + '  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:18}).addTo(map);\n'
+    + '  var coordCache={};\n'  // name -> [lat,lon]
+    + '  var results=[];\n'
+    // ── Geocoding (Nominatim, 1 req/sec) ──────────────────────────
+    + '  function geocodeNext(i){\n'
+    + '    if(i>=PLACES.length){drawMap();return;}\n'
+    + '    fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+encodeURIComponent(PLACES[i]))\n'
+    + '      .then(function(r){return r.json();})\n'
+    + '      .then(function(d){\n'
+    + '        if(d&&d[0]){\n'
+    + '          var ll=[parseFloat(d[0].lat),parseFloat(d[0].lon)];\n'
+    + '          coordCache[PLACES[i]]=ll;\n'
+    + '          results.push({ll:ll,name:PLACES[i]});\n'
+    + '        } else results.push(null);\n'
+    + '        setTimeout(function(){geocodeNext(i+1);},300);\n'
+    + '      }).catch(function(){results.push(null);setTimeout(function(){geocodeNext(i+1);},300);});\n'
+    + '  }\n'
+    // ── Profile colours ───────────────────────────────────────────
+    + '  var PROFILE_COLOR={driving:"#9b72cf",scenic:"#f59e0b",gravel:"#4ade80",foot:"#60a5fa"};\n'
+    + '  var ROUTE_HUE = typeof ROUTE_START_HUE!=="undefined" ? ROUTE_START_HUE : 200;\n'
+    + '  function getDayHue(di){ return (ROUTE_HUE + di*47)%360; }\n'
+    + '  function getEtappeColor(di,ei,total){\n'
+    + '    var h=getDayHue(di),s=65,l=Math.round(70-(ei/Math.max(total-1,1))*35);\n'
+    + '    return "hsl("+h+","+s+"%,"+l+"%)";\n'
+    + '  }\n'
+    // ── Fallback: dashed line ─────────────────────────────────────
+    + '  function drawFallback(lls,prof){\n'
+    + '    L.polyline(lls,{color:PROFILE_COLOR[prof]||"#9b72cf",weight:3,dashArray:"6 4"}).addTo(map);\n'
+    + '  }\n'
+    // ── Draw one segment ──────────────────────────────────────────
+    + '  async function routeSegment(from,to,prof,fb,col){\n'
+    + '    col=col||PROFILE_COLOR[prof]||"#9b72cf";\n'
+    + '    var sty={color:col,weight:4.5,opacity:.92};\n'
+    + '    if(GH_KEY&&prof!=="foot"){\n'
+    + '      try{\n'
+    + '        var gp=prof==="scenic"?"motorcycle":"car";\n'
+    + '        var pts="point="+from[0]+"%2C"+from[1]+"&point="+to[0]+"%2C"+to[1];\n'
+    + '        var rg=await fetch("https://graphhopper.com/api/1/route?"+pts+"&profile="+gp+"&locale=no&calc_points=true&points_encoded=false&key="+GH_KEY);\n'
+    + '        var dg=await rg.json();\n'
+    + '        if(dg.paths&&dg.paths[0]&&dg.paths[0].points){\n'
+    + '          var c=dg.paths[0].points.coordinates.map(function(x){return[x[1],x[0]];});\n'
+    + '          if(fb)map.removeLayer(fb);\n'
+    + '          L.polyline(c,sty).addTo(map);return;\n'
+    + '        }\n'
+    + '      }catch(e){}\n'
+    + '    }\n'
+    + '    try{\n'
+    + '      var op=prof==="foot"?"foot":"driving";\n'
+    + '      var oc=from[1]+","+from[0]+";"+to[1]+","+to[0];\n'
+    + '      var ro=await fetch("https://router.project-osrm.org/route/v1/"+op+"/"+oc+"?overview=full&geometries=geojson");\n'
+    + '      var do2=await ro.json();\n'
+    + '      if(do2.routes&&do2.routes[0]){if(fb)map.removeLayer(fb);L.geoJSON(do2.routes[0].geometry,{style:sty}).addTo(map);}\n'
+    + '    }catch(e){}\n'
+    + '  }\n'
+    + '  function drawMap(){\n'
+    + '    var valid=results.filter(Boolean);\n'
+    + '    if(!valid.length){console.warn("NAF map: no geocoded places");return;}\n'
+    + '    var dotIcon=L.divIcon({html:"",className:"naf-dot",iconSize:[14,14],iconAnchor:[7,7]});\n'
+    + '    valid.forEach(function(r){L.marker(r.ll,{icon:dotIcon}).bindPopup("<b>"+r.name+"</b>").addTo(map);});\n'
+    + '    var lls=valid.map(function(r){return r.ll;});\n'
+    + '    map.fitBounds(L.latLngBounds(lls).pad(0.2));\n'
+    + '    loadPoiLayer(map,lls);\n'
+    + '    if(lls.length<2)return;\n'
+    + '    var etappes=typeof ETAPPES!=="undefined"?ETAPPES:[];\n'
+    + '    if(etappes.length){\n'
+    + '      etappes.forEach(function(e,i){\n'
+    + '        var from=coordCache[e.fra],to=coordCache[e.til];\n'
+    + '        if(!from||!to){console.warn("NAF map: missing coords",e.fra,"→",e.til);return;}\n'
+    + '        var col=getEtappeColor(e.dayIndex||0,e.etappeIndex||i,e.totalInDay||etappes.length);\n'
+    + '        routeSegment(from,to,e.profile||"driving",null,col);\n'
+    + '      });\n'
+    + '    } else {\n'
+    + '      var prof=typeof ROUTE_PROFILE!=="undefined"?ROUTE_PROFILE:"driving";\n'
+    + '      routeSegment(lls[0],lls[lls.length-1],prof,null);\n'
+    + '    }\n'
+    + '  }\n'
+    + '  // POI-lag: bensin, restaurant, hotell langs ruten\n'
+    + '  var POI_DEFS=[{k:"amenity",v:"fuel",icon:"⛽"},{k:"amenity",v:"restaurant",icon:"🍽"},{k:"tourism",v:"hotel",icon:"🏨"},{k:"amenity",v:"cafe",icon:"☕"}];\n'
+    + '  function loadPoiLayer(map,lls){\n'
+    + '    if(!lls||lls.length<1)return;\n'
+    + '    var center=lls[Math.floor(lls.length/2)];\n'
+    + '    var poiGroup=L.layerGroup().addTo(map);\n'
+    + '    function fetchPoi(i){\n'
+    + '      if(i>=POI_DEFS.length)return;\n'
+    + '      var def=POI_DEFS[i];\n'
+    + '      var q=`[out:json][timeout:10];(node["${def.k}"="${def.v}"](around:15000,${center[0]},${center[1]}););out 6;`;\n'
+    + '      fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent(q)})\n'
+    + '        .then(function(r){return r.json();})\n'
+    + '        .then(function(d){\n'
+    + '          (d.elements||[]).slice(0,5).forEach(function(node){\n'
+    + '            var name=node.tags&&(node.tags.name||node.tags.brand||def.icon)||def.icon;\n'
+    + '            L.marker([node.lat,node.lon],{\n'
+    + '              icon:L.divIcon({html:"<span style=\'font-size:1.1rem;filter:drop-shadow(0 1px 2px #000)\'>"+def.icon+"</span>",className:"",iconSize:[24,24],iconAnchor:[12,12]})\n'
+    + '            }).bindPopup("<b>"+def.icon+" "+name+"</b>").addTo(poiGroup);\n'
+    + '          });\n'
+    + '          setTimeout(function(){fetchPoi(i+1);},1200);\n'
+    + '        }).catch(function(){setTimeout(function(){fetchPoi(i+1);},2000);});\n'
+    + '    }\n'
+    + '    setTimeout(function(){fetchPoi(0);},1500);\n'
+    + '  }\n'
+    + '  if(PLACES.length)geocodeNext(0);\n'
+    + '});\n';
+}
+
+// ── Offline snapshot (alt siden trenger for å fungere offline) ────
+app.get("/api/events/:id/snapshot", function(req, res) {
+  const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  const s = getSettings();
+  // Send kun det som trengs – ikke staffPin i klartekst
+  res.json({
+    id: ev.id, slug: ev.slug, title: ev.title, description: ev.description,
+    date: ev.date, location: ev.location, eventType: ev.eventType,
+    image: ev.image, maxParticipants: ev.maxParticipants, showParticipants: ev.showParticipants,
+    hasPin: !!ev.staffPin,
+    registrations: (ev.registrations || []).map(function(r) {
+      return { id: r.id, name: r.name, checkedIn: !!r.checkedIn, checkedInAt: r.checkedInAt || null, checkinPin: r.checkinPin || null };
+    }),
+    staff: (ev.staff || []).map(function(s) {
+      return { id: s.id, name: s.name, role: s.role || "", checkedIn: !!s.checkedIn, checkedInAt: s.checkedInAt || null };
+    }),
+    guestbook: (ev.guestbook || []).filter(function(g) { return g.approved; }).map(function(g) {
+      return { id: g.id, name: g.name, message: g.message, createdAt: g.createdAt };
+    }),
+    snapshotAt: new Date().toISOString(),
+  });
+});
+
+// ── Offline sync – tar imot kø fra SW og utfører operasjonene ─────
+app.post("/api/events/:id/sync", rateLimit(30, 60000), function(req, res) {
+  const ops = req.body.ops;
+  if (!Array.isArray(ops)) return res.status(400).json({ error: "Ugyldig format" });
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+
+  var results = [];
+  ops.forEach(function(op) {
+    try {
+      if (op.type === "checkin_reg") {
+        var r = (ev.registrations || []).find(function(r) { return r.id === op.regId; });
+        if (r && !r.checkedIn) { r.checkedIn = true; r.checkedInAt = op.ts || new Date().toISOString(); }
+        results.push({ id: op.id, ok: true });
+      } else if (op.type === "checkin_staff") {
+        var s = (ev.staff || []).find(function(s) { return s.id === op.staffId; });
+        if (s && !s.checkedIn) { s.checkedIn = true; s.checkedInAt = op.ts || new Date().toISOString(); }
+        results.push({ id: op.id, ok: true });
+      } else if (op.type === "self_checkin_staff") {
+        if (!ev.staff) ev.staff = [];
+        var name = (op.name || "").trim().slice(0, 100);
+        if (name) {
+          ev.staff.push({ id: uuid(), name: name, role: (op.role||"").slice(0,100), checkedIn: true, addedAt: op.ts, checkedInAt: op.ts });
+        }
+        results.push({ id: op.id, ok: true });
+      } else if (op.type === "register") {
+        if (!ev.registrations) ev.registrations = [];
+        var email = (op.email || "").toLowerCase().trim();
+        var name  = (op.name  || "").trim().slice(0, 100);
+        if (name && email && !ev.registrations.find(function(r){ return r.email === email; })) {
+          ev.registrations.push({ id: uuid(), name: name, email: email, phone: (op.phone||"").slice(0,30), registeredAt: op.ts, offlineSync: true });
+        }
+        results.push({ id: op.id, ok: true });
+      } else if (op.type === "guestbook") {
+        if (!ev.guestbook) ev.guestbook = [];
+        var gbName = (op.name || "").trim().slice(0, 100);
+        var gbMsg  = (op.message || "").trim().slice(0, 1000);
+        if (gbName && gbMsg) {
+          ev.guestbook.push({ id: uuid(), name: gbName, message: gbMsg, approved: false, createdAt: op.ts, offlineSync: true });
+        }
+        results.push({ id: op.id, ok: true });
+      } else {
+        results.push({ id: op.id, ok: false, error: "Ukjent operasjon" });
+      }
+    } catch(e) {
+      results.push({ id: op.id, ok: false, error: e.message });
+    }
+  });
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(null);
+  res.json({ ok: true, results: results });
+});
+
+
+// ── Inventar ─────────────────────────────────────────────────────
+app.get("/api/inventar", auth, function(req, res) {
+  const user  = req.session.user;
+  const items = readJSON(INVENTAR_FILE);
+  if (user.role === "admin") return res.json(items);
+  // Non-admin: return items belonging to their departments + items with no department
+  const myDeptIds = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === user.id; }) || {})
+    .map(function(a){ return a.department; }).filter(Boolean);
+  res.json(items.filter(function(i){ return !i.department || myDeptIds.includes(i.department); }));
+});
+
+app.post("/api/inventar", auth, managerOrAdmin, function(req, res) {
+  const user  = req.session.user;
+  const items = readJSON(INVENTAR_FILE);
+  // Determine department: use provided value if admin, else use caller's department
+  let deptId = req.body.department || null;
+  if (user.role !== "admin") {
+    const myDepts = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === user.id; }) || {})
+      .map(function(a){ return a.department; }).filter(Boolean);
+    deptId = myDepts[0] || null;
+  }
+  const item = {
+    id: uuid(), navn: (req.body.navn||"").trim(),
+    kategori: req.body.kategori||"annet",
+    antall: parseInt(req.body.antall)||1,
+    beskrivelse: (req.body.beskrivelse||"").trim(),
+    department: deptId,
+    usageCount: 0, createdAt: new Date().toISOString()
+  };
+  if (req.body.pris !== undefined) item.pris = parseFloat(req.body.pris) || 0;
+  if (!item.navn) return res.status(400).json({ err: "Navn er påkrevd" });
+  items.push(item);
+  writeJSON(INVENTAR_FILE, items);
+  res.json(item);
+});
+
+app.put("/api/inventar/:id", auth, managerOrAdmin, function(req, res) {
+  const user  = req.session.user;
+  const items = readJSON(INVENTAR_FILE);
+  const idx   = items.findIndex(function(i){ return i.id === req.params.id; });
+  if (idx === -1) return res.status(404).json({ err: "Ikke funnet" });
+  // Check access: admin always OK; manager must own this dept
+  const item = items[idx];
+  if (user.role !== "admin" && item.department) {
+    const myDepts = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === user.id; }) || {})
+      .map(function(a){ return a.department; });
+    if (!myDepts.includes(item.department))
+      return res.status(403).json({ err: "Ingen tilgang til dette utstyret" });
+  }
+  items[idx] = Object.assign({}, item, {
+    navn:       (req.body.navn||item.navn).trim(),
+    kategori:   req.body.kategori   || item.kategori,
+    antall:     parseInt(req.body.antall) || item.antall,
+    beskrivelse:(req.body.beskrivelse||"").trim(),
+    department: user.role === "admin" && req.body.department !== undefined
+                  ? (req.body.department || null)
+                  : item.department,
+  });
+  if (req.body.pris !== undefined) items[idx].pris = parseFloat(req.body.pris) || 0;
+  writeJSON(INVENTAR_FILE, items);
+  res.json(items[idx]);
+});
+
+app.delete("/api/inventar/:id", auth, managerOrAdmin, function(req, res) {
+  const user  = req.session.user;
+  const items = readJSON(INVENTAR_FILE);
+  const item  = items.find(function(i){ return i.id === req.params.id; });
+  if (!item) return res.status(404).json({ err: "Ikke funnet" });
+  if (user.role !== "admin" && item.department) {
+    const myDepts = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === user.id; }) || {})
+      .map(function(a){ return a.department; });
+    if (!myDepts.includes(item.department))
+      return res.status(403).json({ err: "Ingen tilgang" });
+  }
+  writeJSON(INVENTAR_FILE, items.filter(function(i){ return i.id !== req.params.id; }));
+  // Remove from all events too
+  const events = readJSON(EVENTS_FILE);
+  events.forEach(e => { if (e.utstyr) e.utstyr = e.utstyr.filter(u => u.id !== req.params.id); });
+  writeJSON(EVENTS_FILE, events);
+  res.json({ ok: true });
+});
+
+// Innkjøp – legg til antall på lager
+app.post("/api/inventar/:id/inkjop", auth, managerOrAdmin, function(req, res) {
+  const user  = req.session.user;
+  const items = readJSON(INVENTAR_FILE);
+  const idx   = items.findIndex(function(i){ return i.id === req.params.id; });
+  if (idx === -1) return res.status(404).json({ err: "Ikke funnet" });
+  if (user.role !== "admin" && items[idx].department) {
+    const myDepts = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === user.id; }) || {})
+      .map(function(a){ return a.department; });
+    if (!myDepts.includes(items[idx].department))
+      return res.status(403).json({ err: "Ingen tilgang" });
+  }
+  const antall = parseInt(req.body.antall) || 0;
+  if (antall <= 0) return res.status(400).json({ err: "Antall må være større enn 0" });
+  items[idx].antall = (items[idx].antall || 0) + antall;
+  if (!items[idx].inkjopLogg) items[idx].inkjopLogg = [];
+  items[idx].inkjopLogg.push({ antall, dato: new Date().toISOString(), notat: (req.body.notat||"").trim() });
+  writeJSON(INVENTAR_FILE, items);
+  res.json({ ok: true, antall: items[idx].antall });
+});
+
+// Varetelling – sett nytt lagersaldo direkte
+app.post("/api/inventar/:id/varetelling", auth, managerOrAdmin, function(req, res) {
+  const user  = req.session.user;
+  const items = readJSON(INVENTAR_FILE);
+  const idx   = items.findIndex(function(i){ return i.id === req.params.id; });
+  if (idx === -1) return res.status(404).json({ err: "Ikke funnet" });
+  if (user.role !== "admin" && items[idx].department) {
+    const myDepts = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === user.id; }) || {})
+      .map(function(a){ return a.department; });
+    if (!myDepts.includes(items[idx].department))
+      return res.status(403).json({ err: "Ingen tilgang" });
+  }
+  const nyttAntall = parseInt(req.body.antall);
+  if (isNaN(nyttAntall) || nyttAntall < 0) return res.status(400).json({ err: "Ugyldig antall" });
+  const gammelt = items[idx].antall || 0;
+  items[idx].antall = nyttAntall;
+  if (!items[idx].varetellingLogg) items[idx].varetellingLogg = [];
+  items[idx].varetellingLogg.push({ fra: gammelt, til: nyttAntall, dato: new Date().toISOString(), notat: (req.body.notat||"").trim() });
+  writeJSON(INVENTAR_FILE, items);
+  res.json({ ok: true, antall: nyttAntall });
+});
+
+// Give-away statistikk per event
+app.get("/api/events/:id/giveaway", auth, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(e => e.id === req.params.id);
+  if (!ev) return res.status(404).json({ err: "Ikke funnet" });
+  res.json(ev.giveaway || []);
+});
+
+app.post("/api/events/:id/giveaway", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const evIdx = events.findIndex(e => e.id === req.params.id);
+  if (evIdx === -1) return res.status(404).json({ err: "Ikke funnet" });
+  if (!events[evIdx].giveaway) events[evIdx].giveaway = [];
+  const { itemId, utDelt, retur } = req.body;
+  const existing = events[evIdx].giveaway.findIndex(g => g.id === itemId);
+  if (existing >= 0) {
+    events[evIdx].giveaway[existing].utDelt = parseInt(utDelt) || 0;
+    events[evIdx].giveaway[existing].retur  = parseInt(retur)  || 0;
+  } else {
+    events[evIdx].giveaway.push({ id: itemId, utDelt: parseInt(utDelt)||0, retur: parseInt(retur)||0 });
+  }
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+// Salg per event
+app.get("/api/events/:id/salg", auth, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(e => e.id === req.params.id);
+  if (!ev) return res.status(404).json({ err: "Ikke funnet" });
+  res.json(ev.salg || []);
+});
+
+app.post("/api/events/:id/salg", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const evIdx = events.findIndex(e => e.id === req.params.id);
+  if (evIdx === -1) return res.status(404).json({ err: "Ikke funnet" });
+  if (!events[evIdx].salg) events[evIdx].salg = [];
+  const { itemId, solgt } = req.body;
+  const existing = events[evIdx].salg.findIndex(s => s.id === itemId);
+  if (existing >= 0) {
+    events[evIdx].salg[existing].solgt = parseInt(solgt) || 0;
+  } else {
+    events[evIdx].salg.push({ id: itemId, solgt: parseInt(solgt)||0 });
+  }
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true });
+});
+
+// Utstyr per event
+app.get("/api/events/:id/utstyr", auth, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(e => e.id === req.params.id);
+  if (!ev) return res.status(404).json({ err: "Ikke funnet" });
+  res.json(ev.utstyr || []);
+});
+
+app.post("/api/events/:id/utstyr", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const evIdx = events.findIndex(e => e.id === req.params.id);
+  if (evIdx === -1) return res.status(404).json({ err: "Ikke funnet" });
+  if (!events[evIdx].utstyr) events[evIdx].utstyr = [];
+  const { itemId, antall, aktiv } = req.body;
+  const existing = events[evIdx].utstyr.findIndex(u => u.id === itemId);
+  if (aktiv) {
+    if (existing >= 0) events[evIdx].utstyr[existing].antall = parseInt(antall)||1;
+    else events[evIdx].utstyr.push({ id: itemId, antall: parseInt(antall)||1 });
+  } else {
+    if (existing >= 0) events[evIdx].utstyr.splice(existing, 1);
+  }
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  // Update usageCount on inventar item
+  const items = readJSON(INVENTAR_FILE);
+  const itemIdx = items.findIndex(i => i.id === itemId);
+  if (itemIdx >= 0) {
+    items[itemIdx].usageCount = events.filter(e => (e.utstyr||[]).some(u => u.id === itemId)).length;
+    writeJSON(INVENTAR_FILE, items);
+  }
+  res.json({ ok: true });
+});
+
+// ── Reiserute per tur-event ───────────────────────────────────────
+app.get("/api/events/:id/route", auth, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(e => e.id === req.params.id);
+  if (!ev) return res.status(404).json({ err: "Ikke funnet" });
+  res.json(ev.route || { days: [] });
+});
+
+// ── Geocoding proxy (unngår CORS og nettverksblokk fra klient) ────
+app.get("/api/geocode/photon", auth, rateLimit(60, 60000), async function(req, res) {
+  const q = (req.query.q || "").trim().slice(0, 200);
+  if (!q) return res.json({ features: [] });
+  try {
+    const url = "https://photon.komoot.io/api/?q=" + encodeURIComponent(q) + "&limit=7&lang=no";
+    const r = await fetch(url, {
+      headers: {
+        "User-Agent": "NAF-Events/1.0 (naf-events.no; contact@naf.no)",
+        "Accept": "application/json",
+        "Accept-Language": "no,nb;q=0.9,en;q=0.8",
+        "Referer": "https://naf-events.no/"
+      }
+    });
+    if (!r.ok) {
+      console.error("[photon] HTTP " + r.status + " for q=" + q);
+      return res.status(502).json({ error: "Photon feil " + r.status });
+    }
+    const d = await r.json();
+    res.json(d);
+  } catch(e) {
+    res.status(502).json({ error: "Geocoding utilgjengelig" });
+  }
+});
+
+app.get("/api/geocode/nominatim", auth, rateLimit(30, 60000), async function(req, res) {
+  const q = (req.query.q || "").trim().slice(0, 200);
+  if (!q) return res.json([]);
+  try {
+    const url = "https://nominatim.openstreetmap.org/search?format=json&limit=7&q=" + encodeURIComponent(q);
+    const r = await fetch(url, {
+      headers: {
+        "User-Agent": "NAF-Events/1.0 (naf-events.no)",
+        "Accept": "application/json",
+        "Accept-Language": "no,nb;q=0.9"
+      }
+    });
+    if (!r.ok) return res.status(502).json({ error: "Nominatim feil" });
+    const d = await r.json();
+    res.json(d);
+  } catch(e) {
+    res.status(502).json({ error: "Geocoding utilgjengelig" });
+  }
+});
+
+// ── GPX-eksport ───────────────────────────────────────────────────
+app.get("/api/events/:id/gpx", auth, rateLimit(20, 60000), async function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Ikke funnet" });
+  if (ev.eventType !== "tur") return res.status(400).json({ error: "Kun tur-events støtter GPX" });
+
+  const route = ev.route || { days: [] };
+  const days  = route.days || [];
+
+  // Manifest-modus: returner filliste uten å generere GPX
+  if (req.query.manifest === "1") {
+    const evTitle  = ev.title || "Tur";
+    const baseSlug = evTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    const files = [];
+    if (days.length <= 1) {
+      files.push({ id: "total", label: "📍 " + evTitle, filename: baseSlug + ".gpx", days: "all" });
+    } else {
+      files.push({ id: "total", label: "🗺️ Total – alle dager", filename: baseSlug + "-total.gpx", days: "all" });
+      days.forEach(function(d, di) {
+        const etapper   = d.etapper || [];
+        const fra       = etapper[0] && etapper[0].fra ? etapper[0].fra : "";
+        const lastE     = etapper[etapper.length - 1];
+        const til       = lastE && lastE.til ? lastE.til : "";
+        const routeDesc = fra && til ? fra + " → " + til : "Dag " + (di + 1);
+        files.push({
+          id:       "dag" + (di + 1),
+          label:    "📅 Dag " + (di + 1) + (d.dato ? " (" + d.dato + ")" : "") + " – " + routeDesc,
+          filename: baseSlug + "-dag" + (di + 1) + ".gpx",
+          days:     di
+        });
+      });
+    }
+    return res.json({ files, multiDay: days.length > 1 });
+  }
+
+  // Download-modus: ?files=total,dag1,dag2 (kommaseparert) eller alle
+  const requestedIds = req.query.files ? req.query.files.split(",") : ["all"];
+  const downloadAll  = requestedIds.includes("all");
+
+  function xmlEsc(s) {
+    return (s || "").replace(/[<>&"]/g, function(c) {
+      return { "<":"&lt;", ">":"&gt;", "&":"&amp;", '"':"&quot;" }[c];
+    });
+  }
+  function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+  async function geocode(name) {
+    try {
+      const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(name);
+      const r = await fetch(url, { headers: { "User-Agent": "EventsAdmin-GPX/1.0" } });
+      const d = await r.json();
+      if (d && d[0]) return { name, lat: parseFloat(d[0].lat), lon: parseFloat(d[0].lon) };
+    } catch(e) {}
+    return null;
+  }
+
+  async function fetchSegment(from, to, segProfile) {
+    try {
+      if (segProfile === "scenic" && process.env.GRAPHHOPPER_KEY) {
+        const pts = "point=" + from.lat + "%2C" + from.lon + "&point=" + to.lat + "%2C" + to.lon;
+        const r = await fetch("https://graphhopper.com/api/1/route?" + pts + "&profile=car&avoid=motorway&locale=no&calc_points=true&points_encoded=false&key=" + process.env.GRAPHHOPPER_KEY);
+        const d = await r.json();
+        if (d.paths && d.paths[0] && d.paths[0].points)
+          return d.paths[0].points.coordinates.map(function(c) { return { lat: c[1], lon: c[0] }; });
+      } else if (segProfile === "gravel") {
+        const lonlats = from.lon + "," + from.lat + "|" + to.lon + "," + to.lat;
+        const r = await fetch("https://brouter.de/brouter?lonlats=" + lonlats + "&profile=gravel&alternativeidx=0&format=geojson");
+        const d = await r.json();
+        if (d.features && d.features[0])
+          return d.features[0].geometry.coordinates.map(function(c) { return { lat: c[1], lon: c[0] }; });
+      } else {
+        const osrmProf = segProfile === "foot" ? "foot" : "driving";
+        const coordStr = from.lon + "," + from.lat + ";" + to.lon + "," + to.lat;
+        const r = await fetch("https://router.project-osrm.org/route/v1/" + osrmProf + "/" + coordStr + "?overview=full&geometries=geojson");
+        const d = await r.json();
+        if (d.routes && d.routes[0])
+          return d.routes[0].geometry.coordinates.map(function(c) { return { lat: c[1], lon: c[0] }; });
+      }
+    } catch(e) {}
+    return [{ lat: from.lat, lon: from.lon }, { lat: to.lat, lon: to.lon }];
+  }
+
+  // Geocode alle unike steder
+  const allNames = [];
+  days.forEach(function(d) {
+    (d.etapper || []).forEach(function(e) {
+      if (e.fra && !allNames.includes(e.fra)) allNames.push(e.fra);
+      if (e.til && !allNames.includes(e.til)) allNames.push(e.til);
+    });
+  });
+  if (!allNames.length) return res.status(400).json({ error: "Ingen steder i ruten" });
+
+  const coordCache = {};
+  for (var i = 0; i < allNames.length; i++) {
+    const result = await geocode(allNames[i]);
+    if (result) coordCache[allNames[i]] = result;
+    if (i < allNames.length - 1) await sleep(300);
+  }
+
+  // Hent rute-segmenter (cached per unik fra+til+profil)
+  const segCache = {};
+  const profileLabel = { driving:"Motorvei", scenic:"Landevei", gravel:"Grusveier" };
+  for (var di = 0; di < days.length; di++) {
+    var etapper = days[di].etapper || [];
+    for (var ei = 0; ei < etapper.length; ei++) {
+      var e = etapper[ei];
+      var fra = coordCache[e.fra], til = coordCache[e.til];
+      if (!fra || !til) continue;
+      var prof = e.profile || "driving";
+      var key  = e.fra + "||" + e.til + "||" + prof;
+      if (!segCache[key]) { segCache[key] = await fetchSegment(fra, til, prof); await sleep(200); }
+    }
+  }
+
+  // GPX builder
+  function buildGpx(title, dayList) {
+    var now = new Date().toISOString();
+    var gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    gpx += '<gpx version="1.1" creator="Events Admin" xmlns="http://www.topografix.com/GPX/1/1">\n';
+    gpx += '  <metadata><name>' + xmlEsc(title) + '</name><time>' + now + '</time></metadata>\n';
+    var seenWpt = {};
+    dayList.forEach(function(d, dIdx) {
+      (d.etapper || []).forEach(function(e, eIdx) {
+        [[e.fra, eIdx === 0 && dIdx === 0 ? "start" : "wpt"],
+         [e.til, e.type === "slutt" ? "end" : e.type === "hotell" ? "hotel" : "wpt"]
+        ].forEach(function(pair) {
+          var nm = pair[0], wt = pair[1];
+          if (!nm || seenWpt[nm]) return;
+          seenWpt[nm] = true;
+          var c = coordCache[nm]; if (!c) return;
+          var sym = wt === "start" ? "Flag, Green" : wt === "end" ? "Flag, Red" : wt === "hotel" ? "Lodging" : "Waypoint";
+          gpx += '  <wpt lat="' + c.lat.toFixed(6) + '" lon="' + c.lon.toFixed(6) + '">\n';
+          gpx += '    <name>' + xmlEsc(nm) + '</name><sym>' + sym + '</sym>\n';
+          gpx += '  </wpt>\n';
+        });
+      });
+    });
+    dayList.forEach(function(d, dIdx) {
+      (d.etapper || []).forEach(function(e, eIdx) {
+        var fra = coordCache[e.fra], til = coordCache[e.til]; if (!fra || !til) return;
+        var prof = e.profile || "driving";
+        var key  = e.fra + "||" + e.til + "||" + prof;
+        var pts  = segCache[key] || [{ lat: fra.lat, lon: fra.lon }, { lat: til.lat, lon: til.lon }];
+        var sn   = xmlEsc(title + " – etappe " + (eIdx + 1) + " (" + (profileLabel[prof] || prof) + ")");
+        gpx += '  <trk><name>' + sn + '</name><trkseg>\n';
+        pts.forEach(function(pt) { gpx += '    <trkpt lat="' + pt.lat.toFixed(6) + '" lon="' + pt.lon.toFixed(6) + '"/>\n'; });
+        gpx += '  </trkseg></trk>\n';
+      });
+    });
+    gpx += '</gpx>';
+    return gpx;
+  }
+
+  var evTitle  = ev.title || "Tur";
+  var baseSlug = evTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  // Én dag eller kun én fil: send direkte som GPX
+  if (days.length <= 1 || (requestedIds.length === 1 && !downloadAll)) {
+    var singleDayIdx = requestedIds[0] === "total" || downloadAll ? null : parseInt(requestedIds[0].replace("dag","")) - 1;
+    var singleDays   = singleDayIdx != null && !isNaN(singleDayIdx) ? [days[singleDayIdx]] : days;
+    var singleTitle  = singleDayIdx != null && !isNaN(singleDayIdx)
+      ? evTitle + " – Dag " + (singleDayIdx + 1) + (days[singleDayIdx] && days[singleDayIdx].dato ? " (" + days[singleDayIdx].dato + ")" : "")
+      : evTitle;
+    var gpxSingle = buildGpx(singleTitle, singleDays.filter(Boolean));
+    var fnSingle  = singleDayIdx != null && !isNaN(singleDayIdx) ? baseSlug + "-dag" + (singleDayIdx+1) + ".gpx" : baseSlug + ".gpx";
+    res.setHeader("Content-Type", "application/gpx+xml");
+    res.setHeader("Content-Disposition", 'attachment; filename="' + fnSingle + '"');
+    return res.send(gpxSingle);
+  }
+
+  // Flerdag: bygg ZIP med kun valgte filer
+  var files = [];
+  if (downloadAll || requestedIds.includes("total")) {
+    files.push({ name: baseSlug + "-total.gpx", data: Buffer.from(buildGpx(evTitle + " – Total", days), "utf8") });
+  }
+  days.forEach(function(d, di) {
+    var fileId = "dag" + (di + 1);
+    if (!downloadAll && !requestedIds.includes(fileId)) return;
+    var dayLabel = evTitle + " – Dag " + (di + 1) + (d.dato ? " (" + d.dato + ")" : "");
+    files.push({ name: baseSlug + "-dag" + (di + 1) + ".gpx", data: Buffer.from(buildGpx(dayLabel, [d]), "utf8") });
+  });
+
+  // Kun én fil valgt: send direkte
+  if (files.length === 1) {
+    res.setHeader("Content-Type", "application/gpx+xml");
+    res.setHeader("Content-Disposition", 'attachment; filename="' + files[0].name + '"');
+    return res.send(files[0].data);
+  }
+
+  function makeZip(fileList) {
+    var crc32Table = (function() {
+      var t = new Uint32Array(256);
+      for (var i = 0; i < 256; i++) {
+        var cx = i;
+        for (var j = 0; j < 8; j++) cx = (cx & 1) ? (0xEDB88320 ^ (cx >>> 1)) : (cx >>> 1);
+        t[i] = cx;
+      }
+      return t;
+    })();
+    function crc32(buf) { var c = 0xFFFFFFFF; for (var i = 0; i < buf.length; i++) c = crc32Table[(c ^ buf[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+    function u16(b, o, v) { b[o] = v & 0xFF; b[o+1] = (v >> 8) & 0xFF; }
+    function u32(b, o, v) { b[o]=v&0xFF; b[o+1]=(v>>8)&0xFF; b[o+2]=(v>>16)&0xFF; b[o+3]=(v>>24)&0xFF; }
+    var parts = [], central = [], offset = 0;
+    fileList.forEach(function(f) {
+      var nb = Buffer.from(f.name, "utf8"), data = f.data, crc = crc32(data);
+      var now2 = new Date();
+      var dt = ((now2.getFullYear()-1980)<<9)|((now2.getMonth()+1)<<5)|now2.getDate();
+      var tm = (now2.getHours()<<11)|(now2.getMinutes()<<5)|Math.floor(now2.getSeconds()/2);
+      var lfh = Buffer.alloc(30 + nb.length);
+      u32(lfh,0,0x04034b50); u16(lfh,4,20); u16(lfh,6,0); u16(lfh,8,0);
+      u16(lfh,10,tm); u16(lfh,12,dt); u32(lfh,14,crc); u32(lfh,18,data.length); u32(lfh,22,data.length);
+      u16(lfh,26,nb.length); u16(lfh,28,0); nb.copy(lfh,30);
+      central.push({ nb, crc, size: data.length, dt, tm, offset });
+      parts.push(lfh, data); offset += lfh.length + data.length;
+    });
+    var cdStart = offset;
+    central.forEach(function(e) {
+      var cde = Buffer.alloc(46 + e.nb.length);
+      u32(cde,0,0x02014b50); u16(cde,4,20); u16(cde,6,20); u16(cde,8,0); u16(cde,10,0);
+      u16(cde,12,e.tm); u16(cde,14,e.dt); u32(cde,16,e.crc); u32(cde,20,e.size); u32(cde,24,e.size);
+      u16(cde,28,e.nb.length); u16(cde,30,0); u16(cde,32,0); u16(cde,34,0); u16(cde,36,0);
+      u32(cde,38,0); u32(cde,42,e.offset); e.nb.copy(cde,46);
+      parts.push(cde); offset += cde.length;
+    });
+    var eocd = Buffer.alloc(22);
+    u32(eocd,0,0x06054b50); u16(eocd,4,0); u16(eocd,6,0);
+    u16(eocd,8,fileList.length); u16(eocd,10,fileList.length);
+    u32(eocd,12,offset-cdStart); u32(eocd,16,cdStart); u16(eocd,20,0);
+    parts.push(eocd);
+    return Buffer.concat(parts);
+  }
+
+  var zipBuf = makeZip(files);
+  res.setHeader("Content-Type", "application/zip");
+  res.setHeader("Content-Disposition", 'attachment; filename="' + baseSlug + '-gpx.zip"');
+  res.send(zipBuf);
+});
+
+app.put("/api/events/:id/route", auth, managerOrAdmin, function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const i = events.findIndex(e => e.id === req.params.id);
+  if (i === -1) return res.status(404).json({ err: "Ikke funnet" });
+  const days = Array.isArray(req.body.days) ? req.body.days.slice(0, 30) : [];
+  // Sanitér
+  const clean = days.map(d => ({
+    dato: (d.dato || "").slice(0, 10),
+    etapper: Array.isArray(d.etapper) ? d.etapper.slice(0, 50).map(e => ({
+      type:    ["start","stopp","lunsj","middag","hotell","slutt","bensin","opplevelse"].includes(e.type) ? e.type : "stopp",
+      fra:     (e.fra   || "").trim().slice(0, 200),
+      til:     (e.til   || "").trim().slice(0, 200),
+      km:      e.km != null && e.km !== "" ? parseFloat(e.km) || null : null,
+      tid:     e.tid != null && e.tid !== "" ? parseFloat(e.tid) || null : null,
+      notat:   (e.notat || "").trim().slice(0, 500),
+      profile: ["driving","scenic","gravel","foot"].includes(e.profile) ? e.profile : "driving",
+      // Behold geocodede koordinater for minikartet
+      _lat:     typeof e._lat     === "number" ? e._lat     : undefined,
+      _lon:     typeof e._lon     === "number" ? e._lon     : undefined,
+      _fra_lat: typeof e._fra_lat === "number" ? e._fra_lat : undefined,
+      _fra_lon: typeof e._fra_lon === "number" ? e._fra_lon : undefined,
+    })) : [],
+  }));
+  events[i].route = { days: clean };
+  // Lagre ruteprofil direkte på eventet
+  const validProfiles = ["driving","scenic","gravel","foot"];
+  const profile = req.body.routeProfile;
+  if (profile && validProfiles.includes(profile)) events[i].routeProfile = profile;
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(events[i].department);
+  res.json({ ok: true });
+});
+
+// ── AI: Generer turforslag ────────────────────────────────────────
+app.post("/api/ai/generate-route", auth, managerOrAdmin, rateLimit(10, 60000), async function(req, res) {
+  const { start, direction, distanceKm, profile, roundtrip, attempt } = req.body;
+  if (!start || !distanceKm) return res.status(400).json({ error: "Mangler startsted eller avstand" });
+
+  if (MOCK_AI) {
+    // Mock: lag en enkel demo-rute med ulike profiler per etappe
+    return res.json({ days: [{
+      dato: "", etapper: [
+        { type:"start", fra: start, til: start + " sentrum", km: Math.round(distanceKm*0.15), profile:"driving", notat:"Kjør inn til sentrum" },
+        { type:"stopp", fra: start + " sentrum", til: "Utsiktspunkt", km: Math.round(distanceKm*0.25), profile:"scenic", notat:"Fin landevei" },
+        { type:"stopp", fra: "Utsiktspunkt", til: "Skogstopp", km: Math.round(distanceKm*0.2), profile:"gravel", notat:"Grusveier i skogen" },
+        { type:"lunsj", fra: "Skogstopp", til: "Kafé ved vannet", km: Math.round(distanceKm*0.15), profile:"gravel", notat:"" },
+        { type:"slutt", fra: "Kafé ved vannet", til: roundtrip ? start : "Destinasjon", km: Math.round(distanceKm*0.25), profile:"driving", notat:"Motorvei hjem" },
+      ]
+    }]});
+  }
+
+  const directionDesc = direction || "valgfri retning";
+  const roundtripDesc = roundtrip
+    ? `Turen skal være en RUNDTUR som starter og slutter i ${start}.`
+    : `Turen starter i ${start} og avsluttes ved et passende mål.`;
+
+  const attemptNote = attempt > 1
+    ? `Dette er forsøk nummer ${attempt} – foreslå en ANNEN rute enn typiske veier, velg alternative stopp.`
+    : "";
+
+  const prompt = `Du er en ekspert på MC-turer og bilutflukter i Skandinavia.
+
+Planlegg en dagstur med følgende krav:
+- Startsted: ${start}
+- Retning: ${directionDesc}
+- Total kjørelengde: ca. ${distanceKm} km
+- ${roundtripDesc}
+${attemptNote}
+
+Returner KUN et JSON-objekt (ingen markdown, ingen forklaring):
+{
+  "days": [{
+    "dato": "",
+    "etapper": [
+      { "type": "start",  "fra": "stedsnavn", "til": "stedsnavn", "km": tall, "profile": "driving", "notat": "kort beskrivelse" },
+      { "type": "stopp",  "fra": "stedsnavn", "til": "stedsnavn", "km": tall, "profile": "scenic",  "notat": "pittoresk landevei" },
+      { "type": "stopp",  "fra": "stedsnavn", "til": "stedsnavn", "km": tall, "profile": "gravel",  "notat": "skogsvei" },
+      { "type": "lunsj",  "fra": "stedsnavn", "til": "stedsnavn", "km": tall, "profile": "driving", "notat": "anbefalt spisested" },
+      { "type": "slutt",  "fra": "stedsnavn", "til": "stedsnavn", "km": tall, "profile": "driving", "notat": "" }
+    ]
+  }]
+}
+
+Regler:
+- Bruk virkelige stedsnavn som kan geocodes
+- 4-8 etapper totalt
+- km per etappe skal summere til ca. ${distanceKm}
+- type må være én av: start, stopp, lunsj, middag, hotell, slutt
+- profile PER etappe: "driving" (bil/motorvei), "scenic" (landevei, unngå motorvei), "gravel" (grusveier/skogsvei), 
+  Velg profil basert på hva som passer for den aktuelle delstrekningen
+- notat maks 80 tegn
+- Kun JSON, ingen annen tekst`;
+
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "anthropic-version": "2023-06-01",
+        "x-api-key": process.env.ANTHROPIC_API_KEY
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1500,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await r.json();
+    if (!r.ok) return res.status(500).json({ error: data.error?.message || "AI-feil" });
+
+    const text = (data.content || []).map(b => b.text || "").join("").trim()
+      .replace(/^```json\s*/i,"").replace(/^```\s*/,"").replace(/```$/,"").trim();
+
+    let parsed;
+    try { parsed = JSON.parse(text); } catch(e) {
+      return res.status(500).json({ error: "Kunne ikke tolke AI-svar", raw: text.slice(0,200) });
+    }
+
+    // Sanitér
+    const days = Array.isArray(parsed.days) ? parsed.days.slice(0,7).map(d => ({
+      dato: "",
+      etapper: Array.isArray(d.etapper) ? d.etapper.slice(0,10).map(e => ({
+        type:    ["start","stopp","lunsj","middag","hotell","slutt"].includes(e.type) ? e.type : "stopp",
+        fra:     (e.fra   || "").trim().slice(0,200),
+        til:     (e.til   || "").trim().slice(0,200),
+        km:      e.km != null ? parseFloat(e.km) || null : null,
+        notat:   (e.notat || "").trim().slice(0,80),
+        profile: ["driving","scenic","gravel","foot"].includes(e.profile) ? e.profile : "driving",
+      })) : []
+    })) : [];
+
+    res.json({ days });
+  } catch(e) {
+    res.status(500).json({ error: "Nettverksfeil mot AI: " + e.message });
+  }
+});
+
+
+app.get("*", function(req, res) {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, function() { console.log("naf-events running on port " + PORT); });
