@@ -1,34 +1,30 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "released": "2026-03-20",
   "changelog": [
-    "Første stabile versjon med full turplanlegger",
-    "Auto-splitting av lange ruter (Jessheim → Roma)",
-    "Stopp-forslag for alle dager i flerdagsturer",
-    "QR-bilde i gjestebok – last opp fra kamera eller galleri",
-    "Hotell-søk via Booking.com / Hotels.com / Trivago",
-    "Avstand i stedssøk – se km fra deg til hvert treff",
-    "Oppdateringssystem med SHA256-verifisering",
-    "Setup wizard med logo og fargeekstraksjon",
-    "Lyst og mørkt tema",
-    "GPX-eksport per dag eller total (ZIP for flerdagsturer)",
-    "Navigasjonsknapp til Apple Maps / Google Maps / Waze"
+    "Brukerveiledning: scrollbar tabmeny, ny Stand- og Oppdatering-fane",
+    "Stopp-forslag fungerer nå for alle dager (ikke bare dag 1)",
+    "Avstand vises i stedssøk (fargekodet grønn/gul/rød)",
+    "Oppmøte-felt er nå søkefelt med koordinater og 📍-indikator",
+    "Søkeresultat kan klikkes (onmousedown-fix)",
+    "CSP oppdatert: brouter.de og unpkg.com lagt til",
+    "Brukerveiledning og ønskeliste oppdatert"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.0/server.js",
-      "sha256": "94054effed20be15f1b545d2917b1ea828c16fcb0e7eeb90b62c3d1e25f10333"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.1/server.js",
+      "sha256": "aacc6b40cb9cc6c3e72d26d0149bc06dd933dd26888aaec4c0331ab41b9fab92"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.0/index.html",
-      "sha256": "206c49d54ccac3810cee0ef5d3947c7699b148f7239047cd335e4c900746095b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.1/index.html",
+      "sha256": "b33a2bc86fb445ab9031bf476d896b36ccc481a3f8c39a290d87506ef26de1c9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.0/package.json",
-      "sha256": "11759c22f86d417c9f352a334da11a21498905bf947ae10c5401f165c2528df1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.1/package.json",
+      "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
 }
