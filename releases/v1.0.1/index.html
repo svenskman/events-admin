@@ -1116,12 +1116,13 @@ textarea{resize:vertical;min-height:80px}
       <div style="padding:0">
         <table>
           <thead><tr>
-            <th>Navn</th>
+            <th style="width:52px"></th>
+            <th>Navn / Beskrivelse</th>
             <th>Kategori</th>
-            <th>Antall</th>
-            <th>Beskrivelse / Pris</th>
-            <th style="text-align:center">Totalt ut</th>
-            <th style="text-align:center">Totalt solgt</th>
+            <th style="text-align:center">Antall</th>
+            <th style="text-align:center">Aktivitet</th>
+            <th style="text-align:center">Salgspris</th>
+            <th style="text-align:center">Innkjøpspris</th>
             <th>Avdeling</th>
             <th style="text-align:center">Neste event</th>
             <th></th>
@@ -1900,21 +1901,95 @@ textarea{resize:vertical;min-height:80px}
       <input type="text" id="evStaffPin" placeholder="f.eks. 1234" maxlength="10" autocomplete="off" inputmode="numeric"/>
       <!-- Lotteri-innstillinger (kun for stand) -->
       <div id="evLotteryWrap" style="display:none;border-top:1px solid #222;padding-top:.75rem;margin-top:.25rem">
-        <label style="color:var(--y);font-weight:700">🎰 Lotteri</label>
+        <label style="color:var(--y);font-weight:700">🎰 Lotteri / Konkurranse</label>
         <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem">
           <input type="checkbox" id="evLotteryEnabled" style="width:auto;margin:0" onchange="onLotteryToggle()"/>
-          <label for="evLotteryEnabled" style="margin:0;font-size:.9rem;color:#ccc">Aktiver lotteri for denne standen</label>
+          <label for="evLotteryEnabled" style="margin:0;font-size:.9rem;color:#ccc">Aktiver konkurranse for denne standen</label>
         </div>
         <div id="evLotteryOptions" style="display:none">
+
+          <!-- Konkurransetype -->
+          <label>Type konkurranse</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;margin-bottom:.75rem">
+            <label id="lt-trekning" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;background:#1a1a1a;border:2px solid #f5c500;border-radius:8px;padding:.6rem .4rem;cursor:pointer;text-align:center;font-size:.75rem;font-weight:700;color:#f5c500">
+              <input type="radio" name="evLotteryType" value="trekning" checked style="display:none" onchange="onLotteryTypeChange()"/>
+              <span style="font-size:1.4rem">🎟️</span>Trekning
+            </label>
+            <label id="lt-quiz" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;background:#1a1a1a;border:2px solid #333;border-radius:8px;padding:.6rem .4rem;cursor:pointer;text-align:center;font-size:.75rem;font-weight:700;color:#888">
+              <input type="radio" name="evLotteryType" value="quiz" style="display:none" onchange="onLotteryTypeChange()"/>
+              <span style="font-size:1.4rem">❓</span>Quiz
+            </label>
+            <label id="lt-spin" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;background:#1a1a1a;border:2px solid #333;border-radius:8px;padding:.6rem .4rem;cursor:pointer;text-align:center;font-size:.75rem;font-weight:700;color:#888">
+              <input type="radio" name="evLotteryType" value="spin" style="display:none" onchange="onLotteryTypeChange()"/>
+              <span style="font-size:1.4rem">🎡</span>Spin
+            </label>
+            <label id="lt-interesse" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;background:#1a1a1a;border:2px solid #333;border-radius:8px;padding:.6rem .4rem;cursor:pointer;text-align:center;font-size:.75rem;font-weight:700;color:#888">
+              <input type="radio" name="evLotteryType" value="interesse" style="display:none" onchange="onLotteryTypeChange()"/>
+              <span style="font-size:1.4rem">📝</span>Interesse
+            </label>
+            <label id="lt-presisjon" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;background:#1a1a1a;border:2px solid #333;border-radius:8px;padding:.6rem .4rem;cursor:pointer;text-align:center;font-size:.75rem;font-weight:700;color:#888">
+              <input type="radio" name="evLotteryType" value="presisjon" style="display:none" onchange="onLotteryTypeChange()"/>
+              <span style="font-size:1.4rem">🎯</span>Presisjon
+            </label>
+            <label id="lt-bilde" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;background:#1a1a1a;border:2px solid #333;border-radius:8px;padding:.6rem .4rem;cursor:pointer;text-align:center;font-size:.75rem;font-weight:700;color:#888">
+              <input type="radio" name="evLotteryType" value="bilde" style="display:none" onchange="onLotteryTypeChange()"/>
+              <span style="font-size:1.4rem">📸</span>Foto
+            </label>
+          </div>
+
+          <!-- Felles felt -->
           <label for="evLotteryMode">Trekningsmodus</label>
           <select id="evLotteryMode">
-            <option value="manual">Manuell – arrang\u00f8r trekker manuelt</option>
+            <option value="manual">Manuell – arrangør trekker manuelt</option>
             <option value="auto30">Automatisk hvert 30. minutt</option>
             <option value="auto60">Automatisk hvert 60. minutt</option>
             <option value="auto120">Automatisk hvert 2. time</option>
           </select>
-          <label for="evLotteryPrize">Premie <span style="color:#555;font-size:.8rem">(valgfritt – vises på lotteri-fanen)</span></label>
-          <input type="text" id="evLotteryPrize" placeholder="f.eks. NAF-mershandise, gratis MC-kurs…" maxlength="100"/>
+          <label for="evLotteryPrize">Premie <span style="color:#555;font-size:.8rem">(vises på skjermen)</span></label>
+          <input type="text" id="evLotteryPrize" placeholder="f.eks. MC-jakke, gratis kurs, gavekort…" maxlength="100"/>
+
+          <!-- Quiz-innstillinger -->
+          <div id="lotteryQuizSettings" style="display:none;background:#141414;border:1px solid #2a2a2a;border-radius:8px;padding:.85rem;margin-bottom:.9rem">
+            <div style="font-size:.72rem;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.6rem">Quiz-innstillinger</div>
+            <label>Spørsmål</label>
+            <input type="text" id="evLotteryQuestion" placeholder="F.eks. Hva er viktigst for trafikksikkerhet?" maxlength="200"/>
+            <label>Svaralternativer <span style="color:#555;font-size:.75rem">(ett riktig svar, kommaseparert)</span></label>
+            <input type="text" id="evLotteryAnswers" placeholder="Bilbelte, Fart, Promille, Mobilbruk" maxlength="300"/>
+            <label>Riktig svar</label>
+            <input type="text" id="evLotteryCorrect" placeholder="Bilbelte" maxlength="100"/>
+          </div>
+
+          <!-- Spin-innstillinger -->
+          <div id="lotterySpinSettings" style="display:none;background:#141414;border:1px solid #2a2a2a;border-radius:8px;padding:.85rem;margin-bottom:.9rem">
+            <div style="font-size:.72rem;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.6rem">Hjul-segmenter <span style="color:#555;font-weight:400">(kommaseparert)</span></div>
+            <input type="text" id="evLotterySegments" placeholder="Prøv igjen, T-skjorte, Prøv igjen, Nøkkelring, JACKPOT, Prøv igjen" maxlength="500"/>
+            <div style="font-size:.75rem;color:#555;margin-top:.3rem">Tips: Ha flest «Prøv igjen» for spenning, og én JACKPOT</div>
+          </div>
+
+          <!-- Interesse-innstillinger -->
+          <div id="lotteryInteresseSettings" style="display:none;background:#141414;border:1px solid #2a2a2a;border-radius:8px;padding:.85rem;margin-bottom:.9rem">
+            <div style="font-size:.72rem;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.6rem">Interessekategorier <span style="color:#555;font-weight:400">(kommaseparert)</span></div>
+            <input type="text" id="evLotteryInterests" placeholder="MC-kurs, Trafikksikkerhet, Medlemskap, Veihjelp, MC-tur" maxlength="500"/>
+          </div>
+
+          <!-- Presisjon-innstillinger -->
+          <div id="lotteryPresisjonSettings" style="display:none;background:#141414;border:1px solid #2a2a2a;border-radius:8px;padding:.85rem;margin-bottom:.9rem">
+            <div style="font-size:.72rem;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.6rem">Presisjonsspill</div>
+            <label>Instruksjon til deltaker</label>
+            <input type="text" id="evLotteryPresisjonTask" placeholder="Trykk STOPP når pekeren er i midten!" maxlength="200"/>
+            <label>Premie ved blink <span style="color:#555;font-size:.75rem">(innenfor senter)</span></label>
+            <input type="text" id="evLotteryPresisjonPrize" placeholder="Gratis MC-kurs!" maxlength="100"/>
+          </div>
+
+          <!-- Foto-innstillinger -->
+          <div id="lotteryBildeSettings" style="display:none;background:#141414;border:1px solid #2a2a2a;border-radius:8px;padding:.85rem;margin-bottom:.9rem">
+            <div style="font-size:.72rem;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.6rem">Foto-konkurranse</div>
+            <label>Hashtag / tema</label>
+            <input type="text" id="evLotteryHashtag" placeholder="#naf2026 eller beskriv bildetema" maxlength="100"/>
+            <label>Instruksjon</label>
+            <input type="text" id="evLotteryBildeTask" placeholder="Ta bilde ved standen og vis det til oss!" maxlength="200"/>
+          </div>
+
         </div>
       </div>
       <label for="evDepartment" id="evDepartmentLabel" style="display:none" data-i18n="department">Department</label>
@@ -4105,6 +4180,8 @@ async function resetEvForm() {
   $("evLotteryOptions").style.display = "none";
   $("evLotteryMode").value = "manual";
   $("evLotteryPrize").value = "";
+  const defType = document.querySelector('input[name="evLotteryType"][value="trekning"]');
+  if (defType) { defType.checked = true; onLotteryTypeChange(); }
   _routeDays = []; _routeEvId = null; _routeProfile = 'driving'; updateRouteCount();
   const rpSelReset = $('routeProfileSelect'); if (rpSelReset) rpSelReset.value = 'driving';
   $("evSeriesId").value = "";
@@ -4200,6 +4277,21 @@ async function openEditEv(id) {
   $("evLotteryOptions").style.display = (ev.lottery && ev.lottery.enabled) ? "" : "none";
   $("evLotteryMode").value          = (ev.lottery && ev.lottery.mode) || "manual";
   $("evLotteryPrize").value         = (ev.lottery && ev.lottery.prize) || "";
+  const lt = ev.lottery && ev.lottery.type || "trekning";
+  const ltRadio = document.querySelector('input[name="evLotteryType"][value="' + lt + '"]');
+  if (ltRadio) { ltRadio.checked = true; }
+  onLotteryTypeChange();
+  if (ev.lottery) {
+    if ($("evLotteryQuestion"))      $("evLotteryQuestion").value     = ev.lottery.question || "";
+    if ($("evLotteryAnswers"))       $("evLotteryAnswers").value      = (ev.lottery.answers || []).join(", ");
+    if ($("evLotteryCorrect"))       $("evLotteryCorrect").value      = ev.lottery.correct || "";
+    if ($("evLotterySegments"))      $("evLotterySegments").value     = (ev.lottery.segments || []).join(", ");
+    if ($("evLotteryInterests"))     $("evLotteryInterests").value    = (ev.lottery.interests || []).join(", ");
+    if ($("evLotteryPresisjonTask")) $("evLotteryPresisjonTask").value= ev.lottery.presisjonTask || "";
+    if ($("evLotteryPresisjonPrize"))$("evLotteryPresisjonPrize").value= ev.lottery.presisjonPrize || "";
+    if ($("evLotteryHashtag"))       $("evLotteryHashtag").value      = ev.lottery.hashtag || "";
+    if ($("evLotteryBildeTask"))     $("evLotteryBildeTask").value    = ev.lottery.bildeTask || "";
+  }
   // Rute
   _routeDays = []; _routeEvId = ev.id;
   if (ev.eventType === "tur") {
@@ -4257,6 +4349,16 @@ async function saveEvent() {
       enabled: $("evLotteryEnabled").checked,
       mode:    $("evLotteryMode").value,
       prize:   $("evLotteryPrize").value.trim(),
+      type:    document.querySelector('input[name="evLotteryType"]:checked')?.value || "trekning",
+      question:      $("evLotteryQuestion")      ? $("evLotteryQuestion").value.trim() : "",
+      answers:       $("evLotteryAnswers")        ? $("evLotteryAnswers").value.split(",").map(s=>s.trim()).filter(Boolean) : [],
+      correct:       $("evLotteryCorrect")        ? $("evLotteryCorrect").value.trim() : "",
+      segments:      $("evLotterySegments")       ? $("evLotterySegments").value.split(",").map(s=>s.trim()).filter(Boolean) : [],
+      interests:     $("evLotteryInterests")      ? $("evLotteryInterests").value.split(",").map(s=>s.trim()).filter(Boolean) : [],
+      presisjonTask: $("evLotteryPresisjonTask")  ? $("evLotteryPresisjonTask").value.trim() : "",
+      presisjonPrize:$("evLotteryPresisjonPrize") ? $("evLotteryPresisjonPrize").value.trim() : "",
+      hashtag:       $("evLotteryHashtag")        ? $("evLotteryHashtag").value.trim() : "",
+      bildeTask:     $("evLotteryBildeTask")      ? $("evLotteryBildeTask").value.trim() : "",
     }));
   }
   if (me.permissions.canSetDepartment) {
@@ -8740,41 +8842,60 @@ async function sendSettingsTestEmail() {
 function openUpdateModal() {
   const upd = window._updateInfo;
   if (!upd) return;
+  const isLab = upd.isLab;
   const ov = document.createElement("div");
   ov.id = "updateModal";
   ov.style.cssText = "position:fixed;inset:0;z-index:9000;background:#000a;display:flex;align-items:center;justify-content:center";
   ov.innerHTML = `
-    <div style="background:var(--modal-bg,#1e1e1e);border:1px solid #3a3a3a;border-radius:12px;padding:2rem;max-width:480px;width:95%;box-shadow:0 8px 40px #000c">
+    <div style="background:var(--modal-bg,#1e1e1e);border:1px solid #3a3a3a;border-radius:12px;padding:2rem;max-width:500px;width:95%;box-shadow:0 8px 40px #000c">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
         <h2 style="margin:0;font-size:1.1rem;font-weight:800">⬆ Oppdatering tilgjengelig</h2>
         <button onclick="this.closest('#updateModal').remove()" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer">×</button>
       </div>
+
+      <!-- Versjonsboks -->
       <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.25rem;background:var(--g2,#2a2a2a);border-radius:8px;padding:.75rem 1rem">
         <div style="font-size:1.4rem">📦</div>
         <div>
-          <div style="font-size:.8rem;color:var(--text2,#aaa)">Ny versjon</div>
+          <div style="font-size:.75rem;color:var(--text2,#aaa)">Ny versjon</div>
           <div style="font-weight:800;font-size:1.1rem">${esc(upd.latest)}</div>
         </div>
-        <div style="margin:0 .5rem;color:#666">→</div>
+        <div style="margin:0 .5rem;color:#555;font-size:1.2rem">→</div>
         <div>
-          <div style="font-size:.8rem;color:var(--text2,#aaa)">Installert</div>
-          <div style="font-weight:800;font-size:1.1rem;color:#888">${esc(upd.current)}</div>
+          <div style="font-size:.75rem;color:var(--text2,#aaa)">Installert</div>
+          <div style="font-weight:800;font-size:1.1rem;color:#666">${esc(upd.current)}</div>
         </div>
+        ${isLab ? '<div style="margin-left:auto"><span style="background:#1a2a1a;border:1px solid #2a5a2a;color:#4ade80;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:10px">🧪 LAB</span></div>' : ''}
       </div>
+
+      <!-- Changelog -->
       ${upd.changelog && upd.changelog.length ? `
         <div style="margin-bottom:1.25rem">
-          <div style="font-size:.75rem;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem">Endringer</div>
+          <div style="font-size:.72rem;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem">Endringer</div>
           <ul style="margin:0;padding-left:1.25rem;display:flex;flex-direction:column;gap:.3rem">
-            ${upd.changelog.map(c => `<li style="font-size:.85rem;color:var(--text2,#aaa)">${esc(c)}</li>`).join("")}
+            ${upd.changelog.map(c => `<li style="font-size:.84rem;color:var(--text2,#aaa)">${esc(c)}</li>`).join("")}
           </ul>
         </div>` : ""}
+
+      <!-- Info -->
       <div style="background:#1a2a1a;border:1px solid #2a4a2a;border-radius:6px;padding:.65rem .9rem;font-size:.8rem;color:#7dbb7d;margin-bottom:1.25rem;display:flex;gap:.5rem">
-        <span>ℹ️</span><span>Data i /data-mappen berøres ikke. Gjeldende filer sikkerhetskopieres automatisk.</span>
+        <span>ℹ️</span><span>Data berøres ikke. Gjeldende filer sikkerhetskopieres automatisk.</span>
       </div>
+
+      <!-- Status -->
       <div id="updateStatus" style="display:none;margin-bottom:1rem"></div>
-      <div style="display:flex;gap:.75rem;justify-content:flex-end">
+
+      <!-- Knapper -->
+      <div style="display:flex;gap:.5rem;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn btn-ghost" style="color:#888;font-size:.82rem" onclick="openRestoreModal()">🔄 Gjenopprett</button>
         <button class="btn btn-ghost" onclick="this.closest('#updateModal').remove()">Avbryt</button>
-        <button class="btn btn-y" id="applyUpdateBtn" onclick="applyUpdate()">⬆ Installer oppdatering</button>
+        ${isLab
+          ? `<button class="btn" id="publishProdBtn" onclick="publishToProd()"
+              style="background:#166534;border:1px solid #16a34a;color:#4ade80;font-weight:700">
+              🚀 Publiser til produksjon
+            </button>`
+          : `<button class="btn btn-y" id="applyUpdateBtn" onclick="applyUpdate()">⬆ Installer oppdatering</button>`
+        }
       </div>
     </div>`;
   document.body.appendChild(ov);
@@ -8783,21 +8904,151 @@ function openUpdateModal() {
 async function applyUpdate() {
   const upd = window._updateInfo;
   if (!upd) return;
-  const btn = $("applyUpdateBtn");
+  const btn    = $("applyUpdateBtn");
   const status = $("updateStatus");
   if (btn) { btn.disabled = true; btn.textContent = "⏳ Laster ned…"; }
-  if (status) { status.style.display = "block"; status.innerHTML = '<div class="msg ok">⏳ Laster ned og verifiserer filer…</div>'; }
+  if (status) { status.style.display = "block"; status.innerHTML = '<div style="background:#1a2a1a;border:1px solid #2a4a2a;border-radius:6px;padding:.65rem;font-size:.82rem;color:#7dbb7d">⏳ Laster ned og verifiserer filer…</div>'; }
   try {
     const r = await api("POST", "/api/update/apply", { files: upd.files });
     if (r.err) throw new Error(r.err);
-    if (status) status.innerHTML = '<div class="msg ok">✅ ' + esc(r.message || "Oppdatering installert!") + '</div>';
+    if (status) status.innerHTML = '<div style="background:#1a2a1a;border:1px solid #2a4a2a;border-radius:6px;padding:.65rem;font-size:.82rem;color:#4ade80">✅ ' + esc(r.message) + '</div>';
     if (btn) btn.style.display = "none";
-    // Reload etter restart
     setTimeout(function() { location.reload(); }, 5000);
   } catch(e) {
-    if (status) status.innerHTML = '<div class="msg err">❌ ' + esc(e.message) + '</div>';
+    if (status) status.innerHTML = '<div style="background:#2a0a0a;border:1px solid #7f1d1d;border-radius:6px;padding:.65rem;font-size:.82rem;color:#f87171;white-space:pre-wrap">❌ ' + esc(e.message) + '</div>';
     if (btn) { btn.disabled = false; btn.textContent = "⬆ Prøv igjen"; }
   }
+}
+
+async function publishToProd() {
+  // Vis publish-dialog
+  const existing = document.getElementById("publishModal");
+  if (existing) existing.remove();
+
+  const ov = document.createElement("div");
+  ov.id = "publishModal";
+  ov.style.cssText = "position:fixed;inset:0;z-index:9001;background:#000a;display:flex;align-items:center;justify-content:center";
+  ov.innerHTML = `
+    <div style="background:#1e1e1e;border:1px solid #3a3a3a;border-radius:12px;padding:1.75rem;max-width:480px;width:95%;box-shadow:0 8px 40px #000c">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+        <h3 style="margin:0;font-size:1rem;font-weight:800">🚀 Publiser ny versjon</h3>
+        <button onclick="this.closest('#publishModal').remove()" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer">×</button>
+      </div>
+
+      <label style="font-size:.8rem;color:#888;display:block;margin-bottom:.25rem">Versjonsnummer</label>
+      <input id="pubVersion" type="text" placeholder="f.eks. 1.0.4" value="${window._updateInfo ? esc(window._updateInfo.latest) : ''}"
+        style="margin-bottom:.85rem;font-family:monospace;font-size:1rem;font-weight:700"/>
+
+      <label style="font-size:.8rem;color:#888;display:block;margin-bottom:.25rem">Changelog <span style="color:#555">(én linje per endring)</span></label>
+      <textarea id="pubChangelog" placeholder="Fikset stopp-forslag for alle dager&#10;Nytt lotterisystem&#10;Inventar med bilder"
+        style="min-height:100px;font-size:.85rem;margin-bottom:.85rem;line-height:1.6"></textarea>
+
+      <div style="background:#141414;border:1px solid #2a2a2a;border-radius:7px;padding:.75rem;font-size:.8rem;color:#666;margin-bottom:1rem;line-height:1.6">
+        <div style="color:#aaa;font-weight:700;margin-bottom:.35rem">Dette skjer automatisk:</div>
+        <div>📤 Laster opp server.js, index.html, package.json → <code style="color:#888">releases/v{versjon}/</code></div>
+        <div>📋 Oppdaterer <code style="color:#888">manifest-lab.json</code> med SHA256-sjekksummer</div>
+        <div>🧪 Lab-instansen får tilgang til den nye versjonen</div>
+      </div>
+
+      <div id="pubStatus" style="display:none;margin-bottom:1rem"></div>
+
+      <div style="display:flex;gap:.5rem;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="this.closest('#publishModal').remove()">Avbryt</button>
+        <button class="btn" id="pubUploadBtn" onclick="_doPublish(false)"
+          style="background:#1a2a3a;border:1px solid #1e3a5f;color:#60a5fa;font-weight:700">
+          📤 Last opp til lab
+        </button>
+        <button class="btn" id="pubApproveBtn" onclick="_doPublish(true)"
+          style="background:#166534;border:1px solid #16a34a;color:#4ade80;font-weight:700">
+          🚀 Last opp + godkjenn prod
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+}
+
+async function _doPublish(publishProd) {
+  const version   = ($("pubVersion")   && $("pubVersion").value.trim())   || APP_VERSION;
+  const changelog = ($("pubChangelog") && $("pubChangelog").value.trim()) || "";
+  const lines     = changelog.split("\n").map(s => s.trim()).filter(Boolean);
+  const status    = $("pubStatus");
+  const btn1      = $("pubUploadBtn");
+  const btn2      = $("pubApproveBtn");
+
+  if (!version) { if (status) { status.style.display="block"; status.innerHTML='<div style="color:#f87171;font-size:.82rem">Skriv inn versjonsnummer</div>'; } return; }
+
+  if (btn1) btn1.disabled = true;
+  if (btn2) btn2.disabled = true;
+  if (status) { status.style.display = "block"; status.innerHTML = '<div style="background:#1a1a2a;border:1px solid #2a2a5a;border-radius:6px;padding:.65rem;font-size:.82rem;color:#60a5fa">⏳ Laster opp filer til GitHub…</div>'; }
+
+  try {
+    const r = await api("POST", "/api/update/publish", { version, changelog: lines, publishProd });
+    if (r.err) throw new Error(r.err);
+
+    let stepsHtml = (r.steps || []).map(s => `<div>${esc(s)}</div>`).join("");
+    if (status) status.innerHTML = `
+      <div style="background:#1a2a1a;border:1px solid #2a4a2a;border-radius:6px;padding:.75rem;font-size:.82rem;color:#4ade80">
+        <div style="font-weight:700;margin-bottom:.4rem">✅ ${esc(r.message)}</div>
+        ${stepsHtml}
+      </div>`;
+    if (btn1) btn1.style.display = "none";
+    if (btn2) { btn2.disabled = false; btn2.textContent = publishProd ? "✅ Publisert til prod!" : "🚀 Godkjenn til produksjon"; }
+    if (publishProd) { if (btn2) btn2.disabled = true; }
+
+  } catch(e) {
+    if (status) status.innerHTML = '<div style="background:#2a0a0a;border:1px solid #7f1d1d;border-radius:6px;padding:.65rem;font-size:.82rem;color:#f87171;white-space:pre-wrap">❌ ' + esc(e.message) + '</div>';
+    if (btn1) btn1.disabled = false;
+    if (btn2) btn2.disabled = false;
+  }
+}
+
+async function openRestoreModal() {
+  const existing = document.getElementById("restoreModal");
+  if (existing) existing.remove();
+  const ov = document.createElement("div");
+  ov.id = "restoreModal";
+  ov.style.cssText = "position:fixed;inset:0;z-index:9001;background:#000a;display:flex;align-items:center;justify-content:center";
+  ov.innerHTML = `
+    <div style="background:#1e1e1e;border:1px solid #3a3a3a;border-radius:12px;padding:1.5rem;max-width:420px;width:95%;box-shadow:0 8px 40px #000c">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h3 style="margin:0;font-size:1rem;font-weight:800">🔄 Gjenopprett tidligere versjon</h3>
+        <button onclick="this.closest('#restoreModal').remove()" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer">×</button>
+      </div>
+      <div id="restoreList"><p style="color:#666;font-size:.85rem">Laster backups…</p></div>
+      <div id="restoreStatus" style="margin-top:.75rem"></div>
+    </div>`;
+  document.body.appendChild(ov);
+  const backups = await api("GET", "/api/update/backups");
+  const list = document.getElementById("restoreList");
+  if (!list) return;
+  if (!backups || backups.err || !backups.length) {
+    list.innerHTML = '<p style="color:#666;font-size:.85rem">Ingen backups funnet ennå. Backups opprettes automatisk ved installasjon.</p>';
+    return;
+  }
+  list.innerHTML = backups.map(b => `
+    <div style="display:flex;align-items:center;justify-content:space-between;background:#141414;border:1px solid #2a2a2a;border-radius:7px;padding:.65rem .85rem;margin-bottom:.4rem">
+      <div>
+        <div style="font-weight:700;font-size:.9rem">v${esc(b.version)}</div>
+        <div style="font-size:.72rem;color:#555">${new Date(b.createdAt).toLocaleDateString("no-NO")} · ${b.files.join(", ")}</div>
+      </div>
+      <button onclick="doRestore('${esc(b.version)}')"
+        style="background:#2a0a0a;border:1px solid #7f1d1d;color:#f87171;border-radius:6px;padding:4px 12px;font-size:.82rem;cursor:pointer;font-weight:700">
+        Gjenopprett
+      </button>
+    </div>`).join("");
+}
+
+async function doRestore(version) {
+  if (!confirm("Gjenopprette v" + version + "?\nNåværende versjon sikkerhetskopieres automatisk.")) return;
+  const status = document.getElementById("restoreStatus");
+  if (status) status.innerHTML = '<p style="color:#f5c500;font-size:.85rem">⏳ Gjenoppretter…</p>';
+  const r = await api("POST", "/api/update/restore/" + version);
+  if (r.err) {
+    if (status) status.innerHTML = '<p style="color:#f87171;font-size:.85rem">❌ ' + esc(r.err) + '</p>';
+    return;
+  }
+  if (status) status.innerHTML = '<p style="color:#4ade80;font-size:.85rem">✅ ' + esc(r.message) + ' Laster om…</p>';
+  setTimeout(function() { location.reload(); }, 5000);
 }
 
 function resetSettingsColors() {
@@ -8928,27 +9179,39 @@ function renderInventar(items) {
       ? `<br><span style="font-size:.75rem;color:#888">${((item._totalSolgt||0) * item.pris).toLocaleString("no-NO",{style:"currency",currency:"NOK",maximumFractionDigits:0})} tot.</span>`
       : "";
 
-    const beskCol = esc(item.beskrivelse) || "–";
-
     const antallCell = (isGiveaway || isSalg)
       ? `<span style="font-weight:700;color:${antallColor}">${tilgjengelig}</span><br><span style="font-size:.72rem;color:#555">${item.antall||0} totalt</span>`
-      : `<span>${item.antall||1}</span>`;
+      : `<span>${item.antall||0}</span>`;
 
     const deptName = (() => {
       if (!item.department) return '<span style="color:#333;font-size:.75rem">–</span>';
       const d = (departments||[]).find(function(d){ return d.id === item.department; });
       return d ? `<span class="avd-tag" style="font-size:.72rem">${esc(d.name)}</span>` : '<span style="color:#555;font-size:.75rem">?</span>';
     })();
+
+    const imgCell = item.bilde
+      ? `<img src="${esc(item.bilde)}" style="width:40px;height:40px;object-fit:cover;border-radius:5px;border:1px solid #333;cursor:pointer" onclick="openInventarImgZoom('${esc(item.bilde)}','${esc(item.navn)}')" title="${esc(item.navn)}"/>`
+      : `<span style="color:#333;font-size:1.1rem">📦</span>`;
+
+    const pakkeInfo = item.perPakke && item.perPakke > 1
+      ? `<br><span style="font-size:.7rem;color:#555">${item.perPakke} stk/pakke</span>`
+      : "";
+
+    const innkjopCol = item.innkjopspris
+      ? `<span style="font-size:.78rem;color:#888">${item.innkjopspris.toLocaleString("no-NO",{style:"currency",currency:"NOK"})}</span>`
+      : `<span style="color:#333;font-size:.78rem">–</span>`;
+
     return `<tr>
-      <td><strong>${esc(item.navn)}</strong></td>
+      <td style="text-align:center;padding:6px 8px">${imgCell}</td>
+      <td><strong>${esc(item.navn)}</strong>${item.beskrivelse ? `<div style="font-size:.75rem;color:#555;margin-top:1px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(item.beskrivelse)}">${esc(item.beskrivelse)}</div>` : ''}</td>
       <td><span style="font-size:.78rem;color:#aaa">${INVENTAR_KAT[item.kategori]||item.kategori}</span></td>
-      <td style="text-align:center">${antallCell}</td>
-      <td style="font-size:.82rem;color:#888">${beskCol}</td>
+      <td style="text-align:center">${antallCell}${pakkeInfo}</td>
       <td style="text-align:center">${col2}${omsetning}</td>
       <td style="text-align:center">${prisCol}</td>
+      <td style="text-align:center">${innkjopCol}</td>
       <td>${deptName}</td>
       <td>${nextLabel}</td>
-      <td>
+      <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm" title="Innkjøp – legg til på lager" data-action="openInkjop" data-args="${item.id}|||${esc(item.navn)}" data-event="click">📥</button>
         <button class="btn btn-ghost btn-sm" title="Varetelling – oppdater saldo" data-action="openVaretelling" data-args="${item.id}|||${esc(item.navn)}|||${tilgjengelig}" data-event="click">🔢</button>
         <button class="btn btn-ghost btn-sm" data-action="openEditInventarItem" data-args="${item.id}" data-event="click">✏️</button>
@@ -8958,8 +9221,18 @@ function renderInventar(items) {
   }).join("") : `<tr><td colspan="8" class="empty">Ingen utstyr registrert ennå</td></tr>`;
 }
 
+function openInventarImgZoom(src, navn) {
+  const ov = document.createElement("div");
+  ov.style.cssText = "position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;cursor:pointer";
+  ov.onclick = function() { ov.remove(); };
+  ov.innerHTML = `<div style="text-align:center">
+    <img src="${esc(src)}" style="max-width:90vw;max-height:80vh;object-fit:contain;border-radius:10px;box-shadow:0 8px 40px #000"/>
+    <div style="color:#aaa;font-size:.9rem;margin-top:.75rem">${esc(navn)} · Klikk for å lukke</div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
 function filterInventar() {
-  const q = ($("inventarSearch").value||"").toLowerCase();
   renderInventar(q ? _allInventar.filter(i => i.navn.toLowerCase().includes(q) || (i.beskrivelse||"").toLowerCase().includes(q) || (INVENTAR_KAT[i.kategori]||"").toLowerCase().includes(q)) : _allInventar);
 }
 
@@ -8984,15 +9257,57 @@ function toggleInventarPrisField() {
   $("inventarPrisField").style.display = kat === "salgsvarer" ? "" : "none";
 }
 
+function previewInventarImg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = $("inventarImgPreview");
+    const ph  = $("inventarImgPlaceholder");
+    const rmv = $("inventarImgRemoveBtn");
+    const dat = $("inventarImgData");
+    img.src = e.target.result;
+    img.style.display = "block";
+    ph.style.display  = "none";
+    rmv.style.display = "block";
+    dat.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearInventarImg() {
+  $("inventarImgPreview").src = "";
+  $("inventarImgPreview").style.display = "none";
+  $("inventarImgPlaceholder").style.display = "block";
+  $("inventarImgRemoveBtn").style.display = "none";
+  $("inventarImgData").value = "";
+  $("inventarImgInput").value = "";
+}
+
+function _setInventarImg(url) {
+  if (url) {
+    $("inventarImgPreview").src = url;
+    $("inventarImgPreview").style.display = "block";
+    $("inventarImgPlaceholder").style.display = "none";
+    $("inventarImgRemoveBtn").style.display = "block";
+    $("inventarImgData").value = url;
+  } else {
+    clearInventarImg();
+  }
+}
+
 function openNewInventarItem() {
   $("inventarId").value = "";
   $("inventarNavn").value = "";
   $("inventarKategori").value = "utstyr";
   $("inventarAntall").value = "1";
+  $("inventarPerPakke").value = "1";
+  $("inventarInnkjopspris").value = "";
   $("inventarPris").value = "0";
   $("inventarBeskrivelse").value = "";
   $("inventarErr").textContent = "";
   $("inventarModalTitle").textContent = "Nytt utstyr";
+  clearInventarImg();
   toggleInventarPrisField();
   initInventarDeptField(null);
   openModal("inventarModal");
@@ -9005,10 +9320,13 @@ function openEditInventarItem(id) {
   $("inventarNavn").value = item.navn;
   $("inventarKategori").value = item.kategori||"annet";
   $("inventarAntall").value = item.antall||1;
+  $("inventarPerPakke").value = item.perPakke||1;
+  $("inventarInnkjopspris").value = item.innkjopspris||"";
   $("inventarPris").value = item.pris||0;
   $("inventarBeskrivelse").value = item.beskrivelse||"";
   $("inventarErr").textContent = "";
   $("inventarModalTitle").textContent = "Rediger utstyr";
+  _setInventarImg(item.bilde || "");
   toggleInventarPrisField();
   initInventarDeptField(item.department || null);
   openModal("inventarModal");
@@ -9020,8 +9338,16 @@ async function saveInventarItem() {
   const id  = $("inventarId").value;
   const kat = $("inventarKategori").value;
   const deptSel = $("inventarDept");
-  const body = { navn, kategori: kat, antall: parseInt($("inventarAntall").value)||1, beskrivelse: $("inventarBeskrivelse").value.trim(),
-                 department: deptSel ? (deptSel.value || null) : undefined };
+  const body = {
+    navn,
+    kategori:       kat,
+    antall:         parseInt($("inventarAntall").value) || 0,
+    perPakke:       parseInt($("inventarPerPakke").value) || 1,
+    innkjopspris:   parseFloat($("inventarInnkjopspris").value) || null,
+    beskrivelse:    $("inventarBeskrivelse").value.trim(),
+    bilde:          $("inventarImgData").value || null,
+    department:     deptSel ? (deptSel.value || null) : undefined
+  };
   if (kat === "salgsvarer") body.pris = parseFloat($("inventarPris").value) || 0;
   const r = id ? await api("PUT", "/api/inventar/" + id, body) : await api("POST", "/api/inventar", body);
   if (r.err) { $("inventarErr").textContent = r.err; return; }
@@ -9160,6 +9486,25 @@ function onEvTypeChange() {
 
 function onLotteryToggle() {
   $("evLotteryOptions").style.display = $("evLotteryEnabled").checked ? "" : "none";
+}
+
+function onLotteryTypeChange() {
+  const type = document.querySelector('input[name="evLotteryType"]:checked')?.value || "trekning";
+  const types = ["trekning","quiz","spin","interesse","presisjon","bilde"];
+  const Y = "var(--y)", G = "#333", TY = "#f5c500", TG = "#888";
+  types.forEach(t => {
+    const el = $("lt-" + t);
+    if (!el) return;
+    const active = t === type;
+    el.style.borderColor = active ? TY : G;
+    el.style.color = active ? TY : TG;
+    el.style.background = active ? "#1a1500" : "#1a1a1a";
+  });
+  $("lotteryQuizSettings").style.display      = type === "quiz"      ? "" : "none";
+  $("lotterySpinSettings").style.display      = type === "spin"      ? "" : "none";
+  $("lotteryInteresseSettings").style.display = type === "interesse" ? "" : "none";
+  $("lotteryPresisjonSettings").style.display = type === "presisjon" ? "" : "none";
+  $("lotteryBildeSettings").style.display     = type === "bilde"     ? "" : "none";
 }
 
 async function downloadGpx(evId) {
@@ -11217,56 +11562,73 @@ async function loadLotteryPanel(evId) {
   const ev = allEvents.find(e => e.id === evId) || {};
   const lottery = ev.lottery || {};
   if (!lottery.enabled) {
-    panel.innerHTML = '<p style="color:#555;font-size:.9rem">Lotteri er ikke aktivert for dette eventet. Rediger eventet for å aktivere.</p>';
+    panel.innerHTML = '<p style="color:#555;font-size:.9rem">Konkurranse er ikke aktivert for dette eventet. Rediger eventet for å aktivere.</p>';
     return;
   }
 
   const d = await api("GET", "/api/events/" + evId + "/lottery");
-  const winners = d.err ? [] : (d.winners || []);
-  const totalRegs = d.err ? 0 : d.total;
-  const eligible = d.err ? 0 : d.eligible;
-  const modeLabels = { manual: "Manuell", auto30: "Automatisk hvert 30. min", auto60: "Automatisk hvert 60. min", auto120: "Automatisk hvert 2. time" };
+  const winners  = d.err ? [] : (d.winners || []);
+  const eligible = d.err ? 0  : d.eligible;
+  const total    = d.err ? 0  : d.total;
+  const type     = lottery.type || "trekning";
+
+  const typeLabels = {
+    trekning:  "🎟️ Trekning",
+    quiz:      "❓ Quiz",
+    spin:      "🎡 Spin-to-win",
+    interesse: "📝 Interesseregistrering",
+    presisjon: "🎯 Presisjonsspill",
+    bilde:     "📸 Foto-konkurranse"
+  };
+  const modeLabels = { manual:"Manuell", auto30:"Automatisk hvert 30. min", auto60:"Automatisk hvert 60. min", auto120:"Automatisk hvert 2. time" };
 
   panel.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:1rem">
-      <div style="background:#1a0a2e;border:1px solid #5b3a7a;border-radius:8px;padding:1rem">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem">
-          <div>
-            <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.6px;color:#9b72cf;margin-bottom:.2rem">Trekningsmodus</div>
-            <div style="font-weight:700">${esc(modeLabels[lottery.mode] || lottery.mode)}</div>
-            ${lottery.prize ? `<div style="font-size:.8rem;color:#aaa;margin-top:.2rem">Premie: <strong style="color:var(--y)">${esc(lottery.prize)}</strong></div>` : ''}
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:.75rem;color:#666">Deltakere</div>
-            <div style="font-size:1.4rem;font-weight:900;color:var(--y)">${eligible}</div>
-            <div style="font-size:.7rem;color:#555">av ${totalRegs} kvalifisert</div>
-          </div>
+      <!-- Info-bar -->
+      <div style="background:#1a0a2e;border:1px solid #5b3a7a;border-radius:8px;padding:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem">
+        <div>
+          <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.6px;color:#9b72cf;margin-bottom:.2rem">${esc(typeLabels[type]||type)} · ${esc(modeLabels[lottery.mode]||lottery.mode)}</div>
+          ${lottery.prize ? `<div style="font-weight:700;color:var(--y)">🏆 ${esc(lottery.prize)}</div>` : ""}
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:1.6rem;font-weight:900;color:var(--y)">${eligible}</div>
+          <div style="font-size:.7rem;color:#555">av ${total} kvalifisert</div>
         </div>
       </div>
 
+      <!-- Fullskjerm-knapp -->
+      <button class="btn" style="background:#1a1a2e;border:1px solid #5b3a7a;color:#d8b4fe;display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:.95rem"
+        onclick="openLotteryFullscreen('${evId}')">
+        🖥️ Åpne fullskjerm-modus for publikum
+      </button>
+
+      <!-- Trekk-knapp -->
       <div style="text-align:center">
-        <button id="lotteryDrawBtn" class="btn btn-y" style="font-size:1.1rem;padding:.75rem 2rem;width:100%" onclick="adminDrawLottery('${evId}')" ${eligible < 1 ? 'disabled' : ''}>
+        <button id="lotteryDrawBtn" class="btn btn-y" style="font-size:1.1rem;padding:.75rem 2rem;width:100%"
+          onclick="adminDrawLottery('${evId}')" ${eligible < 1 ? "disabled" : ""}>
           🎰 Trekk vinner nå
         </button>
         <div id="lotteryDrawMsg" style="margin-top:.5rem;min-height:1.5rem"></div>
       </div>
 
+      <!-- Vinnerliste -->
       <div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
           <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.6px;color:#555">Vinnere (${winners.length})</div>
-          ${winners.length ? `<button class="btn btn-ghost btn-sm" onclick="confirmResetLottery('${evId}')">🗑 Nullstill</button>` : ''}
+          ${winners.length ? `<button class="btn btn-ghost btn-sm" onclick="confirmResetLottery('${evId}')">🗑 Nullstill</button>` : ""}
         </div>
         <div id="lotteryWinnersList">
           ${winners.length ? winners.slice().reverse().map((w, i) => `
             <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;background:#111;border-radius:6px;margin-bottom:.35rem">
-              <div style="font-size:1.1rem">${i === 0 ? '🥇' : '🏆'}</div>
+              <div style="font-size:1.1rem">${i === 0 ? "🥇" : "🏆"}</div>
               <div style="flex:1">
                 <div style="font-weight:600">${esc(w.name)}</div>
+                ${w.meta ? `<div style="font-size:.72rem;color:#888">${esc(w.meta)}</div>` : ""}
                 <div style="font-size:.72rem;color:#555">Trekking #${w.drawNum}</div>
               </div>
               <div style="font-size:.75rem;color:#555">${new Date(w.drawnAt).toLocaleTimeString(t("date_locale"),{hour:"2-digit",minute:"2-digit"})}</div>
             </div>
-          `).join('') : '<p style="color:#555;font-size:.85rem">Ingen vinnere trukket ennå.</p>'}
+          `).join("") : '<p style="color:#555;font-size:.85rem">Ingen vinnere trukket ennå.</p>'}
         </div>
       </div>
     </div>
@@ -11289,6 +11651,291 @@ async function adminDrawLottery(evId) {
   msg.innerHTML = `<span style="color:#4ade80;font-weight:700;font-size:1rem">🎉 ${esc(d.winner.name)} vant!</span>`;
   // Reload panel to show updated winners
   setTimeout(() => loadLotteryPanel(evId), 600);
+}
+
+async function openLotteryFullscreen(evId) {
+  const ev = allEvents.find(e => e.id === evId) || {};
+  const lottery = ev.lottery || {};
+  const type = lottery.type || "trekning";
+
+  const ov = document.createElement("div");
+  ov.id = "lotteryFullscreen";
+  ov.style.cssText = "position:fixed;inset:0;z-index:9999;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;font-family:inherit";
+
+  // Lukk-knapp
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "× Lukk";
+  closeBtn.style.cssText = "position:absolute;top:1rem;right:1rem;background:none;border:1px solid #333;color:#666;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.85rem";
+  closeBtn.onclick = function() { ov.remove(); };
+  ov.appendChild(closeBtn);
+
+  if (type === "trekning" || type === "interesse" || type === "bilde") {
+    _buildTrekningFullscreen(ov, ev, evId);
+  } else if (type === "quiz") {
+    _buildQuizFullscreen(ov, ev, evId);
+  } else if (type === "spin") {
+    _buildSpinFullscreen(ov, ev, evId);
+  } else if (type === "presisjon") {
+    _buildPresisjonFullscreen(ov, ev, evId);
+  }
+
+  document.body.appendChild(ov);
+}
+
+function _buildTrekningFullscreen(ov, ev, evId) {
+  const lottery = ev.lottery || {};
+  const type = lottery.type || "trekning";
+  const icons = { trekning:"🎟️", interesse:"📝", bilde:"📸" };
+  const descs = {
+    trekning:  "Registrer deg – vi trekker en vinner!",
+    interesse: "Fortell oss hva du er interessert i og delta i trekningen!",
+    bilde:     lottery.bildeTask || "Ta bilde og delta i konkurransen!"
+  };
+
+  const box = document.createElement("div");
+  box.style.cssText = "text-align:center;max-width:600px;width:100%";
+  box.innerHTML = `
+    <div style="font-size:5rem;margin-bottom:1rem">${icons[type]||"🎟️"}</div>
+    <div style="font-size:2.5rem;font-weight:900;color:var(--y);margin-bottom:.5rem">${esc(ev.title||"")}</div>
+    <div style="font-size:1.1rem;color:#aaa;margin-bottom:2rem">${descs[type]}</div>
+    ${lottery.interests && lottery.interests.length ? `
+      <div style="display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:2rem" id="interestBtns">
+        ${lottery.interests.map(i => `<button onclick="toggleInterest(this)" style="padding:.5rem 1.1rem;border:2px solid #444;border-radius:20px;background:none;color:#ccc;cursor:pointer;font-size:.9rem">${esc(i)}</button>`).join("")}
+      </div>` : ""}
+    ${lottery.hashtag ? `<div style="color:#888;margin-bottom:1rem;font-size:.95rem">📸 ${esc(lottery.hashtag)}</div>` : ""}
+    <div style="display:flex;gap:.75rem;justify-content:center;max-width:420px;margin:0 auto">
+      <input id="lsName" type="text" placeholder="Navn" autocomplete="off" style="flex:1;background:#1a1a1a;border:2px solid #444;border-radius:8px;padding:.75rem 1rem;color:#fff;font-size:1.1rem"/>
+      <button onclick="_lsRegister('${evId}')" style="background:var(--y);color:#111;font-weight:800;padding:.75rem 1.5rem;border-radius:8px;border:none;font-size:1.1rem;cursor:pointer">Delta!</button>
+    </div>
+    <div id="lsMsg" style="margin-top:1rem;font-size:1rem;min-height:1.5rem"></div>
+    <div id="lsCount" style="margin-top:1.5rem;color:#444;font-size:.85rem"></div>
+    ${lottery.prize ? `<div style="margin-top:1.5rem;padding:1rem 1.5rem;background:#1a1500;border:1px solid #3a3000;border-radius:8px;color:#f5c500;font-size:1rem">🏆 Premie: <strong>${esc(lottery.prize)}</strong></div>` : ""}
+  `;
+  ov.appendChild(box);
+  _lsUpdateCount(evId);
+}
+
+function toggleInterest(btn) {
+  const active = btn.style.borderColor === "rgb(245, 197, 0)" || btn.style.borderColor === "#f5c500";
+  btn.style.borderColor = active ? "#444" : "#f5c500";
+  btn.style.color = active ? "#ccc" : "#f5c500";
+  btn.style.background = active ? "none" : "#1a1500";
+}
+
+async function _lsRegister(evId) {
+  const name = $("lsName") && $("lsName").value.trim();
+  if (!name) { if ($("lsMsg")) $("lsMsg").innerHTML = '<span style="color:#f87171">Skriv inn navn</span>'; return; }
+  const interests = [...document.querySelectorAll("#interestBtns button")].filter(b => b.style.borderColor === "rgb(245, 197, 0)" || b.style.borderColor === "#f5c500").map(b => b.textContent);
+  const r = await api("POST", "/api/events/" + evId + "/lottery/register", { name, meta: interests.join(", ") });
+  if (r.err) { if ($("lsMsg")) $("lsMsg").innerHTML = `<span style="color:#f87171">${esc(r.err)}</span>`; return; }
+  if ($("lsMsg")) $("lsMsg").innerHTML = '<span style="color:#4ade80;font-size:1.2rem">✅ Du er med i trekningen!</span>';
+  if ($("lsName")) $("lsName").value = "";
+  document.querySelectorAll("#interestBtns button").forEach(b => { b.style.borderColor="#444"; b.style.color="#ccc"; b.style.background="none"; });
+  setTimeout(() => { if ($("lsMsg")) $("lsMsg").innerHTML = ""; }, 3000);
+  _lsUpdateCount(evId);
+}
+
+async function _lsUpdateCount(evId) {
+  const d = await api("GET", "/api/events/" + evId + "/lottery");
+  if (!d.err && $("lsCount")) $("lsCount").textContent = d.eligible + " deltakere registrert";
+}
+
+function _buildQuizFullscreen(ov, ev, evId) {
+  const lottery = ev.lottery || {};
+  const answers = lottery.answers || [];
+  const correct = (lottery.correct || "").toLowerCase().trim();
+
+  const box = document.createElement("div");
+  box.style.cssText = "text-align:center;max-width:680px;width:100%";
+  box.innerHTML = `
+    <div style="font-size:3rem;margin-bottom:.75rem">❓</div>
+    <div style="font-size:2rem;font-weight:900;color:#fff;margin-bottom:.75rem;line-height:1.3">${esc(lottery.question || "Quiz-spørsmål ikke satt")}</div>
+    <div style="color:#666;font-size:.85rem;margin-bottom:1.5rem">Velg riktig svar og skriv inn navn for å delta</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem" id="quizAnswers">
+      ${answers.map((a, i) => `
+        <button onclick="_quizSelect(this,'${a.toLowerCase().trim()}','${correct}')"
+          style="padding:1rem;border:2px solid #333;border-radius:10px;background:#1a1a1a;color:#ccc;cursor:pointer;font-size:1rem;font-weight:600">
+          ${["A","B","C","D"][i]||""}) ${esc(a)}
+        </button>`).join("")}
+    </div>
+    <div id="quizFeedback" style="font-size:1.1rem;min-height:1.5rem;margin-bottom:1rem"></div>
+    <div id="quizNameWrap" style="display:none;flex-direction:column;align-items:center;gap:.75rem">
+      <div style="display:flex;gap:.75rem;max-width:420px;width:100%">
+        <input id="lsName" type="text" placeholder="Navn" style="flex:1;background:#1a1a1a;border:2px solid #444;border-radius:8px;padding:.75rem 1rem;color:#fff;font-size:1.1rem"/>
+        <button onclick="_lsRegister('${evId}')" style="background:var(--y);color:#111;font-weight:800;padding:.75rem 1.5rem;border-radius:8px;border:none;font-size:1.1rem;cursor:pointer">Delta!</button>
+      </div>
+    </div>
+    <div id="lsMsg" style="margin-top:.75rem;font-size:1rem;min-height:1.5rem"></div>
+    ${lottery.prize ? `<div style="margin-top:1.5rem;padding:1rem 1.5rem;background:#1a1500;border:1px solid #3a3000;border-radius:8px;color:#f5c500;font-size:1rem">🏆 Premie: <strong>${esc(lottery.prize)}</strong></div>` : ""}
+  `;
+  ov.appendChild(box);
+}
+
+function _quizSelect(btn, selected, correct) {
+  const btns = document.querySelectorAll("#quizAnswers button");
+  btns.forEach(b => { b.style.borderColor="#333"; b.style.background="#1a1a1a"; b.style.color="#ccc"; });
+  const feedback = $("quizFeedback");
+  const nameWrap = $("quizNameWrap");
+  if (selected === correct) {
+    btn.style.borderColor = "#4ade80"; btn.style.background = "#0a2a0a"; btn.style.color = "#4ade80";
+    if (feedback) feedback.innerHTML = '<span style="color:#4ade80;font-size:1.3rem">✅ Riktig! Skriv inn navn for å delta</span>';
+    if (nameWrap) nameWrap.style.display = "flex";
+  } else {
+    btn.style.borderColor = "#f87171"; btn.style.background = "#2a0a0a"; btn.style.color = "#f87171";
+    if (feedback) feedback.innerHTML = '<span style="color:#f87171;font-size:1.1rem">❌ Feil svar – prøv igjen!</span>';
+    if (nameWrap) nameWrap.style.display = "none";
+  }
+}
+
+function _buildSpinFullscreen(ov, ev, evId) {
+  const lottery = ev.lottery || {};
+  const segments = lottery.segments && lottery.segments.length
+    ? lottery.segments
+    : ["Prøv igjen", "T-skjorte", "Prøv igjen", "Nøkkelring", "🎉 JACKPOT!", "Prøv igjen"];
+
+  const colors = ["#9b72cf","#f5c500","#4ade80","#60a5fa","#f87171","#fb923c","#a78bfa","#34d399"];
+  const size = Math.min(window.innerWidth * 0.7, 420);
+  const cx = size / 2, cy = size / 2, r = size / 2 - 10;
+  const n = segments.length;
+  const arc = (2 * Math.PI) / n;
+
+  let svgPaths = "";
+  for (let i = 0; i < n; i++) {
+    const startA = i * arc - Math.PI / 2;
+    const endA   = startA + arc;
+    const x1 = cx + r * Math.cos(startA), y1 = cy + r * Math.sin(startA);
+    const x2 = cx + r * Math.cos(endA),   y2 = cy + r * Math.sin(endA);
+    const midA = startA + arc / 2;
+    const tx = cx + (r * 0.65) * Math.cos(midA), ty = cy + (r * 0.65) * Math.sin(midA);
+    const col = colors[i % colors.length];
+    svgPaths += `<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2} Z" fill="${col}" stroke="#0a0a0a" stroke-width="2"/>`;
+    svgPaths += `<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="${Math.max(10, size/32)}" font-weight="700" transform="rotate(${(midA * 180/Math.PI) + 90},${tx},${ty})">${esc(segments[i]).slice(0,12)}</text>`;
+  }
+
+  const box = document.createElement("div");
+  box.style.cssText = "text-align:center;max-width:500px;width:100%";
+  box.innerHTML = `
+    <div style="font-size:2rem;font-weight:900;color:var(--y);margin-bottom:1rem">${esc(ev.title||"")} – Spin to Win!</div>
+    <div style="position:relative;display:inline-block;margin-bottom:1.5rem">
+      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:2rem;z-index:2">▼</div>
+      <svg id="spinWheel" width="${size}" height="${size}" style="border-radius:50%;transition:transform 4s cubic-bezier(.17,.67,.12,.99);cursor:pointer" onclick="spinWheel(${n},${arc})">
+        ${svgPaths}
+        <circle cx="${cx}" cy="${cy}" r="22" fill="#0a0a0a" stroke="#333" stroke-width="2"/>
+        <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="11" font-weight="700">SPIN</text>
+      </svg>
+    </div>
+    <div id="spinResult" style="font-size:1.3rem;font-weight:700;min-height:2rem;margin-bottom:1rem"></div>
+    <div id="quizNameWrap" style="display:none;flex-direction:column;align-items:center">
+      <div style="display:flex;gap:.75rem;max-width:420px;width:100%">
+        <input id="lsName" type="text" placeholder="Navn for å registrere gevinst" style="flex:1;background:#1a1a1a;border:2px solid #444;border-radius:8px;padding:.75rem 1rem;color:#fff;font-size:1rem"/>
+        <button onclick="_lsRegister('${evId}')" style="background:var(--y);color:#111;font-weight:800;padding:.75rem 1.25rem;border-radius:8px;border:none;font-size:1rem;cursor:pointer">Registrer!</button>
+      </div>
+    </div>
+    <div id="lsMsg" style="margin-top:.75rem;font-size:1rem"></div>
+  `;
+  ov.appendChild(box);
+}
+
+let _spinDeg = 0, _spinning = false;
+function spinWheel(n, arc) {
+  if (_spinning) return;
+  _spinning = true;
+  const wheel = $("spinWheel");
+  const result = $("spinResult");
+  const nameWrap = $("quizNameWrap");
+  if (result) result.textContent = "";
+  if (nameWrap) nameWrap.style.display = "none";
+
+  const spins = 5 + Math.floor(Math.random() * 5);
+  const extraDeg = Math.floor(Math.random() * 360);
+  _spinDeg += spins * 360 + extraDeg;
+  wheel.style.transform = "rotate(" + _spinDeg + "deg)";
+
+  setTimeout(function() {
+    _spinning = false;
+    const normalizedDeg = ((360 - (_spinDeg % 360)) + 270) % 360;
+    const idx = Math.floor((normalizedDeg / 360) * n) % n;
+    const segments = window._spinSegments || [];
+    const seg = segments[idx] || "Prøv igjen";
+    const isWin = !seg.toLowerCase().includes("prøv") && !seg.toLowerCase().includes("igjen");
+    if (result) {
+      result.innerHTML = isWin
+        ? `<span style="color:#4ade80">🎉 ${esc(seg)}!</span>`
+        : `<span style="color:#888">${esc(seg)}</span>`;
+    }
+    if (isWin && nameWrap) nameWrap.style.display = "flex";
+  }, 4100);
+}
+
+function _buildPresisjonFullscreen(ov, ev, evId) {
+  const lottery = ev.lottery || {};
+  const task = lottery.presisjonTask || "Trykk STOPP når pekeren er i sonen!";
+  const prize = lottery.presisjonPrize || lottery.prize || "Premie!";
+
+  const box = document.createElement("div");
+  box.style.cssText = "text-align:center;max-width:500px;width:100%";
+  box.innerHTML = `
+    <div style="font-size:3rem;margin-bottom:.5rem">🎯</div>
+    <div style="font-size:1.8rem;font-weight:900;color:#fff;margin-bottom:.5rem">${esc(task)}</div>
+    <div style="color:#666;font-size:.9rem;margin-bottom:1.5rem">Treff den gule sonen for å vinne!</div>
+    <div style="position:relative;width:320px;height:60px;background:#1a1a1a;border-radius:30px;overflow:hidden;margin:0 auto 1.5rem;border:2px solid #333">
+      <div style="position:absolute;left:35%;width:30%;height:100%;background:#f5c500;border-radius:30px;opacity:.3"></div>
+      <div id="presisjonBar" style="position:absolute;top:8px;width:44px;height:44px;border-radius:50%;background:var(--y);transition:none"></div>
+    </div>
+    <button id="presisjonBtn" onclick="stopPresisjon('${evId}','${esc(prize)}')"
+      style="background:var(--y);color:#111;font-weight:900;padding:1rem 3rem;border-radius:10px;border:none;font-size:1.3rem;cursor:pointer;margin-bottom:1rem">
+      STOPP!
+    </button>
+    <div id="presisjonResult" style="font-size:1.2rem;min-height:2rem;margin-bottom:1rem"></div>
+    <div id="quizNameWrap" style="display:none;flex-direction:column;align-items:center">
+      <div style="display:flex;gap:.75rem;max-width:420px;width:100%">
+        <input id="lsName" type="text" placeholder="Navn" style="flex:1;background:#1a1a1a;border:2px solid #444;border-radius:8px;padding:.75rem 1rem;color:#fff;font-size:1rem"/>
+        <button onclick="_lsRegister('${evId}')" style="background:var(--y);color:#111;font-weight:800;padding:.75rem 1.25rem;border-radius:8px;border:none;font-size:1rem;cursor:pointer">Registrer!</button>
+      </div>
+    </div>
+    <div id="lsMsg" style="margin-top:.75rem;font-size:1rem"></div>
+  `;
+  ov.appendChild(box);
+
+  // Start animasjon
+  let pos = 0, dir = 1, speed = 2.5;
+  const barEl = document.getElementById("presisjonBar");
+  window._presisjonAnim = setInterval(function() {
+    pos += dir * speed;
+    if (pos >= 276) { pos = 276; dir = -1; }
+    if (pos <= 0)   { pos = 0;   dir = 1;  }
+    if (barEl) barEl.style.left = pos + "px";
+  }, 16);
+  window._presisjonPos = function() { return pos; };
+}
+
+function stopPresisjon(evId, prize) {
+  clearInterval(window._presisjonAnim);
+  const pos = window._presisjonPos ? window._presisjonPos() : 0;
+  const inZone = pos >= 276 * 0.35 && pos <= 276 * 0.65;
+  const result = $("presisjonResult");
+  const nameWrap = $("quizNameWrap");
+  const btn = $("presisjonBtn");
+  if (btn) btn.disabled = true;
+  if (inZone) {
+    if (result) result.innerHTML = `<span style="color:#4ade80;font-size:1.5rem">🎯 BLINK! ${esc(prize)}</span>`;
+    if (nameWrap) nameWrap.style.display = "flex";
+  } else {
+    if (result) result.innerHTML = '<span style="color:#f87171">Nesten! Prøv igjen</span>';
+    setTimeout(function() {
+      if (btn) btn.disabled = false;
+      if (result) result.innerHTML = "";
+      let pos2 = 0, dir2 = 1;
+      const barEl = $("presisjonBar");
+      window._presisjonAnim = setInterval(function() {
+        pos2 += dir2 * 2.5;
+        if (pos2 >= 276) { pos2 = 276; dir2 = -1; }
+        if (pos2 <= 0)   { pos2 = 0;   dir2 = 1;  }
+        if (barEl) barEl.style.left = pos2 + "px";
+        window._presisjonPos = function() { return pos2; };
+      }, 16);
+    }, 1500);
+  }
 }
 
 async function confirmResetLottery(evId) {
@@ -11756,7 +12403,7 @@ function schedulePreviewRefresh() {
 
 <!-- MODAL: Inventar-item -->
 <div class="overlay" id="inventarModal">
-  <div class="modal" style="max-width:460px">
+  <div class="modal" style="max-width:480px">
     <div class="modal-head">
       <h3 id="inventarModalTitle">Nytt utstyr</h3>
       <button class="modal-close" data-action="closeModal" data-args="inventarModal" data-event="click">×</button>
@@ -11764,30 +12411,50 @@ function schedulePreviewRefresh() {
     <div class="modal-body">
       <p id="inventarErr" class="err"></p>
       <input type="hidden" id="inventarId"/>
-      <div>
-        <div id="inventarDeptField" style="display:none;margin-bottom:.5rem">
-          <label for="inventarDept" style="font-size:.8rem;color:#888;display:block;margin-bottom:.2rem">Avdeling</label>
-          <select id="inventarDept" style="width:100%;background:#2a2a2a;border:1px solid #444;color:#eee;border-radius:6px;padding:.4rem .6rem;font-size:.85rem">
-            <option value="">Ingen (global)</option>
+
+      <!-- Bilde -->
+      <div style="display:flex;gap:1rem;align-items:flex-start;margin-bottom:.9rem">
+        <div style="flex-shrink:0">
+          <div id="inventarImgPreviewWrap" style="width:80px;height:80px;background:#1a1a1a;border:2px dashed #444;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative"
+            onclick="$('inventarImgInput').click()">
+            <img id="inventarImgPreview" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:6px"/>
+            <span id="inventarImgPlaceholder" style="font-size:1.6rem">📷</span>
+          </div>
+          <button type="button" id="inventarImgRemoveBtn" onclick="clearInventarImg()" style="display:none;width:80px;margin-top:3px;font-size:.7rem;background:none;border:none;color:#888;cursor:pointer;text-align:center">Fjern bilde</button>
+          <input type="file" id="inventarImgInput" accept="image/*" style="display:none" onchange="previewInventarImg(this)"/>
+          <input type="hidden" id="inventarImgData"/>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div id="inventarDeptField" style="display:none;margin-bottom:.5rem">
+            <label for="inventarDept" style="font-size:.8rem;color:#888;display:block;margin-bottom:.2rem">Avdeling</label>
+            <select id="inventarDept" style="width:100%;background:#2a2a2a;border:1px solid #444;color:#eee;border-radius:6px;padding:.4rem .6rem;font-size:.85rem">
+              <option value="">Ingen (global)</option>
+            </select>
+          </div>
+          <label>Navn *</label>
+          <input type="text" id="inventarNavn" placeholder="f.eks. Telt 3x3m" style="margin-bottom:.5rem"/>
+          <label>Kategori</label>
+          <select id="inventarKategori" onchange="toggleInventarPrisField()">
+            <option value="utstyr">🧰 Utstyr</option>
+            <option value="giveaway">🎁 Give-aways</option>
+            <option value="salgsvarer">🛍 Salgsvarer</option>
+            <option value="telt">⛺ Telt</option>
+            <option value="banner">🚩 Banner / Vimpel</option>
+            <option value="bord">🪑 Bord / Stoler</option>
+            <option value="teknisk">🔌 Teknisk utstyr</option>
+            <option value="transport">🚗 Transport</option>
+            <option value="annet">📦 Annet</option>
           </select>
         </div>
-        <label>Navn *</label><input type="text" id="inventarNavn" placeholder="f.eks. Telt 3x3m"/></div>
-      <div><label>Kategori</label>
-        <select id="inventarKategori" onchange="toggleInventarPrisField()">
-          <option value="utstyr">🧰 Utstyr</option>
-          <option value="giveaway">🎁 Give-aways</option>
-          <option value="salgsvarer">🛍 Salgsvarer</option>
-          <option value="telt">⛺ Telt</option>
-          <option value="banner">🚩 Banner / Vimpel</option>
-          <option value="bord">🪑 Bord / Stoler</option>
-          <option value="teknisk">🔌 Teknisk utstyr</option>
-          <option value="transport">🚗 Transport</option>
-          <option value="annet">📦 Annet</option>
-        </select>
       </div>
-      <div><label>Antall (lager)</label><input type="number" id="inventarAntall" value="1" min="1"/></div>
-      <div id="inventarPrisField" style="display:none"><label>Pris per stk (kr)</label><input type="number" id="inventarPris" value="0" min="0" step="0.01" placeholder="f.eks. 49.90"/></div>
-      <div><label>Beskrivelse</label><textarea id="inventarBeskrivelse" placeholder="Farge, størrelse, oppbevaringssted…" style="min-height:60px"></textarea></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem">
+        <div><label>Antall (lager)</label><input type="number" id="inventarAntall" value="1" min="0"/></div>
+        <div><label>Stk per pakke</label><input type="number" id="inventarPerPakke" value="1" min="1" placeholder="1" title="Antall enheter i en pakke"/></div>
+        <div><label>Innkjøpspris (kr)</label><input type="number" id="inventarInnkjopspris" value="" min="0" step="0.01" placeholder="0.00" title="Hva du betalte per enhet"/></div>
+      </div>
+      <div id="inventarPrisField" style="display:none"><label>Salgspris per stk (kr)</label><input type="number" id="inventarPris" value="0" min="0" step="0.01" placeholder="f.eks. 49.90"/></div>
+      <div><label>Beskrivelse</label><textarea id="inventarBeskrivelse" placeholder="Farge, størrelse, oppbevaringssted, leverandør…" style="min-height:70px"></textarea></div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-y" data-action="saveInventarItem" data-event="click">Lagre</button>
