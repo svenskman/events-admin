@@ -1,23 +1,23 @@
 {
-  "version": "1.0.7",
+  "version": "1.0.8",
   "released": "2026-03-21",
   "changelog": [
-    "Update med V.nr i botten."
+    "Justering på update upload."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.7/server.js",
-      "sha256": "ef35c36536ee44d3ac849d3aea5d15829057c123ef3ca37ebc2040284f011bbf"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.8/server.js",
+      "sha256": "87749a4b158ccfb788502933e74aae703739cadefe9b6f76a362035db6d8ac4c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.7/index.html",
-      "sha256": "97f14fc85156451f5a637e63ad3f1a1520b4b6af86a589b136c6a73b666503ff"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.8/index.html",
+      "sha256": "31478448606cb702e9ed421bd6da1a3cd23110e4536ccb72c03c6c5bbe839d3a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.7/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.8/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
