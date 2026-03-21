@@ -707,24 +707,44 @@ app.get("/api/version", function(req, res) {
 });
 
 // ── Oppdateringssystem ───────────────────────────────────────────
-// URL til sentralt manifest – kan overstyres med UPDATE_URL env-var
 const UPDATE_BASE     = process.env.UPDATE_URL      || "https://updates.events-admin.no";
 const UPDATE_MANIFEST = process.env.UPDATE_MANIFEST || "manifest.json";
+const IS_LAB          = !!(process.env.UPDATE_MANIFEST && process.env.UPDATE_MANIFEST !== "manifest.json");
+const GITHUB_TOKEN    = process.env.GITHUB_TOKEN    || "";
+const GITHUB_REPO     = process.env.GITHUB_REPO     || "svenskman/events-admin";
 
+// Hjelpefunksjon: HTTP GET som fungerer på alle Node.js-versjoner
+function httpGet(url, extraHeaders) {
+  return new Promise(function(resolve, reject) {
+    const mod = url.startsWith("https") ? require("https") : require("http");
+    const opts = require("url").parse(url);
+    opts.headers = Object.assign({ "User-Agent": "EventsAdmin/" + APP_VERSION }, extraHeaders || {});
+    mod.get(opts, function(res) {
+      if (res.statusCode === 301 || res.statusCode === 302) {
+        return httpGet(res.headers.location, extraHeaders).then(resolve).catch(reject);
+      }
+      const chunks = [];
+      res.on("data", function(c) { chunks.push(c); });
+      res.on("end",  function()  { resolve({ status: res.statusCode, body: Buffer.concat(chunks) }); });
+      res.on("error", reject);
+    }).on("error", reject);
+  });
+}
+
+// Sjekk om oppdatering er tilgjengelig
 app.get("/api/update/check", auth, adminOnly, async function(req, res) {
   try {
-    const r = await fetch(UPDATE_BASE + "/" + UPDATE_MANIFEST, {
-      headers: { "User-Agent": "EventsAdmin/" + APP_VERSION },
-      signal: AbortSignal.timeout(8000)
-    });
-    if (!r.ok) return res.status(502).json({ err: "Manifest ikke tilgjengelig" });
-    const manifest = await r.json();
+    const url = UPDATE_BASE + "/" + UPDATE_MANIFEST;
+    const r = await httpGet(url);
+    if (r.status !== 200) return res.status(502).json({ err: "Manifest ikke tilgjengelig (HTTP " + r.status + ")" });
+    const manifest = JSON.parse(r.body.toString());
     const latest = manifest.version || "0.0.0";
     const hasUpdate = compareVersions(latest, APP_VERSION) > 0;
     res.json({
       current:   APP_VERSION,
       latest,
       hasUpdate,
+      isLab:     IS_LAB,
       changelog: manifest.changelog || [],
       files:     manifest.files || []
     });
@@ -733,63 +753,309 @@ app.get("/api/update/check", auth, adminOnly, async function(req, res) {
   }
 });
 
+// Installer oppdatering – laster ned filer og bytter dem ut
 app.post("/api/update/apply", auth, adminOnly, async function(req, res) {
-  const { files } = req.body; // [{name, url, sha256}]
+  const { files } = req.body;
   if (!files || !files.length) return res.status(400).json({ err: "Ingen filer angitt" });
 
   const crypto = require("crypto");
   const tmpDir = path.join(DATA, "_update_tmp");
-  if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+  try { fs.mkdirSync(tmpDir, { recursive: true }); } catch(e) {}
+
+  const allowedFiles = ["server.js", "index.html", "package.json"];
 
   try {
-    // 1. Last ned alle filer til tmp
+    // 1. Last ned til tmp
     for (const f of files) {
-      if (!["server.js","index.html","package.json"].includes(f.name))
+      if (!allowedFiles.includes(f.name))
         return res.status(400).json({ err: "Ugyldig filnavn: " + f.name });
-      const r = await fetch(f.url, { signal: AbortSignal.timeout(30000) });
-      if (!r.ok) throw new Error("Nedlasting feilet for " + f.name);
-      const buf = Buffer.from(await r.arrayBuffer());
-      // Verifiser checksum
+      const r = await httpGet(f.url);
+      if (r.status !== 200) throw new Error("Nedlasting feilet for " + f.name + " (HTTP " + r.status + ")");
+      // Verifiser SHA256
       if (f.sha256) {
-        const hash = crypto.createHash("sha256").update(buf).digest("hex");
-        if (hash !== f.sha256) throw new Error("Checksum feilet for " + f.name);
+        const hash = crypto.createHash("sha256").update(r.body).digest("hex");
+        if (hash !== f.sha256) throw new Error("Checksum feilet for " + f.name + "\nForventet: " + f.sha256.slice(0,12) + "…\nFikk:      " + hash.slice(0,12) + "…");
       }
-      fs.writeFileSync(path.join(tmpDir, f.name), buf);
+      fs.writeFileSync(path.join(tmpDir, f.name), r.body);
     }
 
-    // 2. Sikkerhetskopiér gjeldende filer
+    // 2. Sikkerhetskopier gjeldende filer
     const backupDir = path.join(DATA, "_update_backup_" + APP_VERSION);
-    if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
+    try { fs.mkdirSync(backupDir, { recursive: true }); } catch(e) {}
     for (const f of files) {
       const src = path.join(process.cwd(), f.name);
-      if (fs.existsSync(src)) fs.copyFileSync(src, path.join(backupDir, f.name));
+      if (fs.existsSync(src)) {
+        try { fs.copyFileSync(src, path.join(backupDir, f.name)); } catch(e) {}
+      }
     }
 
-    // 3. Flytt nye filer på plass
+    // 3. Legg nye filer på plass
     for (const f of files) {
-      fs.copyFileSync(path.join(tmpDir, f.name), path.join(process.cwd(), f.name));
+      const dst = path.join(process.cwd(), f.name);
+      try {
+        // Prøv direkte kopi
+        fs.copyFileSync(path.join(tmpDir, f.name), dst);
+      } catch(e) {
+        // Fallback: skriv innhold direkte
+        fs.writeFileSync(dst, fs.readFileSync(path.join(tmpDir, f.name)));
+      }
     }
 
-    // 4. Rydd opp tmp
-    fs.rmSync(tmpDir, { recursive: true, force: true });
+    // 4. Rydd opp
+    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch(e) {}
 
-    res.json({ ok: true, message: "Filer oppdatert. Starter om om 3 sekunder…" });
-
-    // 5. Restart prosessen (Docker restart policy starter den opp igjen)
+    res.json({ ok: true, message: "Oppdatering installert! Starter om 3 sekunder…" });
     setTimeout(function() { process.exit(0); }, 3000);
 
   } catch(e) {
-    // Rollback
+    // Auto-rollback
     try {
       const backupDir = path.join(DATA, "_update_backup_" + APP_VERSION);
       if (fs.existsSync(backupDir)) {
         for (const f of files) {
           const bak = path.join(backupDir, f.name);
-          if (fs.existsSync(bak)) fs.copyFileSync(bak, path.join(process.cwd(), f.name));
+          if (fs.existsSync(bak)) fs.writeFileSync(path.join(process.cwd(), f.name), fs.readFileSync(bak));
         }
       }
     } catch(re) {}
-    res.status(500).json({ err: "Oppdatering feilet: " + e.message + " – gamle filer gjenopprettet" });
+    console.error("[update/apply] Feil:", e.message);
+    res.status(500).json({ err: e.message });
+  }
+});
+
+// Liste tilgjengelige backups
+app.get("/api/update/backups", auth, adminOnly, function(req, res) {
+  try {
+    const dirs = fs.readdirSync(DATA)
+      .filter(function(d) { return d.startsWith("_update_backup_") && fs.statSync(path.join(DATA, d)).isDirectory(); })
+      .map(function(d) {
+        const version = d.replace("_update_backup_", "");
+        const files   = fs.readdirSync(path.join(DATA, d));
+        const stat    = fs.statSync(path.join(DATA, d));
+        return { version, files, createdAt: stat.mtime };
+      })
+      .sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+    res.json(dirs);
+  } catch(e) { res.json([]); }
+});
+
+// Gjenopprett fra backup
+app.post("/api/update/restore/:version", auth, adminOnly, function(req, res) {
+  const version   = req.params.version;
+  const backupDir = path.join(DATA, "_update_backup_" + version);
+  if (!fs.existsSync(backupDir)) return res.status(404).json({ err: "Backup ikke funnet for v" + version });
+  try {
+    const files = fs.readdirSync(backupDir);
+    if (!files.length) return res.status(400).json({ err: "Backup er tom" });
+    // Sikkerhetskopier gjeldende
+    const safeDir = path.join(DATA, "_update_backup_" + APP_VERSION + "_pre_restore");
+    try { fs.mkdirSync(safeDir, { recursive: true }); } catch(e) {}
+    for (const f of files) {
+      const src = path.join(process.cwd(), f);
+      if (fs.existsSync(src)) {
+        try { fs.copyFileSync(src, path.join(safeDir, f)); } catch(e) {}
+      }
+    }
+    // Gjenopprett
+    for (const f of files) {
+      fs.writeFileSync(path.join(process.cwd(), f), fs.readFileSync(path.join(backupDir, f)));
+    }
+    res.json({ ok: true, message: "v" + version + " gjenopprettet! Starter om 3 sekunder…" });
+    setTimeout(function() { process.exit(0); }, 3000);
+  } catch(e) {
+    res.status(500).json({ err: "Gjenoppretting feilet: " + e.message });
+  }
+});
+
+// LAB: Publiser til produksjon – oppdaterer manifest.json på GitHub
+app.post("/api/update/publish", auth, adminOnly, async function(req, res) {
+  if (!IS_LAB) return res.status(400).json({ err: "Kun tilgjengelig på lab-instansen" });
+  if (!GITHUB_TOKEN) return res.status(400).json({ err: "GITHUB_TOKEN ikke konfigurert i docker-compose" });
+
+  const version = req.body.version || APP_VERSION;
+  const changelog = req.body.changelog || [];
+
+  // Hjelpefunksjon: last opp én fil til GitHub
+  async function githubUpload(filePath, content, commitMsg) {
+    // Sjekk om filen finnes (trenger SHA for oppdatering)
+    const checkR = await httpGet(
+      "https://api.github.com/repos/" + GITHUB_REPO + "/contents/" + filePath,
+      { "Authorization": "token " + GITHUB_TOKEN, "Accept": "application/vnd.github.v3+json" }
+    );
+    let sha = "";
+    if (checkR.status === 200) {
+      try { sha = JSON.parse(checkR.body.toString()).sha || ""; } catch(e) {}
+    }
+
+    const body = JSON.stringify({
+      message: commitMsg,
+      content: Buffer.from(content).toString("base64"),
+      sha: sha || undefined
+    });
+
+    return new Promise(function(resolve, reject) {
+      const https = require("https");
+      const opts = {
+        hostname: "api.github.com",
+        path: "/repos/" + GITHUB_REPO + "/contents/" + filePath,
+        method: "PUT",
+        headers: {
+          "Authorization": "token " + GITHUB_TOKEN,
+          "Accept": "application/vnd.github.v3+json",
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(body),
+          "User-Agent": "EventsAdmin/" + APP_VERSION
+        }
+      };
+      const req2 = https.request(opts, function(r) {
+        const chunks = [];
+        r.on("data", function(c) { chunks.push(c); });
+        r.on("end",  function()  {
+          if (r.statusCode === 200 || r.statusCode === 201) resolve(true);
+          else {
+            let msg = "HTTP " + r.statusCode;
+            try { msg = JSON.parse(Buffer.concat(chunks).toString()).message || msg; } catch(e) {}
+            reject(new Error(msg));
+          }
+        });
+      });
+      req2.on("error", reject);
+      req2.write(body);
+      req2.end();
+    });
+  }
+
+  try {
+    const crypto = require("crypto");
+    const releaseDir = "releases/v" + version;
+    const appFiles   = ["server.js", "index.html", "package.json"];
+    const hashes     = {};
+    const steps      = [];
+
+    // 1. Last opp kode-filene til releases/vX.X.X/
+    for (const name of appFiles) {
+      const localPath = path.join(process.cwd(), name);
+      if (!fs.existsSync(localPath)) throw new Error("Finner ikke " + name + " i /app");
+      const content = fs.readFileSync(localPath);
+      hashes[name] = crypto.createHash("sha256").update(content).digest("hex");
+      await githubUpload(releaseDir + "/" + name, content, "v" + version + ": " + name);
+      steps.push("✅ " + releaseDir + "/" + name);
+      console.log("[publish] Lastet opp " + releaseDir + "/" + name);
+    }
+
+    // 2. Bygg manifest-objekt
+    const manifest = {
+      version,
+      released: new Date().toISOString().slice(0, 10),
+      changelog: changelog.length ? changelog : ["v" + version],
+      files: appFiles.map(function(name) {
+        return {
+          name,
+          url: "https://raw.githubusercontent.com/" + GITHUB_REPO + "/main/" + releaseDir + "/" + name,
+          sha256: hashes[name]
+        };
+      })
+    };
+
+    const manifestJson = JSON.stringify(manifest, null, 2);
+
+    // 3. Oppdater manifest-lab.json
+    const labManifestFile = UPDATE_MANIFEST;
+    await githubUpload(labManifestFile, manifestJson, "v" + version + " lab-manifest");
+    steps.push("✅ " + labManifestFile);
+
+    // 4. Oppdater manifest.json (prod) kun hvis req.body.publishProd
+    if (req.body.publishProd) {
+      await githubUpload("manifest.json", manifestJson, "Publiser v" + version + " til produksjon");
+      steps.push("✅ manifest.json (prod)");
+    }
+
+    console.log("[publish] Ferdig:", steps.join(", "));
+    res.json({
+      ok: true,
+      version,
+      steps,
+      hashes,
+      prodPublished: !!req.body.publishProd,
+      message: req.body.publishProd
+        ? "v" + version + " er lastet opp og tilgjengelig for alle instanser!"
+        : "v" + version + " er lastet opp til GitHub og tilgjengelig for lab-testing. Klikk 'Godkjenn til produksjon' når du er klar."
+    });
+
+  } catch(e) {
+    console.error("[publish] Feil:", e.message);
+    res.status(500).json({ err: e.message });
+  }
+});
+
+// Godkjenn lab-versjon til produksjon (oppdaterer kun manifest.json)
+app.post("/api/update/approve", auth, adminOnly, async function(req, res) {
+  if (!IS_LAB) return res.status(400).json({ err: "Kun tilgjengelig på lab-instansen" });
+  if (!GITHUB_TOKEN) return res.status(400).json({ err: "GITHUB_TOKEN ikke konfigurert" });
+
+  try {
+    // Hent lab-manifest fra GitHub
+    const labR = await httpGet(
+      "https://api.github.com/repos/" + GITHUB_REPO + "/contents/" + UPDATE_MANIFEST,
+      { "Authorization": "token " + GITHUB_TOKEN, "Accept": "application/vnd.github.v3+json" }
+    );
+    if (labR.status !== 200) throw new Error("Kan ikke hente lab-manifest fra GitHub");
+    const labFile    = JSON.parse(labR.body.toString());
+    const labContent = Buffer.from(labFile.content.replace(/\n/g, ""), "base64").toString();
+    const labManifest = JSON.parse(labContent);
+
+    // Hent SHA for manifest.json
+    const prodR = await httpGet(
+      "https://api.github.com/repos/" + GITHUB_REPO + "/contents/manifest.json",
+      { "Authorization": "token " + GITHUB_TOKEN, "Accept": "application/vnd.github.v3+json" }
+    );
+    let prodSha = "";
+    if (prodR.status === 200) {
+      try { prodSha = JSON.parse(prodR.body.toString()).sha || ""; } catch(e) {}
+    }
+
+    // Skriv manifest.json = kopi av lab-manifest
+    const body = JSON.stringify({
+      message: "Godkjenn v" + labManifest.version + " til produksjon",
+      content: Buffer.from(JSON.stringify(labManifest, null, 2)).toString("base64"),
+      sha: prodSha || undefined
+    });
+
+    await new Promise(function(resolve, reject) {
+      const https = require("https");
+      const opts = {
+        hostname: "api.github.com",
+        path: "/repos/" + GITHUB_REPO + "/contents/manifest.json",
+        method: "PUT",
+        headers: {
+          "Authorization": "token " + GITHUB_TOKEN,
+          "Accept": "application/vnd.github.v3+json",
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(body),
+          "User-Agent": "EventsAdmin/" + APP_VERSION
+        }
+      };
+      const req2 = https.request(opts, function(r) {
+        const chunks = [];
+        r.on("data", function(c) { chunks.push(c); });
+        r.on("end", function() {
+          if (r.statusCode === 200 || r.statusCode === 201) resolve();
+          else {
+            let msg = "HTTP " + r.statusCode;
+            try { msg = JSON.parse(Buffer.concat(chunks).toString()).message || msg; } catch(e) {}
+            reject(new Error(msg));
+          }
+        });
+      });
+      req2.on("error", reject);
+      req2.write(body);
+      req2.end();
+    });
+
+    res.json({ ok: true, version: labManifest.version, message: "v" + labManifest.version + " er nå tilgjengelig for alle produksjonsinstanser!" });
+  } catch(e) {
+    console.error("[approve] Feil:", e.message);
+    res.status(500).json({ err: e.message });
   }
 });
 
@@ -2312,6 +2578,32 @@ app.get("/api/events/:id/registrations", auth, function(req, res) {
 });
 
 // ── Lottery API ──────────────────────────────────────────────────
+// Registrer deltaker til lotteri/konkurranse via fullskjerm-modus
+app.post("/api/events/:id/lottery/register", rateLimit(10, 60000), function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const i = events.findIndex(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Ikke funnet" });
+  const ev = events[i];
+  if (!ev.lottery || !ev.lottery.enabled) return res.status(400).json({ error: "Konkurranse ikke aktiv" });
+  const name = (req.body.name || "").trim().slice(0, 100);
+  const meta = (req.body.meta || "").trim().slice(0, 300);
+  if (!name) return res.status(400).json({ error: "Navn er påkrevd" });
+  if (!ev.registrations) ev.registrations = [];
+  // Unngå duplikater på navn (innen siste time)
+  const existing = ev.registrations.find(function(r) {
+    return r.name.toLowerCase() === name.toLowerCase() && !r.anonymized;
+  });
+  if (existing) return res.status(400).json({ error: "Du er allerede registrert!" });
+  const reg = {
+    id: uuid(), name, email: "", phone: "", meta,
+    registeredAt: new Date().toISOString(), lotteryEntry: true
+  };
+  ev.registrations.push(reg);
+  writeJSON(EVENTS_FILE, events);
+  broadcastEventUpdate(ev.department);
+  res.json({ ok: true, id: reg.id });
+});
+
 app.post("/api/events/:id/lottery/draw", auth, managerOrAdmin, function(req, res) {
   const events = readJSON(EVENTS_FILE);
   const i = events.findIndex(function(e) { return e.id === req.params.id; });
@@ -2328,9 +2620,11 @@ app.post("/api/events/:id/lottery/draw", auth, managerOrAdmin, function(req, res
   const draw = {
     regId:   winner.id,
     name:    winner.name,
+    meta:    winner.meta || "",
     drawnAt: new Date().toISOString(),
     drawnBy: req.session.user.email,
     prize:   ev.lottery.prize || "",
+    drawNum: (ev.lottery.winners || []).length + 1
   };
   if (!ev.lottery.winners) ev.lottery.winners = [];
   ev.lottery.winners.push(draw);
@@ -6248,8 +6542,11 @@ app.post("/api/inventar", auth, managerOrAdmin, function(req, res) {
   const item = {
     id: uuid(), navn: (req.body.navn||"").trim(),
     kategori: req.body.kategori||"annet",
-    antall: parseInt(req.body.antall)||1,
+    antall: parseInt(req.body.antall)||0,
+    perPakke: parseInt(req.body.perPakke)||1,
+    innkjopspris: req.body.innkjopspris != null ? (parseFloat(req.body.innkjopspris)||null) : null,
     beskrivelse: (req.body.beskrivelse||"").trim(),
+    bilde: req.body.bilde || null,
     department: deptId,
     usageCount: 0, createdAt: new Date().toISOString()
   };
@@ -6274,13 +6571,16 @@ app.put("/api/inventar/:id", auth, managerOrAdmin, function(req, res) {
       return res.status(403).json({ err: "Ingen tilgang til dette utstyret" });
   }
   items[idx] = Object.assign({}, item, {
-    navn:       (req.body.navn||item.navn).trim(),
-    kategori:   req.body.kategori   || item.kategori,
-    antall:     parseInt(req.body.antall) || item.antall,
-    beskrivelse:(req.body.beskrivelse||"").trim(),
-    department: user.role === "admin" && req.body.department !== undefined
-                  ? (req.body.department || null)
-                  : item.department,
+    navn:         (req.body.navn||item.navn).trim(),
+    kategori:     req.body.kategori    || item.kategori,
+    antall:       parseInt(req.body.antall) >= 0 ? parseInt(req.body.antall) : item.antall,
+    perPakke:     parseInt(req.body.perPakke)||item.perPakke||1,
+    innkjopspris: req.body.innkjopspris != null ? (parseFloat(req.body.innkjopspris)||null) : item.innkjopspris||null,
+    beskrivelse:  (req.body.beskrivelse||"").trim(),
+    bilde:        req.body.bilde !== undefined ? (req.body.bilde || null) : (item.bilde||null),
+    department:   user.role === "admin" && req.body.department !== undefined
+                    ? (req.body.department || null)
+                    : item.department,
   });
   if (req.body.pris !== undefined) items[idx].pris = parseFloat(req.body.pris) || 0;
   writeJSON(INVENTAR_FILE, items);
