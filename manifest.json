@@ -1,34 +1,24 @@
 {
-  "version": "1.0.0",
-  "released": "2026-03-20",
+  "version": "1.0.1",
+  "released": "2026-03-21",
   "changelog": [
-    "Første stabile versjon med full turplanlegger",
-    "Auto-splitting av lange ruter (Jessheim → Roma)",
-    "Stopp-forslag for alle dager i flerdagsturer",
-    "QR-bilde i gjestebok – last opp fra kamera eller galleri",
-    "Hotell-søk via Booking.com / Hotels.com / Trivago",
-    "Avstand i stedssøk – se km fra deg til hvert treff",
-    "Oppdateringssystem med SHA256-verifisering",
-    "Setup wizard med logo og fargeekstraksjon",
-    "Lyst og mørkt tema",
-    "GPX-eksport per dag eller total (ZIP for flerdagsturer)",
-    "Navigasjonsknapp til Apple Maps / Google Maps / Waze"
+    "v1.0.1"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.0/server.js",
-      "sha256": "94054effed20be15f1b545d2917b1ea828c16fcb0e7eeb90b62c3d1e25f10333"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.1/server.js",
+      "sha256": "cbd06b28b81fdb71a2cf6fbaf4c510796e20f977963e45b2794d5cde2deb4e30"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.0/index.html",
-      "sha256": "206c49d54ccac3810cee0ef5d3947c7699b148f7239047cd335e4c900746095b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.1/index.html",
+      "sha256": "112d77628f2089bfc149f5ab390716d3e722b99c4c082a30a54bd97fce5d6013"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.0/package.json",
-      "sha256": "11759c22f86d417c9f352a334da11a21498905bf947ae10c5401f165c2528df1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.1/package.json",
+      "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
 }
