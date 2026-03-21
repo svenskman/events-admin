@@ -1,23 +1,24 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.6",
   "released": "2026-03-21",
   "changelog": [
-    "v1.0.1"
+    "Diverse fikser.",
+    "Litt bedre lyst tema"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.1/server.js",
-      "sha256": "cbd06b28b81fdb71a2cf6fbaf4c510796e20f977963e45b2794d5cde2deb4e30"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.6/server.js",
+      "sha256": "a304e353a1e764ef28ce8fee188e20904cdd893bbcb1b309b2cd3eaad77b3191"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.1/index.html",
-      "sha256": "112d77628f2089bfc149f5ab390716d3e722b99c4c082a30a54bd97fce5d6013"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.6/index.html",
+      "sha256": "c9fa4faf84dd9ade949d4ea45d20f2de1fa7aa112a6ccd97beae21f60882dfd6"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.1/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.6/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
