@@ -1,25 +1,19 @@
 {
   "version": "1.0.1",
-  "released": "2026-03-20",
+  "released": "2026-03-21",
   "changelog": [
-    "Brukerveiledning: scrollbar tabmeny, ny Stand- og Oppdatering-fane",
-    "Stopp-forslag fungerer nå for alle dager (ikke bare dag 1)",
-    "Avstand vises i stedssøk (fargekodet grønn/gul/rød)",
-    "Oppmøte-felt er nå søkefelt med koordinater og 📍-indikator",
-    "Søkeresultat kan klikkes (onmousedown-fix)",
-    "CSP oppdatert: brouter.de og unpkg.com lagt til",
-    "Brukerveiledning og ønskeliste oppdatert"
+    "v1.0.1"
   ],
   "files": [
     {
       "name": "server.js",
       "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.1/server.js",
-      "sha256": "aacc6b40cb9cc6c3e72d26d0149bc06dd933dd26888aaec4c0331ab41b9fab92"
+      "sha256": "cbd06b28b81fdb71a2cf6fbaf4c510796e20f977963e45b2794d5cde2deb4e30"
     },
     {
       "name": "index.html",
       "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.1/index.html",
-      "sha256": "b33a2bc86fb445ab9031bf476d896b36ccc481a3f8c39a290d87506ef26de1c9"
+      "sha256": "112d77628f2089bfc149f5ab390716d3e722b99c4c082a30a54bd97fce5d6013"
     },
     {
       "name": "package.json",
