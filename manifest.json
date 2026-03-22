@@ -1,23 +1,23 @@
 {
-  "version": "1.0.17",
+  "version": "1.0.18",
   "released": "2026-03-22",
   "changelog": [
-    "v1.0.17"
+    "Fixed manager access to settings"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.17/server.js",
-      "sha256": "01247fbe959aea7f4cf9cdd8afe5702e41789cfa8351b7a800b67cb15138133b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.18/server.js",
+      "sha256": "9a451545b9e3514479e5fbd6dbfb87386f6b84752b4c58505f7ab8912977197a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.17/index.html",
-      "sha256": "41faa5bb148e4c61af652366820aeba7a68d74ffe952adfa8653f7815768f006"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.18/index.html",
+      "sha256": "0c2228e9fd1475022701757be15e69d8bc9c8998fdc723b5bc7239a848bd9e71"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.17/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.18/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
