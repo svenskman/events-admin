@@ -1,23 +1,23 @@
 {
-  "version": "1.0.16",
+  "version": "1.0.17",
   "released": "2026-03-22",
   "changelog": [
-    "Diverse sikkerhets tilltak och vask av gammal kode."
+    "v1.0.17"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.16/server.js",
-      "sha256": "e66183af1bbb5ea85a4ccb369cbf6aceb1628911a1a9283bc98f8b8ea4d1bca3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.17/server.js",
+      "sha256": "01247fbe959aea7f4cf9cdd8afe5702e41789cfa8351b7a800b67cb15138133b"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.16/index.html",
-      "sha256": "bbb228dc8039d0a0ca4ec0a503512b2dcca91081c4ab3cc3af1e24fab135d3dc"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.17/index.html",
+      "sha256": "41faa5bb148e4c61af652366820aeba7a68d74ffe952adfa8653f7815768f006"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.16/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.17/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
