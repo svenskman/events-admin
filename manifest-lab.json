@@ -1,23 +1,23 @@
 {
-  "version": "1.0.18",
+  "version": "1.0.19",
   "released": "2026-03-22",
   "changelog": [
-    "Fixed manager access to settings"
+    "Endring på AI turen med automatisk opplevelsemål och möjlighet att planera flera dagar."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.18/server.js",
-      "sha256": "9a451545b9e3514479e5fbd6dbfb87386f6b84752b4c58505f7ab8912977197a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.19/server.js",
+      "sha256": "eec2f658d51b5532f4ba42885270b6ba9cd25d61335cd54c2ea06814e14fb080"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.18/index.html",
-      "sha256": "0c2228e9fd1475022701757be15e69d8bc9c8998fdc723b5bc7239a848bd9e71"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.19/index.html",
+      "sha256": "cbcf00531e420eebc6ead3692014e4588c9fc91a72421ebcb647ffded8a3e56a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.18/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.19/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
