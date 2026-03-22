@@ -1,23 +1,23 @@
 {
-  "version": "1.0.13",
+  "version": "1.0.14",
   "released": "2026-03-22",
   "changelog": [
-    "v1.0.13"
+    "Personal knappen, och lite design på event."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.13/server.js",
-      "sha256": "6037f482cba05e7f34b111cecc962827422cc97cdf8c054950affb6d0dd7d829"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.14/server.js",
+      "sha256": "b0d830dec1111caf3417025044f459ab03771a7bffa681673367adc2807e4c94"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.13/index.html",
-      "sha256": "055bc31b1de6e8c9dd70bcd7674fba3088781e459b2e88828269954d6293861a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.14/index.html",
+      "sha256": "29008ab118ca22cbe073269daab7b00bb0cd3314e961d379c126e251907670f9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.13/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.14/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
