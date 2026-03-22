@@ -1,23 +1,23 @@
 {
-  "version": "1.0.12",
+  "version": "1.0.13",
   "released": "2026-03-22",
   "changelog": [
-    "Bättre hantering av färger i tema."
+    "v1.0.13"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.12/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.13/server.js",
       "sha256": "6037f482cba05e7f34b111cecc962827422cc97cdf8c054950affb6d0dd7d829"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.12/index.html",
-      "sha256": "ac5c4860f025d84214df373a2d9d65f62ffd1870207f1b190b252060163c7575"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.13/index.html",
+      "sha256": "055bc31b1de6e8c9dd70bcd7674fba3088781e459b2e88828269954d6293861a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.12/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.13/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
