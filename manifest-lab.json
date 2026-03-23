@@ -1,23 +1,23 @@
 {
-  "version": "1.0.22",
+  "version": "1.0.23",
   "released": "2026-03-23",
   "changelog": [
-    "Fikset QR kode"
+    "Oppdatering til Gjestebok."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.22/server.js",
-      "sha256": "6f9e1df031af2360fd108eaaee36fa5e258bd94e1b8030d27605d4334b62c554"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.23/server.js",
+      "sha256": "9bc8f057dc794b61e12730febf65f4c2eaf9b4cd438f5678348814eb0f05ef64"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.22/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.23/index.html",
       "sha256": "3989caa5f1cc417b7c81fa090d0ab59f00840a2ebb2a48313c246f6d04bb9b3e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.22/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.23/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
