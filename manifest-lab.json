@@ -1,23 +1,23 @@
 {
-  "version": "1.0.20",
+  "version": "1.0.21",
   "released": "2026-03-23",
   "changelog": [
-    "Ordnet småting i Romplan"
+    "Epost log problem"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.20/server.js",
-      "sha256": "eec2f658d51b5532f4ba42885270b6ba9cd25d61335cd54c2ea06814e14fb080"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.21/server.js",
+      "sha256": "5de10337101c9d3c2b001be3f3c93ed72cede619b8a4974d0a6c67943c4ea5fe"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.20/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.21/index.html",
       "sha256": "3989caa5f1cc417b7c81fa090d0ab59f00840a2ebb2a48313c246f6d04bb9b3e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.20/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.21/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
