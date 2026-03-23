@@ -1,23 +1,23 @@
 {
-  "version": "1.0.19",
-  "released": "2026-03-22",
+  "version": "1.0.20",
+  "released": "2026-03-23",
   "changelog": [
-    "Endring på AI turen med automatisk opplevelsemål och möjlighet att planera flera dagar."
+    "Ordnet småting i Romplan"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.19/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.20/server.js",
       "sha256": "eec2f658d51b5532f4ba42885270b6ba9cd25d61335cd54c2ea06814e14fb080"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.19/index.html",
-      "sha256": "cbcf00531e420eebc6ead3692014e4588c9fc91a72421ebcb647ffded8a3e56a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.20/index.html",
+      "sha256": "3989caa5f1cc417b7c81fa090d0ab59f00840a2ebb2a48313c246f6d04bb9b3e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.19/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.20/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
