@@ -1,23 +1,23 @@
 {
-  "version": "1.0.27",
-  "released": "2026-03-24",
+  "version": "1.0.28",
+  "released": "2026-03-26",
   "changelog": [
-    "v1.0.27"
+    "Justering på tidrapportering"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.27/server.js",
-      "sha256": "2765f61de91923c898872ce6ec909f4941f713c99e532ab29ea03011ba5af645"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.28/server.js",
+      "sha256": "36ea9fcaeffbc4c0256be569f3bc7cc5f54ef94e7f818976fceb0d69b55e9aa4"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.27/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.28/index.html",
       "sha256": "c94d83cf5431bca470ed80ab0eb1a016e4e33de4a9e1295ae6478095d61753d7"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.27/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.28/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
