@@ -1,23 +1,23 @@
 {
-  "version": "1.0.38",
+  "version": "1.0.39",
   "released": "2026-04-08",
   "changelog": [
-    "Uppdaterad Manual, wishlist och changelog"
+    "Bättring av lotteri på mobilen"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.38/server.js",
-      "sha256": "d01c08def1d3de235db9d72d31c39b1b2e3ec16950bd3ac60501a0f7c9f86184"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.39/server.js",
+      "sha256": "6811f59e7925269e555202899233f248b3426d3bcfb25389f6225b26f2bb8f88"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.38/index.html",
-      "sha256": "60e809a0cb5ff71269425d65ff380a41519b2405fe8c6203abfa3656d6a408ff"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.39/index.html",
+      "sha256": "15a7637f62b4b66339f674729b642853f11bd1c3c1dfbc2b2c41b4948b9e5aa3"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.38/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.39/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
