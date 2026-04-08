@@ -1,23 +1,23 @@
 {
-  "version": "1.0.34",
+  "version": "1.0.35",
   "released": "2026-04-08",
   "changelog": [
-    "v1.0.34"
+    "Oppdatering stor skjerm med automatik"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.34/server.js",
-      "sha256": "2683d9efabb8c2580eeebaf46f3d3a49d3a05aa5aea01a395970544a5b05510c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.35/server.js",
+      "sha256": "5e883d34cf3b89ccee04999164c690a8225b86bb9f7a32f2bb5e9ca707b50415"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.34/index.html",
-      "sha256": "3f30b04ccdbc4e1abbbd26c17fd1db348033dfd43f99f575c48c888f24df4d88"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.35/index.html",
+      "sha256": "dcd661fde6bc2b75283a43bf8a477a5e66309d0855cad46371abe0e6b2c8907c"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.34/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.35/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
