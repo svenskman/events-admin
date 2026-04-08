@@ -1,23 +1,23 @@
 {
-  "version": "1.0.33",
+  "version": "1.0.34",
   "released": "2026-04-08",
   "changelog": [
-    "Oppdatering av Publik skjerm med import av powerpoint"
+    "v1.0.34"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.33/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.34/server.js",
       "sha256": "2683d9efabb8c2580eeebaf46f3d3a49d3a05aa5aea01a395970544a5b05510c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.33/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.34/index.html",
       "sha256": "3f30b04ccdbc4e1abbbd26c17fd1db348033dfd43f99f575c48c888f24df4d88"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.33/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.34/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
