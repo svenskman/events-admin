@@ -1,23 +1,23 @@
 {
-  "version": "1.0.36",
+  "version": "1.0.37",
   "released": "2026-04-08",
   "changelog": [
-    "Sortering av events"
+    "Lotteri mail med QR kod"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.36/server.js",
-      "sha256": "5e883d34cf3b89ccee04999164c690a8225b86bb9f7a32f2bb5e9ca707b50415"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.37/server.js",
+      "sha256": "d01c08def1d3de235db9d72d31c39b1b2e3ec16950bd3ac60501a0f7c9f86184"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.36/index.html",
-      "sha256": "efcb5e2458bc6f7ec6a99ce3a97640a777c0bc8da5146629659564c0cf5d41fa"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.37/index.html",
+      "sha256": "6711b25fc6eeab8c33765ea28ecb1974649e153c06f5ebf27cd47932e5180ea1"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.36/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.37/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
