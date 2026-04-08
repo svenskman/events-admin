@@ -1,23 +1,23 @@
 {
-  "version": "1.0.39",
+  "version": "1.0.40",
   "released": "2026-04-08",
   "changelog": [
-    "Bättring av lotteri på mobilen"
+    "Premier kopplade mot inventarer"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.39/server.js",
-      "sha256": "6811f59e7925269e555202899233f248b3426d3bcfb25389f6225b26f2bb8f88"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.40/server.js",
+      "sha256": "0fd008ab8ff7c3cd033df2a73c9a1482d249279b50566586cc6d086a97a35840"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.39/index.html",
-      "sha256": "15a7637f62b4b66339f674729b642853f11bd1c3c1dfbc2b2c41b4948b9e5aa3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.40/index.html",
+      "sha256": "07bbc8f2dab07a433ff632e892707930acd02923bbfd81b505846f6b0ec50897"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.39/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.40/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
