@@ -1,23 +1,23 @@
 {
-  "version": "1.0.29",
+  "version": "1.0.30",
   "released": "2026-04-08",
   "changelog": [
-    "v1.0.29"
+    "Lotteri oppdateringer, Antal premier, minst antall deltakere, trekkning fra tid"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.29/server.js",
-      "sha256": "82c2d5ad6d472c4fc2ebfbb3b2003ef1c18958adc1fcc61eb3d61c93cec6cf2c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.30/server.js",
+      "sha256": "e13ee4db5fbf21f907b54b25fb26a378600fe42c31492c868a11c098a3e14ca0"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.29/index.html",
-      "sha256": "c94d83cf5431bca470ed80ab0eb1a016e4e33de4a9e1295ae6478095d61753d7"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.30/index.html",
+      "sha256": "2e7d0d7f43048d2b98a7e23037bfe15f0cf6df8c38dcbe0fa3692e643e06f408"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.29/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.30/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
