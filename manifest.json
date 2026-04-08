@@ -1,23 +1,23 @@
 {
-  "version": "1.0.31",
+  "version": "1.0.32",
   "released": "2026-04-08",
   "changelog": [
-    "Opprydding av lotteri... check av vinnare."
+    "Oppdatering av Publik skjerm"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.31/server.js",
-      "sha256": "e13ee4db5fbf21f907b54b25fb26a378600fe42c31492c868a11c098a3e14ca0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.32/server.js",
+      "sha256": "22c416a97fa6f43522a82aecc00c67e3659889561122a7201c6b75dfba38ac6e"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.31/index.html",
-      "sha256": "bb7fc5a0f4a05df0a61dbbe5173c995ba57225deaada0a0a635b04528cbf8857"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.32/index.html",
+      "sha256": "960269738256284d1c9a87d5f185d31e301438261b37794e7751dd1c393e3281"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.31/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.32/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
