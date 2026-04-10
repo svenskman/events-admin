@@ -1,23 +1,23 @@
 {
-  "version": "1.0.40",
-  "released": "2026-04-08",
+  "version": "1.0.41",
+  "released": "2026-04-10",
   "changelog": [
-    "Premier kopplade mot inventarer"
+    "Uppdatering Lotteri och presentation."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.40/server.js",
-      "sha256": "0fd008ab8ff7c3cd033df2a73c9a1482d249279b50566586cc6d086a97a35840"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.41/server.js",
+      "sha256": "7d8849796b707477063176e6dc194bbdcce6f1b9cb2c2974ad919ba2c902038d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.40/index.html",
-      "sha256": "07bbc8f2dab07a433ff632e892707930acd02923bbfd81b505846f6b0ec50897"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.41/index.html",
+      "sha256": "5d65d68d30edf0c0a1b4181d4fdf1a8482e4b24291552ba0c520fb5c78de302d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.40/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.41/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
