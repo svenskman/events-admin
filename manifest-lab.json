@@ -1,23 +1,23 @@
 {
-  "version": "1.0.42",
-  "released": "2026-04-10",
+  "version": "1.0.43",
+  "released": "2026-04-11",
   "changelog": [
-    "Mobil version, bättringar på presentationen"
+    "Bug i inventar vid lotteriet"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.42/server.js",
-      "sha256": "7a64dbf6292058b70513efca7a948ff90df174e5cdab7c4e08760830f4650594"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.43/server.js",
+      "sha256": "027be5217c85acec6022db7065755027e5be3c909badfa276a853fde0325ac21"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.42/index.html",
-      "sha256": "5d65d68d30edf0c0a1b4181d4fdf1a8482e4b24291552ba0c520fb5c78de302d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.43/index.html",
+      "sha256": "f5bf4fb387969c7c8d08eadd701d7b7eb388d4583535bdd7ac81a605bb95d95e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.42/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.43/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
