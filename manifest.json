@@ -1,23 +1,23 @@
 {
-  "version": "1.0.43",
+  "version": "1.0.44",
   "released": "2026-04-11",
   "changelog": [
-    "Bug i inventar vid lotteriet"
+    "Ändring av vinnar lista under presentation, uppdatering av schema design, timeout på bekreftelse."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.43/server.js",
-      "sha256": "027be5217c85acec6022db7065755027e5be3c909badfa276a853fde0325ac21"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.44/server.js",
+      "sha256": "3910ef62822eaf1fcd273eb142018796334b7c7b49905077a85ef1fa46cff11d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.43/index.html",
-      "sha256": "f5bf4fb387969c7c8d08eadd701d7b7eb388d4583535bdd7ac81a605bb95d95e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.44/index.html",
+      "sha256": "83561a29ee2d27979e940da097cb4a7384d147ccd3fbb67171f9695696d699fe"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.43/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.44/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
