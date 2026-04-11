@@ -1,23 +1,23 @@
 {
-  "version": "1.0.44",
+  "version": "1.0.45",
   "released": "2026-04-11",
   "changelog": [
-    "Ändring av vinnar lista under presentation, uppdatering av schema design, timeout på bekreftelse."
+    "Fixat tema."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.44/server.js",
-      "sha256": "3910ef62822eaf1fcd273eb142018796334b7c7b49905077a85ef1fa46cff11d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.45/server.js",
+      "sha256": "b28014879a2c0db5712007c6a6c07348e4c3355845bd1e2087321c65f9735066"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.44/index.html",
-      "sha256": "83561a29ee2d27979e940da097cb4a7384d147ccd3fbb67171f9695696d699fe"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.45/index.html",
+      "sha256": "28b8c11ebaf31bbcad3c76d60f8a50676f4bb61689100b4e1169f3e743c2555d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.44/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.45/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
