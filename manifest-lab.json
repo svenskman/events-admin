@@ -1,23 +1,23 @@
 {
-  "version": "1.0.45",
-  "released": "2026-04-11",
+  "version": "1.0.46",
+  "released": "2026-04-12",
   "changelog": [
-    "Fixat tema."
+    "Språk stöd, Norsk, svensk och engelsk."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.45/server.js",
-      "sha256": "b28014879a2c0db5712007c6a6c07348e4c3355845bd1e2087321c65f9735066"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.46/server.js",
+      "sha256": "f7b9ba5c3571542c89622731015b51cff4432a07883c7736fb8491e1f3619f64"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.45/index.html",
-      "sha256": "28b8c11ebaf31bbcad3c76d60f8a50676f4bb61689100b4e1169f3e743c2555d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.46/index.html",
+      "sha256": "b3958f1ab62a6a5576f3efa28f0bc3fd6c474edb3dd848baf19cec0027329fe8"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.45/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.46/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
