@@ -1,23 +1,23 @@
 {
-  "version": "1.0.46",
-  "released": "2026-04-12",
+  "version": "1.0.47",
+  "released": "2026-04-14",
   "changelog": [
-    "Språk stöd, Norsk, svensk och engelsk."
+    "Mail maler, standard sida på non-public"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.46/server.js",
-      "sha256": "f7b9ba5c3571542c89622731015b51cff4432a07883c7736fb8491e1f3619f64"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.47/server.js",
+      "sha256": "e1faeeaf4d2dbf0560c7727adfdd65e2e5cf62139e92cc25fc444dbc4843feb0"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.46/index.html",
-      "sha256": "b3958f1ab62a6a5576f3efa28f0bc3fd6c474edb3dd848baf19cec0027329fe8"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.47/index.html",
+      "sha256": "b29677c8b7bf4d49cfb6d6327f1bc7dbda5ccde3e015895f35fc961d2996b33f"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.46/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.47/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
