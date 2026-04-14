@@ -1,23 +1,23 @@
 {
-  "version": "1.0.48",
+  "version": "1.0.49",
   "released": "2026-04-14",
   "changelog": [
-    "Gruppeleder tilgang"
+    "Fortsättning på grupp tillgångar"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.48/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.49/server.js",
       "sha256": "909845baa936da14e08b38d2e93b546eb82eeb10b1e3b203f398196ac50a6e1d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.48/index.html",
-      "sha256": "ebdfbeeaf72fa2f44c9b0fbf18c31ac890fc9372501efcd1bddfe0b11f0926c9"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.49/index.html",
+      "sha256": "97b993a865a3486ef451b054936d1519df7d354d40bba99375cc4bf51897ce80"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.48/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.49/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
