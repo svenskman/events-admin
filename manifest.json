@@ -1,23 +1,23 @@
 {
-  "version": "1.0.49",
+  "version": "1.0.50",
   "released": "2026-04-14",
   "changelog": [
-    "Fortsättning på grupp tillgångar"
+    "Cleanup Volonteers"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.49/server.js",
-      "sha256": "909845baa936da14e08b38d2e93b546eb82eeb10b1e3b203f398196ac50a6e1d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.50/server.js",
+      "sha256": "e961e953a2da3b2a7f747f0a88899fcbdb3097320ea8018abdde2855676443cc"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.49/index.html",
-      "sha256": "97b993a865a3486ef451b054936d1519df7d354d40bba99375cc4bf51897ce80"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.50/index.html",
+      "sha256": "83b900494d88db04bf7ef7b8a7157ba05746d41011d4434a583458d5fbc2fa81"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.49/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.50/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
