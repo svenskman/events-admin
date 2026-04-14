@@ -1,23 +1,23 @@
 {
-  "version": "1.0.50",
+  "version": "1.0.51",
   "released": "2026-04-14",
   "changelog": [
-    "Cleanup Volonteers"
+    "Mail maler, tillgangstyring."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.50/server.js",
-      "sha256": "e961e953a2da3b2a7f747f0a88899fcbdb3097320ea8018abdde2855676443cc"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.51/server.js",
+      "sha256": "2badff4924a51c0569909226325b93862ef80b3a44a10d30f37518ebd04f7ad1"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.50/index.html",
-      "sha256": "83b900494d88db04bf7ef7b8a7157ba05746d41011d4434a583458d5fbc2fa81"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.51/index.html",
+      "sha256": "a9b583f6a9243b198070cc7c3eb7ce3cad5d069a65fdbabdf5807aedafc089ca"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.50/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.51/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
