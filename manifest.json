@@ -1,23 +1,23 @@
 {
-  "version": "1.0.51",
-  "released": "2026-04-14",
+  "version": "1.0.52",
+  "released": "2026-04-15",
   "changelog": [
-    "Mail maler, tillgangstyring."
+    "Justering på frivillig funktionen, och tidblokker"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.51/server.js",
-      "sha256": "2badff4924a51c0569909226325b93862ef80b3a44a10d30f37518ebd04f7ad1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.52/server.js",
+      "sha256": "921e7b00b3e770a429274b92455c6262b4b1707a96191fe8df97d406d57e8740"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.51/index.html",
-      "sha256": "a9b583f6a9243b198070cc7c3eb7ce3cad5d069a65fdbabdf5807aedafc089ca"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.52/index.html",
+      "sha256": "cb7a49c850a5d3811ca7ca75ef69aa38194270da95e683b864288299c0636a04"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.51/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.52/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
