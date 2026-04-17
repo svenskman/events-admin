@@ -1,23 +1,23 @@
 {
-  "version": "1.0.54",
+  "version": "1.0.55",
   "released": "2026-04-17",
   "changelog": [
-    "Stor uppdatering. TV skärm Tillgång visning."
+    "TV visning + Manual uppdatering"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.54/server.js",
-      "sha256": "59af6b331d73df642a1f7c184351fe65ea0d65f01212fdfcea518807d5fe638c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.55/server.js",
+      "sha256": "83a2c372343be7e4a3fa9e67c6b0c1e1ebc51beb0d5ee42c80cac14a0485dc36"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.54/index.html",
-      "sha256": "43fb99099f564555ee53db25cf500b5322cb1d2ad33cbd32d15fe0c4f7995697"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.55/index.html",
+      "sha256": "16eba030562c5cecb2eb367bad443c698cb6c241233d3659b77fcf22ca1b5ea4"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.54/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.55/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
