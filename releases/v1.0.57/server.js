@@ -10806,6 +10806,18 @@ body{background:#0a0a0a;color:#fff;font-family:"Helvetica Neue",Arial,sans-serif
 <script>
 var DEPT_ID = ${JSON.stringify(deptId)};
 var ACCENT  = ${JSON.stringify(accent)};
+// Compute whether text on ACCENT background should be dark or light
+function accentTextColor(hex) {
+  hex = hex.replace("#","");
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  var r = parseInt(hex.slice(0,2),16);
+  var g = parseInt(hex.slice(2,4),16);
+  var b = parseInt(hex.slice(4,6),16);
+  // Perceived luminance
+  var lum = 0.299*r + 0.587*g + 0.114*b;
+  return lum > 140 ? "#111111" : "#ffffff";
+}
+var ACCENT_TEXT = accentTextColor(ACCENT);
 
 var state = { mode:"events", slides:[], slideInterval:15, showEvents:true, upcoming:[], ticker:"", eventCount:5 };
 var slideIdx = 0;
@@ -11071,7 +11083,7 @@ function showEventCards(upcoming) {
         ? '<img class="ev-thumb" src="' + esc(ev.image) + '" loading="lazy" style="' + (ongoing ? 'border-color:' + ACCENT + ';box-shadow:0 0 12px ' + ACCENT + '44' : '') + '"/>'
         : '<div class="ev-thumb-placeholder" style="background:' + style.bg + '">' + (ev.eventType==="stand"?"🟢":ev.eventType==="kurs"?"🔵":ev.eventType==="tur"?"🟣":"🟡") + '</div>';
       var ongoingBadge = ongoing
-        ? '<span style="display:inline-flex;align-items:center;gap:4px;background:' + ACCENT + ';color:#111;font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px;margin-left:.5rem"><span style="width:6px;height:6px;border-radius:50%;background:#111;animation:tvpulse 1.2s ease-in-out infinite;display:inline-block"></span>Pågår nå</span>'
+        ? '<span style="display:inline-flex;align-items:center;gap:4px;background:' + ACCENT + ';color:' + ACCENT_TEXT + ';font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px;margin-left:.5rem"><span style="width:6px;height:6px;border-radius:50%;background:' + ACCENT_TEXT + ';animation:tvpulse 1.2s ease-in-out infinite;display:inline-block"></span>Pågår nå</span>'
         : '';
       var cardBorder = ongoing ? 'border-left:4px solid ' + ACCENT + ';padding-left:.75rem;' : '';
       return '<div class="ev-card-tv' + (isSingle?" ev-single":"") + (ongoing?" ev-ongoing":"") + '" style="' + cardBorder + '">'
