@@ -2,13 +2,13 @@
   "version": "1.0.57",
   "released": "2026-04-17",
   "changelog": [
-    "Pågående aktivitet på tv."
+    "Pågående aktivitet visning."
   ],
   "files": [
     {
       "name": "server.js",
       "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.57/server.js",
-      "sha256": "b44530012f920d836ddf33cf8a3f72075a079be4cc2d9960b24a751fd21b0237"
+      "sha256": "f7b054b76ee82bd7c499602457e5cfe9ba093c017fff0887e2874b63cba95312"
     },
     {
       "name": "index.html",
