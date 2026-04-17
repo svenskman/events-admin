@@ -1,23 +1,23 @@
 {
-  "version": "1.0.56",
+  "version": "1.0.57",
   "released": "2026-04-17",
   "changelog": [
-    "Massa ändringar med rättigheter med roller. Och presentation på TV."
+    "Pågående aktivitet på tv."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.56/server.js",
-      "sha256": "5548fa344c152fdec3317a7c83e3cbd5d6a1244aa3efff0c9a274012cfd02299"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.57/server.js",
+      "sha256": "b44530012f920d836ddf33cf8a3f72075a079be4cc2d9960b24a751fd21b0237"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.56/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.57/index.html",
       "sha256": "36a9300089865dd5407c84c49980ea28f76a173e686b4a25fa74b4ab5065db31"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.56/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.57/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
