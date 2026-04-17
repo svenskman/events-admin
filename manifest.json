@@ -1,23 +1,23 @@
 {
-  "version": "1.0.52",
-  "released": "2026-04-15",
+  "version": "1.0.53",
+  "released": "2026-04-17",
   "changelog": [
-    "Justering på frivillig funktionen, och tidblokker"
+    "Oppdatering av översikt sidan. www och root"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.52/server.js",
-      "sha256": "921e7b00b3e770a429274b92455c6262b4b1707a96191fe8df97d406d57e8740"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.53/server.js",
+      "sha256": "01894714009df4f508e3f6e4fea8cf1f716882956582c97d88c2f39b59901619"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.52/index.html",
-      "sha256": "cb7a49c850a5d3811ca7ca75ef69aa38194270da95e683b864288299c0636a04"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.53/index.html",
+      "sha256": "baf2cd5e4f95fad0c8fce41706bd73ec6569b11cf39774772e43157737f55eb1"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.52/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.53/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
