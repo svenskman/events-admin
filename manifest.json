@@ -1,23 +1,23 @@
 {
-  "version": "1.0.57",
-  "released": "2026-04-17",
+  "version": "1.0.58",
+  "released": "2026-04-18",
   "changelog": [
-    "Pågående aktivitet visning."
+    "TV oppdatering, eventlista"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.57/server.js",
-      "sha256": "f7b054b76ee82bd7c499602457e5cfe9ba093c017fff0887e2874b63cba95312"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.58/server.js",
+      "sha256": "d1b36b388f69a1186f703ec91941baf83d36d1b68fa7777ccb9b6c04fbd8ff4d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.57/index.html",
-      "sha256": "36a9300089865dd5407c84c49980ea28f76a173e686b4a25fa74b4ab5065db31"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.58/index.html",
+      "sha256": "08a6f6e0d2d78fd6fc79efc743faef37d0f743dd0bd2347815ff7b405465e692"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.57/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.58/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
