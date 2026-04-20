@@ -1,23 +1,23 @@
 {
-  "version": "1.0.62",
+  "version": "1.0.63",
   "released": "2026-04-20",
   "changelog": [
-    "Tid justering"
+    "Justering på TV med farger"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.62/server.js",
-      "sha256": "95b35aa825d80787fa0157535f79daa750eb9158a8a292feeb2d52f1f3912279"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.63/server.js",
+      "sha256": "77167678772081230824ba0e6d51b7b13d37c6ebd259ca80066b39cf5ed3fd92"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.62/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.63/index.html",
       "sha256": "cee7ed7ca56b4a791c79e3cce12aac183902109fe1907a9a488c9f3dc4206cb5"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.62/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.63/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
