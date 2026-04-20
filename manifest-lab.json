@@ -1,23 +1,23 @@
 {
-  "version": "1.0.63",
+  "version": "1.0.64",
   "released": "2026-04-20",
   "changelog": [
-    "Justering på TV med farger"
+    "Event Bild hantering i TV"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.63/server.js",
-      "sha256": "77167678772081230824ba0e6d51b7b13d37c6ebd259ca80066b39cf5ed3fd92"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.64/server.js",
+      "sha256": "d12dfbd287ca2b53487da61160f3f22239ea1c17b66b6701a17ff1906783e79e"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.63/index.html",
-      "sha256": "cee7ed7ca56b4a791c79e3cce12aac183902109fe1907a9a488c9f3dc4206cb5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.64/index.html",
+      "sha256": "d39c52fbac7f4c24654d143a0ac110a24c9ae7d703faa19fd944461bb20c48b4"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.63/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.64/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
