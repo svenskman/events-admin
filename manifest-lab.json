@@ -1,23 +1,23 @@
 {
-  "version": "1.0.60",
-  "released": "2026-04-19",
+  "version": "1.0.61",
+  "released": "2026-04-20",
   "changelog": [
-    "Rättelser på TV"
+    "Ny layout på TV"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.60/server.js",
-      "sha256": "ae6623a9eef5d8e482cf0a8d502978c1ada510b703c63f030f488f9265656214"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.61/server.js",
+      "sha256": "1eafb943ad877f39a3d3ca65e49caaf2936f581f752cc06ef37f7a4e7ac77df4"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.60/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.61/index.html",
       "sha256": "cee7ed7ca56b4a791c79e3cce12aac183902109fe1907a9a488c9f3dc4206cb5"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.60/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.61/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
