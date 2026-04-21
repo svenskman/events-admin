@@ -1,23 +1,23 @@
 {
-  "version": "1.0.66",
+  "version": "1.0.67",
   "released": "2026-04-21",
   "changelog": [
-    "Fix på sikkerhet och tv"
+    "v1.0.67"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.66/server.js",
-      "sha256": "62483cb2cf37599e3fec210daca5591dff8f99de3eb6c06f7a3b20dbef009fe8"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.67/server.js",
+      "sha256": "23f770d6cabc87398742abbd02d61734726ac6b0a3f3d6c619cfdf5540c233e4"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.66/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.67/index.html",
       "sha256": "a4d9cf7ee334bf6fda2f747bbd0ddf73f31d1edc18e35c6357736db859ca5524"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.66/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.67/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
