@@ -1,23 +1,23 @@
 {
-  "version": "1.0.69",
+  "version": "1.0.70",
   "released": "2026-04-21",
   "changelog": [
-    "Problem med hidden på tv-events."
+    "Bugfix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.69/server.js",
-      "sha256": "5dba32564763d7e157db2e11075e76f645f928356e3caf943ecfba93de21a237"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.70/server.js",
+      "sha256": "e93d0427c9316bdce585e941105f02cf4d33ecae461f0deb3f561ae1ec34e024"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.69/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.70/index.html",
       "sha256": "95d8ca9bda75a566d6ff2ff99ceaad54d720ad488e401ee281e51bc50681ad74"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.69/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.70/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
