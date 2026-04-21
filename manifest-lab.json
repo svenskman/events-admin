@@ -1,23 +1,23 @@
 {
-  "version": "1.0.75",
+  "version": "1.0.76",
   "released": "2026-04-21",
   "changelog": [
-    "v1.0.75"
+    "Print från årshjulet"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.75/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.76/server.js",
       "sha256": "1a68dd503204086b9c592460a37835b1285d9aa01fedb5e665d752183f209424"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.75/index.html",
-      "sha256": "4691b2bc55de324fa3907693d25c07d2d4b6e92bad6074f6d9212f4ea0d87a18"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.76/index.html",
+      "sha256": "24e87d0dcbeb04ecf5806c84a2ddf5c00a485f4c5c3e4db552acf7de5e316e58"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.75/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.76/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
