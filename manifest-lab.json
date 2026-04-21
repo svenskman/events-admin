@@ -1,23 +1,23 @@
 {
-  "version": "1.0.64",
-  "released": "2026-04-20",
+  "version": "1.0.65",
+  "released": "2026-04-21",
   "changelog": [
-    "Event Bild hantering i TV"
+    "Sikkerhets patch"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.64/server.js",
-      "sha256": "d12dfbd287ca2b53487da61160f3f22239ea1c17b66b6701a17ff1906783e79e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.65/server.js",
+      "sha256": "0b6918cc2b6747eb3fd06df52698c053856d60ec1b35a1b540a2eca50ab78340"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.64/index.html",
-      "sha256": "d39c52fbac7f4c24654d143a0ac110a24c9ae7d703faa19fd944461bb20c48b4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.65/index.html",
+      "sha256": "71ac1a08c40609917c20523e70d7a28c29278069fd3c4dcc36498be7408ed284"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.64/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.65/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
