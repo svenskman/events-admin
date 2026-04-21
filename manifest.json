@@ -1,23 +1,23 @@
 {
-  "version": "1.0.77",
+  "version": "1.0.78",
   "released": "2026-04-21",
   "changelog": [
-    "Uppdaterad Manual"
+    "Site med QR"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.77/server.js",
-      "sha256": "1a68dd503204086b9c592460a37835b1285d9aa01fedb5e665d752183f209424"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.78/server.js",
+      "sha256": "a355dcaa9506e14b0359da490d17c09a05997e95a3809258fea3e548271bdaae"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.77/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.78/index.html",
       "sha256": "f3cf28ae90c15002feda0f50fc473b682123f4e0f58466345a8b8fa685515cc2"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.77/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.78/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
