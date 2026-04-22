@@ -1,23 +1,23 @@
 {
-  "version": "1.0.78",
-  "released": "2026-04-21",
+  "version": "1.0.79",
+  "released": "2026-04-22",
   "changelog": [
-    "Site med QR"
+    "Gästbok media till TV"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.78/server.js",
-      "sha256": "a355dcaa9506e14b0359da490d17c09a05997e95a3809258fea3e548271bdaae"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.79/server.js",
+      "sha256": "d25c62c746ee13550558f712453e830dd476e12981406323980e8668cb040998"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.78/index.html",
-      "sha256": "f3cf28ae90c15002feda0f50fc473b682123f4e0f58466345a8b8fa685515cc2"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.79/index.html",
+      "sha256": "8839b8fb61c5a133445bdd3ee6cb621a6856c679032bc6f78f9b88d1c928f201"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.78/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.79/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
