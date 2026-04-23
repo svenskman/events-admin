@@ -1,23 +1,23 @@
 {
-  "version": "1.0.84",
+  "version": "1.0.85",
   "released": "2026-04-23",
   "changelog": [
-    "Gjestbok QR kode fix"
+    "Farge adminisrasjon"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.84/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.85/server.js",
       "sha256": "7483ed914b336e2c5a80c4351fe7d30bf1f00e1a53cabda6f0067601db797032"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.84/index.html",
-      "sha256": "352e2ae3a6285ad38eb93c948fd360c4987930b5e565eac935511d43b55d9478"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.85/index.html",
+      "sha256": "6cfb45c730e497e69189d1bed1f3d6d437124deb0778f50f8bf62acdcf4e8779"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.84/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.85/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
