@@ -1,23 +1,23 @@
 {
-  "version": "1.0.83",
-  "released": "2026-04-22",
+  "version": "1.0.84",
+  "released": "2026-04-23",
   "changelog": [
-    "Gjestbok bug"
+    "Gjestbok QR kode fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.83/server.js",
-      "sha256": "141425f1cd1041a98a6be4e2748b2e054b7a19fd96b4845aca704fbf712e78c1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.84/server.js",
+      "sha256": "7483ed914b336e2c5a80c4351fe7d30bf1f00e1a53cabda6f0067601db797032"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.83/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.84/index.html",
       "sha256": "352e2ae3a6285ad38eb93c948fd360c4987930b5e565eac935511d43b55d9478"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.83/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.84/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
