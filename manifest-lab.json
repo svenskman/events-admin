@@ -1,23 +1,23 @@
 {
-  "version": "1.0.90",
+  "version": "1.0.91",
   "released": "2026-04-24",
   "changelog": [
-    "Light mode rättelser"
+    "Theme bugs"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.90/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.91/server.js",
       "sha256": "81bfdbfff6b722250c61d5cb4705668fbe1d6539d692356451ea4395816e8df5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.90/index.html",
-      "sha256": "bbe753c95d83c646cfd18a5ab895bdadf149702ac619eec4fc96a490d34b1026"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.91/index.html",
+      "sha256": "9e475572748fea0c6ce9af4407fb89c86bdd9b702e24c1b89fb8fd2984639020"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.90/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.91/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
