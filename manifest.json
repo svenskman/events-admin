@@ -1,23 +1,23 @@
 {
-  "version": "1.0.86",
+  "version": "1.0.87",
   "released": "2026-04-24",
   "changelog": [
-    "Designprofil justering."
+    "Design Import"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.86/server.js",
-      "sha256": "7483ed914b336e2c5a80c4351fe7d30bf1f00e1a53cabda6f0067601db797032"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.87/server.js",
+      "sha256": "20be58a1f43ed213ea64149455825dc3a23e870457688aef7111667a81b58e27"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.86/index.html",
-      "sha256": "29f52537b8274571ddb1ed8f1ffbe91245dda4d192f954b77c0224f5237a3678"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.87/index.html",
+      "sha256": "a159e726dd0e5e8986b0af514c4eb76e07caf6cd651101d94a7be5e9cf35b2c6"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.86/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.87/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
