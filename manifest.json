@@ -1,23 +1,23 @@
 {
-  "version": "1.0.85",
-  "released": "2026-04-23",
+  "version": "1.0.86",
+  "released": "2026-04-24",
   "changelog": [
-    "Farge adminisrasjon"
+    "Designprofil justering."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.85/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.86/server.js",
       "sha256": "7483ed914b336e2c5a80c4351fe7d30bf1f00e1a53cabda6f0067601db797032"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.85/index.html",
-      "sha256": "6cfb45c730e497e69189d1bed1f3d6d437124deb0778f50f8bf62acdcf4e8779"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.86/index.html",
+      "sha256": "29f52537b8274571ddb1ed8f1ffbe91245dda4d192f954b77c0224f5237a3678"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.85/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.86/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
