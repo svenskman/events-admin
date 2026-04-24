@@ -1,23 +1,23 @@
 {
-  "version": "1.0.88",
+  "version": "1.0.89",
   "released": "2026-04-24",
   "changelog": [
-    "Design justering / type presentasjon"
+    "Light theme bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.88/server.js",
-      "sha256": "d974df02f852d91bc5e1f05894d1f9cd1b880942e9f3c1bdb4a40e34fa41aec5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.89/server.js",
+      "sha256": "81bfdbfff6b722250c61d5cb4705668fbe1d6539d692356451ea4395816e8df5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.88/index.html",
-      "sha256": "dbd77eec853dab2fd9135efb8637a1fa23ff9e9564816ea87e5745859d2e09b8"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.89/index.html",
+      "sha256": "8222a45d231449c41d64848ed2578776bbba1f4851f4c26462d17adc1a66eafe"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.88/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.89/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
