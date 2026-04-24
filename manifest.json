@@ -1,23 +1,23 @@
 {
-  "version": "1.0.93",
+  "version": "1.0.94",
   "released": "2026-04-24",
   "changelog": [
-    "Darkmode bugs"
+    "Frivillig checkin bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.93/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.94/server.js",
       "sha256": "81bfdbfff6b722250c61d5cb4705668fbe1d6539d692356451ea4395816e8df5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.93/index.html",
-      "sha256": "e49a884989a0346f3d64cc6b9bdb752d72dc88e6dc5a42ae9f9496621d92509e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.94/index.html",
+      "sha256": "9f54f0070efd6ef089969f7561cc6751b0b734146f2fba46e7b11d8ee826ec72"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.93/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.94/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
