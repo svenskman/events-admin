@@ -1,23 +1,23 @@
 {
-  "version": "1.0.91",
+  "version": "1.0.92",
   "released": "2026-04-24",
   "changelog": [
-    "Theme bugs"
+    "FavIcon fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.91/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.92/server.js",
       "sha256": "81bfdbfff6b722250c61d5cb4705668fbe1d6539d692356451ea4395816e8df5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.91/index.html",
-      "sha256": "9e475572748fea0c6ce9af4407fb89c86bdd9b702e24c1b89fb8fd2984639020"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.92/index.html",
+      "sha256": "f2072caaa34d73f01d85a84b37e218d9f7be9113238c252bb8830434922f987d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.91/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.92/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
