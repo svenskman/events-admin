@@ -1,23 +1,23 @@
 {
-  "version": "1.0.98",
+  "version": "1.0.99",
   "released": "2026-04-24",
   "changelog": [
-    "Personal knapp bug"
+    "Checkin bug på events"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.98/server.js",
-      "sha256": "05636f6181f4f3856deef7c98b7f19280f6cdf2a50d7bcd7bb975794d1fbcdca"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.99/server.js",
+      "sha256": "e02dfa25fb44effbeae4da9440b82550494e37538f8a87014793f3a4cf5664bb"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.98/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.99/index.html",
       "sha256": "9f54f0070efd6ef089969f7561cc6751b0b734146f2fba46e7b11d8ee826ec72"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.98/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.99/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
