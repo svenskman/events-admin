@@ -1,23 +1,23 @@
 {
-  "version": "1.0.92",
+  "version": "1.0.93",
   "released": "2026-04-24",
   "changelog": [
-    "FavIcon fix"
+    "Darkmode bugs"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.92/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.93/server.js",
       "sha256": "81bfdbfff6b722250c61d5cb4705668fbe1d6539d692356451ea4395816e8df5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.92/index.html",
-      "sha256": "f2072caaa34d73f01d85a84b37e218d9f7be9113238c252bb8830434922f987d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.93/index.html",
+      "sha256": "e49a884989a0346f3d64cc6b9bdb752d72dc88e6dc5a42ae9f9496621d92509e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.92/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.93/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
