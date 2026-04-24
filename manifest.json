@@ -1,23 +1,23 @@
 {
-  "version": "1.0.96",
+  "version": "1.0.97",
   "released": "2026-04-24",
   "changelog": [
-    "Språk Bug"
+    "Personal knapp"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.96/server.js",
-      "sha256": "934039d8fd16c70eff6397fb00c4b677661bd88b67d8944e2a27834497c2c131"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.97/server.js",
+      "sha256": "b19006a942e018fd598f19699b483236348d37723dc72f43538f879b4611ee82"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.96/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.97/index.html",
       "sha256": "9f54f0070efd6ef089969f7561cc6751b0b734146f2fba46e7b11d8ee826ec72"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.96/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.97/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
