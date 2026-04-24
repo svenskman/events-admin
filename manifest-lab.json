@@ -1,23 +1,23 @@
 {
-  "version": "1.0.94",
+  "version": "1.0.95",
   "released": "2026-04-24",
   "changelog": [
-    "Frivillig checkin bug"
+    "Bug fixed"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.94/server.js",
-      "sha256": "81bfdbfff6b722250c61d5cb4705668fbe1d6539d692356451ea4395816e8df5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.95/server.js",
+      "sha256": "33229f97f5a501fbcbfa2803d50d56b5fadde1c368428b8144377a8e97f1f344"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.94/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.95/index.html",
       "sha256": "9f54f0070efd6ef089969f7561cc6751b0b734146f2fba46e7b11d8ee826ec72"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.94/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.95/package.json",
       "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
     }
   ]
