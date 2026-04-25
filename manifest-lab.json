@@ -1,23 +1,23 @@
 {
-  "version": "1.0.101",
+  "version": "1.0.102",
   "released": "2026-04-25",
   "changelog": [
-    "Watchdog fix"
+    "Kurs del påmelding"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.101/server.js",
-      "sha256": "77d7bf2ec11a5989a19cc1c687eee4e27e12f210c5f5c4ce517844869d518909"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.102/server.js",
+      "sha256": "ec0d28d8ab88c6c2ac0581fa3bcc7c762b3561a80241089f809f5ef0a473b91a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.101/index.html",
-      "sha256": "6abc275ed4c9ea3a8e65dce03ea8a785147990791fd654fa727d8a03e0acd1f4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.102/index.html",
+      "sha256": "556650c90cf790212247b8d6fd3be11d96d717e0e77c65625945e9ecaaa7d684"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.101/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.102/package.json",
       "sha256": "e5487ee9bedd46c9a954a0d6a61c389ee8e412a9f5183debd96540472ea7591e"
     }
   ]
