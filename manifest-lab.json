@@ -1,23 +1,23 @@
 {
-  "version": "1.0.110",
+  "version": "1.0.111",
   "released": "2026-04-25",
   "changelog": [
-    "Rekonstruktion av Turplanläggaren"
+    "v1.0.111"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.110/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.111/server.js",
       "sha256": "46e123f09ea6f2166f7600b1c8e8e52133effe1ef50e357d7278c55c0d5ef0f4"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.110/index.html",
-      "sha256": "cc07f62cb8ba2714189a88c5010182ac17038ada148b7b5a7e441bd46d7279d4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.111/index.html",
+      "sha256": "861162ed34bb7989e2688062dc460dc3cc3f984aa33737bbe7c30853806dcc96"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.110/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.111/package.json",
       "sha256": "e5487ee9bedd46c9a954a0d6a61c389ee8e412a9f5183debd96540472ea7591e"
     }
   ]
