@@ -1,24 +1,24 @@
 {
-  "version": "1.0.100",
+  "version": "1.0.101",
   "released": "2026-04-25",
   "changelog": [
-    "Designprofil fix"
+    "Watchdog fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.100/server.js",
-      "sha256": "5e39322f04796e9550e69994619c8abd2ba76bb976691ed0536a108939e7467f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.101/server.js",
+      "sha256": "77d7bf2ec11a5989a19cc1c687eee4e27e12f210c5f5c4ce517844869d518909"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.100/index.html",
-      "sha256": "a1e76b5370b441232e694dd4b2a131df6541ea5cdb4283151b37b9f9dd4c6fe1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.101/index.html",
+      "sha256": "6abc275ed4c9ea3a8e65dce03ea8a785147990791fd654fa727d8a03e0acd1f4"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.100/package.json",
-      "sha256": "7e562d9099b02172f62fbcdf35ee588527f31e523b42a299c7c83c9a46703507"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.101/package.json",
+      "sha256": "e5487ee9bedd46c9a954a0d6a61c389ee8e412a9f5183debd96540472ea7591e"
     }
   ]
 }
