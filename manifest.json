@@ -1,23 +1,23 @@
 {
-  "version": "1.0.113",
+  "version": "1.0.114",
   "released": "2026-04-25",
   "changelog": [
-    "Turplan oppdatering"
+    "Public bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.113/server.js",
-      "sha256": "a773ef216d288629993a00954ffd7a58c0f7a600f0493add974091b70db04c6d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.114/server.js",
+      "sha256": "cbb1c7d96a6905379d698ec51973e57703a1aa4213e6bcd31f27d4e74a384559"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.113/index.html",
-      "sha256": "70059497fd2db10ed1e950fa92f86a601a097efcae13570d07f9fce406670db4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.114/index.html",
+      "sha256": "85a6dc6f04c713ca2e0b58e23d93c1c2e79ecba77b659d8bac4ee6433029b225"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.113/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.114/package.json",
       "sha256": "e5487ee9bedd46c9a954a0d6a61c389ee8e412a9f5183debd96540472ea7591e"
     }
   ]
