@@ -1,23 +1,23 @@
 {
-  "version": "1.0.115",
+  "version": "1.0.116",
   "released": "2026-04-26",
   "changelog": [
-    "Kartvy Event"
+    "Kartfix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.115/server.js",
-      "sha256": "b61740f9709a1311c44e43c3f31570fc221edc98bf42d0e604f9963b9a07e0e8"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.116/server.js",
+      "sha256": "d14507574a6fd9c3a285f278e53c9b49946a9641109efea21a8289cbcbf95579"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.115/index.html",
-      "sha256": "d35f6d44caa36272bb242fb873a9b8cad2cc26d6970018e3cfa663bade40d96b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.116/index.html",
+      "sha256": "ae104ac661a8d8b3d337fd7277c23ab11e4541989e3364bb378a87ac4129b209"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.115/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.116/package.json",
       "sha256": "e5487ee9bedd46c9a954a0d6a61c389ee8e412a9f5183debd96540472ea7591e"
     }
   ]
