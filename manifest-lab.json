@@ -1,23 +1,23 @@
 {
-  "version": "1.0.117",
+  "version": "1.0.118",
   "released": "2026-04-26",
   "changelog": [
-    "BugFix på kart"
+    "Bugfixes Kart"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.117/server.js",
-      "sha256": "1d6983772038f49751ef182e4f318ed1c6410d9c0c2d33b3f0eee9d6b33915f2"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.118/server.js",
+      "sha256": "fe655b9d8bf6c3c577fbad44aae330c99aa588d10b45bfc0d33cff311d0bbc61"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.117/index.html",
-      "sha256": "3caf51706c5490e8085f3181cd5a4765dc1df650e27ce00ad3542d6104cad44a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.118/index.html",
+      "sha256": "502b81dfa993c33298b3ad3a363a3888cc2d01cc19f47ea8d89cba239bed02b3"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.117/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.118/package.json",
       "sha256": "e5487ee9bedd46c9a954a0d6a61c389ee8e412a9f5183debd96540472ea7591e"
     }
   ]
