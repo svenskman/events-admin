@@ -1,23 +1,23 @@
 {
-  "version": "1.0.123",
+  "version": "1.0.124",
   "released": "2026-04-26",
   "changelog": [
-    "Tracking"
+    "Tracking og TV bugs"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.123/server.js",
-      "sha256": "f3e9d3ef079b6b36d443e03ffa89d0c772e37eb0e1988f2b066752df70b433b9"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.124/server.js",
+      "sha256": "0ac7fc7c08fcbf1bda83fb67b8a99716f5b68dba01ef9fe6661400268d0b4443"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.123/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.124/index.html",
       "sha256": "77c0cf7929e16f98aded27a461720a7cde5336d8c6d2d41ba9efc18c8083a337"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.123/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.124/package.json",
       "sha256": "e5487ee9bedd46c9a954a0d6a61c389ee8e412a9f5183debd96540472ea7591e"
     }
   ]
