@@ -1,23 +1,23 @@
 {
-  "version": "1.0.120",
+  "version": "1.0.121",
   "released": "2026-04-26",
   "changelog": [
-    "TV fix Turer"
+    "v1.0.121"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.120/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.121/server.js",
       "sha256": "07d6c661d61dbb2be1361e84aa18813da83362f1dcc42d13fb160d2c6e899f0f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.120/index.html",
-      "sha256": "f2bffa3a5a3f09c7832d88f59a6badb5a05ad063372f6dda43b86fa1ce1173e7"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.121/index.html",
+      "sha256": "ae1747d6c14480e868b17ddd614558d4c0fae76788b6394124041b787d018b17"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.120/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.121/package.json",
       "sha256": "e5487ee9bedd46c9a954a0d6a61c389ee8e412a9f5183debd96540472ea7591e"
     }
   ]
