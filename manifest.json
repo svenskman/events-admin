@@ -1,23 +1,23 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "released": "2026-04-26",
   "changelog": [
-    "Remote restore av LAB"
+    "Bugs"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.1.0/server.js",
-      "sha256": "4c14a106a9cdf6053ae040c25fa9b1d01b90092f43f817637ab766f38d5e6c8c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.1.1/server.js",
+      "sha256": "deda6ee3f0925a9e6d98eb532866a03aed4fc3f40351e2d021799d97a5e5738f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.1.0/index.html",
-      "sha256": "9c1773b5f4c57bf23dc7e571637dacc98812de5f225ac56b8da9f856f10700ca"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.1.1/index.html",
+      "sha256": "5fb82f9062a516397771e823a57d98a3277f348645945c6bafdc43e1fed26e76"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.1.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.1.1/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
