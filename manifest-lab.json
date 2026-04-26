@@ -1,23 +1,23 @@
 {
-  "version": "1.0.122",
+  "version": "1.0.123",
   "released": "2026-04-26",
   "changelog": [
-    "Tur på TV FIX"
+    "Tracking"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.122/server.js",
-      "sha256": "cb687f4a1e31a5cc23b0dd2d6f0441e1fe7a52093e9773c7b2a62c0387e78c59"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.123/server.js",
+      "sha256": "f3e9d3ef079b6b36d443e03ffa89d0c772e37eb0e1988f2b066752df70b433b9"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.122/index.html",
-      "sha256": "ae1747d6c14480e868b17ddd614558d4c0fae76788b6394124041b787d018b17"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.123/index.html",
+      "sha256": "77c0cf7929e16f98aded27a461720a7cde5336d8c6d2d41ba9efc18c8083a337"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.122/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.123/package.json",
       "sha256": "e5487ee9bedd46c9a954a0d6a61c389ee8e412a9f5183debd96540472ea7591e"
     }
   ]
