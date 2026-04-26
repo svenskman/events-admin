@@ -1,24 +1,24 @@
 {
-  "version": "1.0.125",
+  "version": "1.0.126",
   "released": "2026-04-26",
   "changelog": [
-    "Branding"
+    "Remote recovery LAB"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.125/server.js",
-      "sha256": "f6fa656604f2c311b24d8dfd9a5b2ff0a691d09c9841d2bee6ed4313bf08f478"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.126/server.js",
+      "sha256": "fdbee2a2797ddfcf0df25293e2b27eca1df82ff9e8695f0cdf75e9dcf6481b83"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.125/index.html",
-      "sha256": "24f81f19085eb60094e632bb8186550b4b4e44dc74d9d3a60f174ed53cc54600"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.126/index.html",
+      "sha256": "2d0e2a3067eafbe477d11c614202b671c2e44c48dc56148c23d42e8faf8428b0"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.125/package.json",
-      "sha256": "e5487ee9bedd46c9a954a0d6a61c389ee8e412a9f5183debd96540472ea7591e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.0.126/package.json",
+      "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
 }
