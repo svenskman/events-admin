@@ -3,15 +3,53 @@
 // ╔══════════════════════════════════════════════════════════════════════╗
 // ║  MODULE REGISTRY – events-admin/server.js                            ║
 // ║                                                                      ║
-// ║  Hver modul er markert med ╔═ MODULE: NAVN ═╗ / ╚═ END MODULE ═╝    ║
-// ║  IKKE rediger på tvers av modulgrenser – søk på modulnavnet          ║
+// ║  Søk på «MODULE: NAVN» for å hoppe til en modul                     ║
+// ║  IKKE rediger på tvers av modulgrenser                              ║
 // ║                                                                      ║
-// ║  MODULER:                                                            ║
-// ║  • GUESTBOOK     linje ~5787  post/get/approve/delete + QR-photo     ║
-// ║  • BACKUP        linje ~2432  kryptert backup/restore                 ║
-// ║  • UPDATE/LAB    linje ~1658  upload, apply, publish, remote          ║
-// ║  • AUTH          linje ~2324  login/logout/session                    ║
-// ║  • EMAIL         linje  ~73   smtp, maler, logg                       ║
+// ║  MODUL                     START   INNHOLD                           ║
+// ║  ───────────────────────── ─────  ──────────────────────────────────║
+// ║  EMAIL                       108  smtp · maler · oversettelser · l   ║
+// ║  BREAKGLASS                  677  emergency accounts · passord       ║
+// ║  SSE                         711  server-sent events · display · T   ║
+// ║  TV_PLAYLISTS                849  department TV-spillelister         ║
+// ║  STORAGE                     891  readEventsJSON · writeEventsJSON   ║
+// ║  INIT                       1023  admin · middleware · session · C   ║
+// ║  SEARCH                     1324  global søk på tvers av events      ║
+// ║  PERMISSIONS                1426  auth guards · adminOnly · rateLimit║
+// ║  LAB_EXPORT                 1586  lab/files · export/sizes · expor   ║
+// ║  LAB_REMOTE                 1752  is-lab · remote status · backups   ║
+// ║  UPDATE_SYSTEM              1926  update/check · apply · backups ·   ║
+// ║  AUTH                       2436  login · logout · session · forgo   ║
+// ║  BACKUP                     2551  kryptert backup · restore · sche   ║
+// ║  BREAKGLASS_API             3039  breakglass login API · logg        ║
+// ║  EMAIL_LOG_API              3188  e-postlogg · glemt passord API ·   ║
+// ║  SETTINGS_CORE              3448  settings GET/PUT · branding · lo   ║
+// ║  ORG_STRUCTURE              3631  org levels · roles · departments   ║
+// ║  USERS_API                  3986  users CRUD · lookup · password ·   ║
+// ║  EVENTS_CRUD                4236  events stream · guestbook pendin   ║
+// ║  LOTTERY                    4546  register · draw · winners · emai   ║
+// ║  REGISTRATIONS              5050  register · avmeld · checkin-by-p   ║
+// ║  EMAIL_TEMPLATES            5280  e-postmaler avd/sg/event · vedle   ║
+// ║  STAFF_SHIFTS               5449  staff · shifts · walk-in · volun   ║
+// ║  GUESTBOOK                  5983  submit · approve · delete · phot   ║
+// ║  SERIES_BLOCKS_GDPR         6339  serier · blokker · GDPR anonymis   ║
+// ║  EMAIL_TEST_AI_DESIGN       6622  e-post test · AI proxy (Claude)    ║
+// ║  MEMBERS_WISHES_VOLUNTEERS  7070  members · wishes · frivillige      ║
+// ║  DEVLOG                     7295  dev-logg API · kun DEVLOG_OWNER    ║
+// ║  PAGE_HELPERS               8301  buildEventPage · appearance casc   ║
+// ║  PAGE_STAND                 9172  stand page · form · guestbook      ║
+// ║  PAGE_MOTE                  9501  møte-page · form · agenda          ║
+// ║  PAGE_KURS                  9745  kurs-page · form · program         ║
+// ║  PAGE_TUR                  10085  tur-page · form · route · guestbook║
+// ║  INVENTAR_API              10558  inventar CRUD · giveaway · salg    ║
+// ║  MAPS_ROUTES               10818  reiserute · geocoding · GPX · OS   ║
+// ║  AI_ROUTES                 11583  AI route from waypoints · AI gen   ║
+// ║  DISPLAY_SCREEN            11987  display SSE · state · slides · P   ║
+// ║  TV_CHANNEL                12521  TV spilleliste · activate · TV c   ║
+// ║  TV_PAGE                   12988  TV channel page · buildTvPage ·    ║
+// ║  DISPLAY_PAGE              13814  display screen page · drum roll    ║
+// ║  LOTTERY_DISPLAY           14373  mobil lottery control · /lottery   ║
+// ║  MOBILE_ADMIN              14655  mobil admin /m · catch-all · Lib   ║
 // ╚══════════════════════════════════════════════════════════════════════╝
 // Version: 1.0.1
 
@@ -84,6 +122,10 @@ function verifyWinnerToken(token) {
   } catch(e) { return null; }
 }
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: EMAIL                                                       ║
+// ║  smtp · sendMail · maler · oversettelser · logg · scheduler          ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── E-post via Nodemailer + Runbox SMTP ──────────────────────────
 // Configuration via environment variables (set in docker-compose.yml / Portainer):
 //   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
@@ -638,7 +680,7 @@ function readEventsJSON() {
 function writeEventsJSON(data) {
   _eventsCache = data;
   _eventsCacheDirty = false;
-  writeEventsJSON(data);
+  writeJSON(EVENTS_FILE, data);
 }
 const SETTINGS_FILE = path.join(DATA, "settings.json");
 const MEMBERS_FILE  = path.join(DATA, "members.json");
@@ -646,6 +688,13 @@ const WISHES_F   = path.join(DATA, "wishes.json");
 const UPLOADS    = path.join(DATA, "uploads");
 const DEVLOG_OWNER = process.env.DEVLOG_OWNER || ("admin@" + (process.env.BASE_DOMAIN || "events-admin.no"));
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: EMAIL                                                   ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: BREAKGLASS                                                  ║
+// ║  breakglass accounts · emergency access                              ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Breakglass accounts ──────────────────────────────────────────
 // Provisioned via env vars only – never via UI
 // BREAKGLASS_1=email:password  BREAKGLASS_2=email:password  BREAKGLASS_3=email:password
@@ -673,6 +722,13 @@ const INVENTAR_FILE   = path.join(DATA, "inventar.json");
 const PLAYLISTS_FILE  = path.join(DATA, "tv_playlists.json");
 const EMAIL_LOG_FILE  = path.join(DATA, "email_log.json");
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: BREAKGLASS                                              ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: SSE                                                         ║
+// ║  Server-Sent Events · display SSE · TV channel SSE                   ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── SSE (Server-Sent Events) ─────────────────────────────────────
 // Clients subscribe to /api/events/stream?department=xxx
 const sseClients = new Map(); // clientId → { res, department }
@@ -804,6 +860,13 @@ function getTvState(deptId) {
   };
 }
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: SSE                                                     ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: TV_PLAYLISTS                                                ║
+// ║  TV-spillelister (department-level)                                  ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── TV Spillelister ──────────────────────────────────────────────
 function readPlaylists() {
   try { return JSON.parse(fs.readFileSync(PLAYLISTS_FILE, "utf8")); } catch(e) { return []; }
@@ -839,6 +902,13 @@ fs.mkdirSync(DATA,    { recursive: true });
   if (!fs.existsSync(f)) fs.writeFileSync(f, init);
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: TV_PLAYLISTS                                            ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: STORAGE                                                     ║
+// ║  readEventsJSON · writeEventsJSON · sanitizeInput · getSettings      ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Storage helpers ──────────────────────────────────────────────
 const readJSON  = function(f) { try { return JSON.parse(fs.readFileSync(f)); } catch(e) { return []; } };
 // Atomic write: write to .tmp, rename – avoids corrupt JSON on crash
@@ -964,6 +1034,13 @@ function writeEmailLog(entry) {
   } catch(e) { console.error("[migration] inventar:", e.message); }
 })();
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: STORAGE                                                 ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: INIT                                                        ║
+// ║  default admin · middleware · session · CSP · subdomain routing      ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Init default admin ───────────────────────────────────────────
 (async function() {
   if (!fs.existsSync(USERS_FILE) || readJSON(USERS_FILE).length === 0) {
@@ -1258,6 +1335,13 @@ const auth = function(req, res, next) {
   next();
 }
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: INIT                                                    ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: SEARCH                                                      ║
+// ║  global search på tvers av events                                    ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Global søk på tvers av events ────────────────────────────────
 app.get("/api/search", auth, rateLimit(30, 60000), function(req, res) {
   const q = (req.query.q || "").trim().toLowerCase();
@@ -1353,6 +1437,13 @@ const canEditEvent = function(ev, user) {
   return false;
 };
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: SEARCH                                                  ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: PERMISSIONS                                                 ║
+// ║  auth guards · adminOnly · managerOrAdmin · rateLimit                ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Permissions ──────────────────────────────────────────────────
 // Calculate what the user is allowed to do – frontend bruker kun disse flaggene,
 // aldri role direkte. All tilgangskontroll skjer fortsatt i server.
@@ -1506,6 +1597,13 @@ setInterval(function() {
   _rl.forEach(function(v, k) { if (v.start < cut) _rl.delete(k); });
 }, 600000);
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: PERMISSIONS                                             ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: LAB_EXPORT                                                  ║
+// ║  lab/files · lab/export/sizes · lab/export/code · context · data     ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Version ──────────────────────────────────────────────────────
 // ── Static files (leaflet bundled locally) ─────────────────────
 // Public config (non-secret values needed by admin frontend)
@@ -1665,6 +1763,13 @@ function _crc32(buf) {
   return(crc^0xFFFFFFFF)>>>0;
 }
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: LAB_EXPORT                                              ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: LAB_REMOTE                                                  ║
+// ║  is-lab · remote status · remote backups · remote control · webhook  ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 app.get("/api/version", function(req, res) {
   res.json({ version: APP_VERSION });
 });
@@ -1832,6 +1937,13 @@ function httpGet(url, extraHeaders) {
 }
 
 // Sjekk om oppdatering er tilgjengelig
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: LAB_REMOTE                                              ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: UPDATE_SYSTEM                                               ║
+// ║  update/check · apply · backups · restore · publish · upload · restart · approve║
+// ╚══════════════════════════════════════════════════════════════════════╝
 app.get("/api/update/check", auth, adminOnly, async function(req, res) {
   try {
     const url = UPDATE_BASE + "/" + UPDATE_MANIFEST;
@@ -2335,6 +2447,13 @@ function compareVersions(a, b) {
   return 0;
 }
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: UPDATE_SYSTEM                                           ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: AUTH                                                        ║
+// ║  login · logout · session · forgot password · force rotation         ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Auth API ─────────────────────────────────────────────────────
 app.post("/api/login", rateLimit(5, 900000), async function(req, res) { // 5 attempts per 15min
   const email    = (typeof req.body.email    === "string" ? req.body.email    : "").toLowerCase().trim();
@@ -2443,6 +2562,13 @@ app.post("/api/login", rateLimit(5, 900000), async function(req, res) { // 5 att
 
 
 // ══════════════════════════════════════════════════════════════════
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: AUTH                                                    ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: BACKUP                                                      ║
+// ║  encrypt · decrypt · build · send · scheduler · API restore/download ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── BACKUP SYSTEM ─────────────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════
 const crypto = require("crypto");
@@ -2924,6 +3050,13 @@ app.post("/api/departments/:id/backup-enabled", auth, function(req, res) {
 });
 // ══════════════════════════════════════════════════════════════════
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: BACKUP                                                  ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: BREAKGLASS_API                                              ║
+// ║  breakglass login API · logg                                         ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Breakglass API ────────────────────────────────────────────────
 const breakglassOnly = function(req, res, next) {
   if (req.session.user && req.session.user.role === "breakglass") return next();
@@ -3066,6 +3199,13 @@ app.get("/api/breakglass/log", auth, adminOnly, function(req, res) {
   res.json(readJSON(BREAKGLASS_LOG_FILE));
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: BREAKGLASS_API                                          ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: EMAIL_LOG_API                                               ║
+// ║  e-postlogg API · glemt passord API · favicon                        ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── E-postlogg API ───────────────────────────────────────────────
 app.get("/api/email-log", auth, function(req, res) {
   const me = req.session.user;
@@ -3319,6 +3459,13 @@ app.post("/api/admin/force-password-rotation", auth, adminOnly, function(req, re
   res.json({ ok: true, affected: users.filter(function(u){ return u.mustChangePassword; }).length });
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: EMAIL_LOG_API                                           ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: SETTINGS_CORE                                               ║
+// ║  settings GET/PUT · branding · logo · palette · setup-status         ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Settings API ─────────────────────────────────────────────────
 app.get("/api/settings", auth, function(req, res) { res.json(getSettings()); });
 
@@ -3495,6 +3642,13 @@ function getRolePermissions(user) {
 }
 
 // API: get org levels and roles
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: SETTINGS_CORE                                           ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: ORG_STRUCTURE                                               ║
+// ║  org levels · org roles · org structure · departments · subgroups    ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 app.get("/api/org/levels", auth, function(req, res) {
   res.json(getOrgLevels());
 });
@@ -3843,6 +3997,13 @@ app.put("/api/departments/:deptId/eventtypes/:typeId", auth, adminOnly, function
 });
 
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: ORG_STRUCTURE                                           ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: USERS_API                                                   ║
+// ║  users CRUD · user lookup · password · roles                         ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Users API ────────────────────────────────────────────────────
 function userPublic(u, forAvdeling) {
   var accessList = getAccessList(u);
@@ -4086,6 +4247,13 @@ app.delete("/api/users/:id", auth, function(req, res) {
   res.status(403).json({ error: "Access denied" });
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: USERS_API                                               ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: EVENTS_CRUD                                                 ║
+// ║  events stream · guestbook pending · events CRUD · image upload      ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Events API ───────────────────────────────────────────────────
 
 // SSE stream: clients connect for live updates
@@ -4389,6 +4557,13 @@ app.get("/api/events/:id/registrations", auth, function(req, res) {
   res.json(ev.registrations || []);
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: EVENTS_CRUD                                             ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: LOTTERY                                                     ║
+// ║  lottery register · draw · winners · emails · QR verify · roomplan   ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Lottery API ──────────────────────────────────────────────────
 // Registrer deltaker til lotteri/konkurranse via fullskjerm-modus
 app.post("/api/events/:id/lottery/register", rateLimit(10, 60000), function(req, res) {
@@ -4886,6 +5061,13 @@ function validateVehicleText(s) {
 function sanitizeName(s)  { return (s || "").trim().slice(0, 100); }
 function sanitizePhone(s) { return (s || "").replace(/[^\d\s+\-().]/g, "").trim().slice(0, 30); }
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: LOTTERY                                                 ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: REGISTRATIONS                                               ║
+// ║  register · avmeld · checkin-by-pin · registrations delete           ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 app.post("/api/events/:id/register", rateLimit(10, 60000), function(req, res) {
   const name  = sanitizeName(req.body.name);
   const email = (req.body.email || "").toLowerCase().trim().slice(0, 200);
@@ -5109,6 +5291,13 @@ app.post("/api/events/:id/checkin-by-pin", rateLimit(30, 60000), function(req, r
   res.json({ ok: true, alreadyCheckedIn: false, name: reg.name });
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: REGISTRATIONS                                           ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: EMAIL_TEMPLATES                                             ║
+// ║  e-postmaler per avdeling · undergruppe · event · vedlegg            ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── E-postmaler per avdeling / undergruppe ─────────────────────
 app.get("/api/departments/:id/email-templates", auth, function(req, res) {
   const s = getSettings();
@@ -5271,6 +5460,13 @@ app.post("/api/events/:id/registrations/:rid/checkin", rateLimit(30, 60000), fun
   res.json({ ok: true });
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: EMAIL_TEMPLATES                                         ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: STAFF_SHIFTS                                                ║
+// ║  staff · shifts · walk-in · volunteer · collaborators · guest staff  ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Staff PIN verify ─────────────────────────────────────────────
 app.post("/api/events/:id/staff/verify-pin", rateLimit(20, 60000), function(req, res) {
   const ev = readEventsJSON().find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
@@ -5798,6 +5994,9 @@ app.delete("/api/events/:id/guestshifts/:deptId/:shid", auth, managerOrAdmin, fu
   res.json({ ok: true });
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: STAFF_SHIFTS                                            ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  MODULE: GUESTBOOK                                               ║
 // ║  Inneholder: submit, approve, delete, photo-token, SSE, QR-upload║
@@ -6154,6 +6353,10 @@ app.delete("/api/events/:id/guestbook/:gid", auth, managerOrAdmin, function(req,
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  END MODULE: GUESTBOOK                                           ║
 // ╚══════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: SERIES_BLOCKS_GDPR                                          ║
+// ║  serie API · blokker API · GDPR anonymisering                        ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Serie API ────────────────────────────────────────────────────
 // Repeat-typer:
 //   yearly-date     - hvert ar, samme dag+maned (f.eks. 17. mai)
@@ -6430,6 +6633,13 @@ app.post("/api/events/:id/gdpr/anonymize", auth, managerOrAdmin, function(req, r
   res.json({ ok: true, anonymized: count });
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: SERIES_BLOCKS_GDPR                                      ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: EMAIL_TEST_AI_DESIGN                                        ║
+// ║  e-post test · AI proxy (Claude) · design profile PDF import         ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── E-post test-sending (admin) ──────────────────────────────────
 app.post("/api/admin/email/test", auth, adminOnly, async function(req, res) {
   const s = getSettings();
@@ -6871,6 +7081,13 @@ Rules:
   }
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: EMAIL_TEST_AI_DESIGN                                    ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: MEMBERS_WISHES_VOLUNTEERS                                   ║
+// ║  members · wishes · frivillige                                       ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Members API ─────────────────────────────────────────────────
 app.get("/api/members", auth, function(req, res) {
   const me = req.session.user;
@@ -7089,6 +7306,13 @@ app.delete("/api/volunteers/:id/events/:evId", auth, managerOrAdmin, function(re
   res.json(all[i]);
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: MEMBERS_WISHES_VOLUNTEERS                               ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: DEVLOG                                                      ║
+// ║  dev-logg API · kun DEVLOG_OWNER                                     ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Dev-logg API (kun DEVLOG_OWNER) ─────────────────────────────
 function devlogAuth(req, res, next) {
   if (!req.session.user || req.session.user.email !== DEVLOG_OWNER)
@@ -7129,6 +7353,10 @@ app.delete("/api/devlog/entries/:id", auth, devlogAuth, function(req, res) {
   fs.writeFileSync(DEVLOG_F, JSON.stringify(log, null, 2));
   res.json({ ok: true });
 });
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: DEVLOG                                                  ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Overview page ─────────────────────────────────────────────
 function serveOverviewPage(req, res) {
   var events   = readEventsJSON();
@@ -8087,6 +8315,10 @@ function buildEventPage(ev, isAuthenticated) {
 }
 
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: PAGE_HELPERS                                                ║
+// ║  shared helpers · appearance cascade · buildEventPage · reg form · shift signup║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Shared helpers ────────────────────────────────────────────────
 
 function evFmtDate(d) {
@@ -8951,6 +9183,13 @@ showTab = function(id) {
 }
 
 // ── Stand page ────────────────────────────────────────────────────
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: PAGE_HELPERS                                            ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: PAGE_STAND                                                  ║
+// ║  Stand page · form · guestbook                                       ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 function buildStandPage(ev, isAuthenticated) {
   const settings      = getSettings();
   const regs          = ev.registrations || [];
@@ -9273,6 +9512,13 @@ loadLottery();
 }
 
 // ── Meeting page ─────────────────────────────────────────────────────
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: PAGE_STAND                                              ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: PAGE_MOTE                                                   ║
+// ║  Møte-page · form · agenda                                           ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 function buildMotePage(ev, isAuthenticated) {
   const settings     = getSettings();
   const regs         = ev.registrations || [];
@@ -9510,6 +9756,13 @@ function filterRegs(q){
 }
 
 // ── Course page ─────────────────────────────────────────────────────
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: PAGE_MOTE                                               ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: PAGE_KURS                                                   ║
+// ║  Kurs-page · form · program                                          ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 function buildKursPage(ev, isAuthenticated) {
   const settings     = getSettings();
   const regs         = ev.registrations || [];
@@ -9843,6 +10096,13 @@ function closeGbQrOverlay(){
 }
 
 // ── Trip page ──────────────────────────────────────────────────────
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: PAGE_KURS                                               ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: PAGE_TUR                                                    ║
+// ║  Tur-page · form · route · guestbook                                 ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 function buildTurPage(ev, isAuthenticated) {
   const settings     = getSettings();
   const regs         = ev.registrations || [];
@@ -10229,6 +10489,10 @@ function closeGbQrOverlay(){
 
 
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: PAGE_TUR                                                ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Offline snapshot (everything the page needs to work offline) ────
 app.get("/api/events/:id/snapshot", auth, function(req, res) {
   const ev = readEventsJSON().find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
@@ -10308,6 +10572,10 @@ app.post("/api/events/:id/sync", rateLimit(30, 60000), function(req, res) {
 });
 
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: INVENTAR_API                                                ║
+// ║  inventar CRUD · giveaway · salg · utstyr                            ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Inventar ─────────────────────────────────────────────────────
 app.get("/api/inventar", auth, function(req, res) {
   const user  = req.session.user;
@@ -10561,6 +10829,13 @@ app.post("/api/events/:id/utstyr", auth, managerOrAdmin, function(req, res) {
   res.json({ ok: true });
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: INVENTAR_API                                            ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: MAPS_ROUTES                                                 ║
+// ║  reiserute · geocoding · GPX · OSM tiles · routecoords · kartbilde · stemming║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Reiserute per tur-event ───────────────────────────────────────
 app.get("/api/events/:id/route", auth, function(req, res) {
   const events = readEventsJSON();
@@ -11319,6 +11594,13 @@ app.post("/api/events/:id/route/vote", auth, rateLimit(30, 60000), function(req,
   res.json({ ok: true, votes: etappe.votes, activeAlternative: etappe.activeAlternative });
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: MAPS_ROUTES                                             ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: AI_ROUTES                                                   ║
+// ║  AI route from waypoints · AI generate route suggestion              ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── AI: Generer rute fra ankerpunkter ────────────────────────────
 app.post("/api/ai/route-from-waypoints", auth, managerOrAdmin, rateLimit(10, 60000), async function(req, res) {
   const { waypoints, waypointLabels, profile, altCount, roundtrip, startDate, endDate } = req.body;
@@ -11716,6 +11998,13 @@ Absolutte regler:
   }
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: AI_ROUTES                                               ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: DISPLAY_SCREEN                                              ║
+// ║  display SSE stream · display state · slides · PPTX import · event slides · screenshot║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Display screen endpoints ─────────────────────────────────────
 
 // SSE stream for display screen
@@ -12243,6 +12532,13 @@ app.post("/api/tv/:deptId/screenshot", auth, managerOrAdmin, function(req, res) 
   }
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: DISPLAY_SCREEN                                          ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: TV_CHANNEL                                                  ║
+// ║  TV spilleliste CRUD · activate · save-as-playlist · TV channel API · state · slides · PPTX║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── TV Spilleliste-API ───────────────────────────────────────────
 
 // List all playlists (optionally filtered by deptId)
@@ -12703,6 +12999,13 @@ app.delete("/api/tv/:deptId/slides", auth, managerOrAdmin, function(req, res) {
   res.json({ ok: true });
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: TV_CHANNEL                                              ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: TV_PAGE                                                     ║
+// ║  TV channel page · buildTvPage · SSE · state · ticker · main cycle · slides║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── TV Channel Page ──────────────────────────────────────────────
 app.get("/tv/:deptId", function(req, res) {
   const settings  = getSettings();
@@ -13522,6 +13825,13 @@ document.addEventListener("mousemove", function() {
 </html>`;
 }
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: TV_PAGE                                                 ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: DISPLAY_PAGE                                                ║
+// ║  display screen page · drum roll · countdown · lotteri-display · vinnerkort║
+// ╚══════════════════════════════════════════════════════════════════════╝
 app.get("/display/:evId", function(req, res) {
   const rawId  = req.params.evId;
   const ev     = readEventsJSON().find(function(e) { return e.id === rawId || e.slug === rawId; });
@@ -14074,6 +14384,13 @@ es.onerror = function() {
 </html>`);
 });
 
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: DISPLAY_PAGE                                            ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: LOTTERY_DISPLAY                                             ║
+// ║  mobil lottery control page · /lottery/:evId                         ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Mobil-lotteri-kontrollside ───────────────────────────────────
 app.get("/lottery/:evId", auth, function(req, res) {
   const evId    = req.params.evId;
@@ -14349,6 +14666,13 @@ async function onScanFound(data) {
 });
 
 // Auto-redirect mobile browsers from / to /m
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: LOTTERY_DISPLAY                                         ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE: MOBILE_ADMIN                                                ║
+// ║  mobil admin /m · catch-all · LibreOffice auto-installer             ║
+// ╚══════════════════════════════════════════════════════════════════════╝
 // ── Mobil-admin (/m) ─────────────────────────────────────────────
 function isMobileBrowser(req) {
   const ua = (req.headers["user-agent"] || "").toLowerCase();
@@ -14555,3 +14879,6 @@ app.listen(PORT, function() {
     if (changed > 0) { writeJSON(USERS_FILE, users); console.log("[migrate] Normaliserte " + changed + " roller"); }
   } catch(e) { console.error("[migrate] Feil ved rolenormalisering:", e.message); }
 });
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  END MODULE: MOBILE_ADMIN                                            ║
+// ╚══════════════════════════════════════════════════════════════════════╝
