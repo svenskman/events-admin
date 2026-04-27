@@ -11887,19 +11887,22 @@ function applyThemeColors(accent, card, theme, bg, textColors) {
   // Header & nav
   // Only use saved headerBg if it's appropriate for the current theme
   var _hbg = tc.headerBg;
-  if (_hbg && !isDark) {
-    // In light mode: reject obviously dark colors saved from dark-mode sessions
-    var _r=parseInt(_hbg.slice(1,3)||"0",16), _g2=parseInt(_hbg.slice(3,5)||"0",16), _b2=parseInt(_hbg.slice(5,7)||"0",16);
-    if ((_r*0.299 + _g2*0.587 + _b2*0.114) < 80) _hbg = null; // too dark for light mode
+  if (_hbg) {
+    var _hr=parseInt(_hbg.slice(1,3)||"0",16), _hg=parseInt(_hbg.slice(3,5)||"0",16), _hb2=parseInt(_hbg.slice(5,7)||"0",16);
+    var _hlum = _hr*0.299 + _hg*0.587 + _hb2*0.114;
+    if (!isDark && _hlum < 80)  _hbg = null; // for mørk til lys modus
+    if (isDark  && _hlum > 180) _hbg = null; // for lys til dark modus
   }
   root.style.setProperty("--header-bg", _hbg || (isDark ? "#111111" : "#FFFFFF"));
   root.style.setProperty("--header-text",         tc.headerText         || (isDark ? "#FFFFFF" : "#111111"));
   root.style.setProperty("--header-border",       tc.headerBorder       || accent);
   root.style.setProperty("--header-border-width", tc.headerBorderWidth  || "3px");
   var _nt = tc.navText;
-  if (_nt && !isDark) {
+  if (_nt) {
     var _nr=parseInt(_nt.slice(1,3)||"0",16), _ng=parseInt(_nt.slice(3,5)||"0",16), _nb=parseInt(_nt.slice(5,7)||"0",16);
-    if ((_nr*0.299 + _ng*0.587 + _nb*0.114) > 200) _nt = null; // too light for light mode text
+    var _nlum = _nr*0.299 + _ng*0.587 + _nb*0.114;
+    if (!isDark && _nlum > 200) _nt = null; // for lys til lys modus → bruk default
+    if (isDark  && _nlum < 80)  _nt = null; // for mørk til dark modus → bruk default
   }
   root.style.setProperty("--nav-text", _nt || (isDark ? "#AAAAAA" : "#444444"));
   root.style.setProperty("--nav-active-bg",       tc.navActiveBg        || accent);
