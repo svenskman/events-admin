@@ -2,18 +2,18 @@
   "version": "1.2.1",
   "released": "2026-04-27",
   "changelog": [
-    "Bugfixes och backup."
+    "Diverse bugfix"
   ],
   "files": [
     {
       "name": "server.js",
       "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.2.1/server.js",
-      "sha256": "8e3b478c9e522d7e9c237f7c73ed9ed5c022bc529a69f7ad4d362cc4c5d115a5"
+      "sha256": "8d99bf00ddf669cb8404d93d7194ef4db41a9b84315213e53403f13fafd29c9b"
     },
     {
       "name": "index.html",
       "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.2.1/index.html",
-      "sha256": "94aba5bac6f08566cc5abee64cc45e9f303e497c9a40c31a27e9e3ab3ca375f2"
+      "sha256": "3c414aa2774230909336f306c20cb34b9da61b22f7f57b5f4c7ee50284185ec8"
     },
     {
       "name": "package.json",
