@@ -1,5 +1,5 @@
 {
-  "version": "1.3.10",
+  "version": "1.3.11",
   "released": "2026-04-28",
   "changelog": [
     "Remote restore fix"
@@ -7,17 +7,17 @@
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.10/server.js",
-      "sha256": "277cb3e8d5708874d3a6ae1734c1c97057d4f749bb7a214e0894c0fa80c34d48"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.11/server.js",
+      "sha256": "86743e0c5096cf13b5c442842c3674adba16ce9b12ce96b875219847d32f1ff5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.10/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.11/index.html",
       "sha256": "d10e5ed6cd127ccb1484628b29fc7371d9c04ca9c6f59376a99fd3dac2d838db"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.10/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.11/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
