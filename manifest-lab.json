@@ -1,19 +1,19 @@
 {
   "version": "1.2.1",
-  "released": "2026-04-27",
+  "released": "2026-04-28",
   "changelog": [
-    "Diverse bugfix"
+    "TV fixes"
   ],
   "files": [
     {
       "name": "server.js",
       "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.2.1/server.js",
-      "sha256": "8d99bf00ddf669cb8404d93d7194ef4db41a9b84315213e53403f13fafd29c9b"
+      "sha256": "b5a05daef460934ed4031e0b2150a3c4982d004d1d9bf076ec536b15edf17dff"
     },
     {
       "name": "index.html",
       "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.2.1/index.html",
-      "sha256": "3c414aa2774230909336f306c20cb34b9da61b22f7f57b5f4c7ee50284185ec8"
+      "sha256": "09ee224f677e4732578de3255873e9dd53c3b3f34a1480747499ef2430e15db9"
     },
     {
       "name": "package.json",
