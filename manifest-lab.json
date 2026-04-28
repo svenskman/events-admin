@@ -1,23 +1,23 @@
 {
-  "version": "1.3.5",
+  "version": "1.3.6",
   "released": "2026-04-28",
   "changelog": [
-    "Turplanlegger fix"
+    "Blink vid påloggning"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.5/server.js",
-      "sha256": "3a41ac9a1f4532f49e319f691bb57ea7f384067df96597ff4f9346d4c220fe7a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.6/server.js",
+      "sha256": "a0a0eabb033901ae12bf3facb9455066fcfbf691624c9b2918329ff8eac04609"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.5/index.html",
-      "sha256": "25cb95c17a4048f26cd954fb916029ce559f32be3f0abc50112965412f1c76e6"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.6/index.html",
+      "sha256": "7155125a262247bf2ff4b1e34320a33040c754478bf935fae4af57221259cca8"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.5/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.6/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
