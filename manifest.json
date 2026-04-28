@@ -1,23 +1,23 @@
 {
-  "version": "1.3.7",
+  "version": "1.3.8",
   "released": "2026-04-28",
   "changelog": [
-    "Planleggerfix og versionshantering"
+    "Turplan justeringer"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.7/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.8/server.js",
       "sha256": "fe28c0bc5789054baee019774ca07c0863fdb011f013b9a0a6d934940e861b98"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.7/index.html",
-      "sha256": "f855c69335ae2e19b36363f0c695d865b49e84d1fb4b6959824b5de57a6ad04e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.8/index.html",
+      "sha256": "35122fcbde804f916bfbeca1b023c1c8c0ec9475a108e626085619255c5b551a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.7/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.8/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
