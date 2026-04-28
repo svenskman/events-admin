@@ -1,23 +1,23 @@
 {
-  "version": "1.3.4",
+  "version": "1.3.5",
   "released": "2026-04-28",
   "changelog": [
-    "QRkod på inventarer"
+    "Turplanlegger fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.4/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.5/server.js",
       "sha256": "3a41ac9a1f4532f49e319f691bb57ea7f384067df96597ff4f9346d4c220fe7a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.4/index.html",
-      "sha256": "e42836d85445b35ec298ce9da72a2ba2cdf492fe71ddfec6d3eacad76ef9daa9"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.5/index.html",
+      "sha256": "25cb95c17a4048f26cd954fb916029ce559f32be3f0abc50112965412f1c76e6"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.5/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
