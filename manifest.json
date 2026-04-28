@@ -1,23 +1,23 @@
 {
-  "version": "1.3.2",
+  "version": "1.3.3",
   "released": "2026-04-28",
   "changelog": [
-    "TV- farge fix"
+    "Modulering"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.2/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.3/server.js",
       "sha256": "8a3799c3e9ec3b65b07b486b4c777cc0d64744f8f77215117967e4f96e103b1f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.2/index.html",
-      "sha256": "6f518231c1cbd5d95114f70fc5f2326b3c48e9c8951d421d9553bac82df01708"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.3/index.html",
+      "sha256": "7271b461170842081796d5bdf70d12dbf412c643529b31f5284c2eeabd5cd379"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.2/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.3/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
