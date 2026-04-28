@@ -1,23 +1,23 @@
 {
-  "version": "1.3.6",
+  "version": "1.3.7",
   "released": "2026-04-28",
   "changelog": [
-    "Blink vid påloggning"
+    "Planleggerfix og versionshantering"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.6/server.js",
-      "sha256": "a0a0eabb033901ae12bf3facb9455066fcfbf691624c9b2918329ff8eac04609"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.7/server.js",
+      "sha256": "fe28c0bc5789054baee019774ca07c0863fdb011f013b9a0a6d934940e861b98"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.6/index.html",
-      "sha256": "7155125a262247bf2ff4b1e34320a33040c754478bf935fae4af57221259cca8"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.7/index.html",
+      "sha256": "f855c69335ae2e19b36363f0c695d865b49e84d1fb4b6959824b5de57a6ad04e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.6/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.7/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
