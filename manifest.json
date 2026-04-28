@@ -1,23 +1,23 @@
 {
-  "version": "1.3.8",
+  "version": "1.3.9",
   "released": "2026-04-28",
   "changelog": [
-    "Turplan justeringer"
+    "Remote fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.8/server.js",
-      "sha256": "fe28c0bc5789054baee019774ca07c0863fdb011f013b9a0a6d934940e861b98"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.9/server.js",
+      "sha256": "3ad27bdd790b1cd157fa093ad5b3264b909defca782b7fb1734bd7a604c25419"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.8/index.html",
-      "sha256": "35122fcbde804f916bfbeca1b023c1c8c0ec9475a108e626085619255c5b551a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.9/index.html",
+      "sha256": "d10e5ed6cd127ccb1484628b29fc7371d9c04ca9c6f59376a99fd3dac2d838db"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.8/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.9/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
