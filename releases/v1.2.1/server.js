@@ -13204,7 +13204,8 @@ function _connectTvSSE() {
 }
 _connectTvSSE();
 
-// ── State ─────────────────────────────────────────────────────────
+// Detect preview mode (embedded in admin iframe)
+var IS_PREVIEW = new URLSearchParams(window.location.search).has('preview');
 function applyState(s) {
   if (s.type === "state") {
     Object.assign(state, s);
@@ -13588,7 +13589,7 @@ function _showEvDetail(upcoming, idx, count, dayIdx) {
   // ── MIDT/TRACKING: live sporing ved siden av info ──
   if (trackDiv) {
     clearInterval(window._trackingRefresh);
-    if (ev.eventType === 'tur' && ev.liveTrackingUrl) {
+    if (!IS_PREVIEW && ev.eventType === 'tur' && ev.liveTrackingUrl) {
       trackDiv.style.display = 'flex';
       trackDiv.innerHTML =
         '<div style="position:absolute;top:0;left:0;right:0;z-index:2;background:rgba(0,0,0,.7);padding:.35vh .7vw;display:flex;align-items:center;gap:.5vw">' +
