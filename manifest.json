@@ -1,23 +1,23 @@
 {
-  "version": "1.3.11",
+  "version": "1.3.12",
   "released": "2026-04-28",
   "changelog": [
-    "Remote restore fix"
+    "Events fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.11/server.js",
-      "sha256": "86743e0c5096cf13b5c442842c3674adba16ce9b12ce96b875219847d32f1ff5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.12/server.js",
+      "sha256": "f1b00bdacd9eebb6f06b6a17222adf7a336bb424bd168c3e24f495a029ebe47f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.11/index.html",
-      "sha256": "d10e5ed6cd127ccb1484628b29fc7371d9c04ca9c6f59376a99fd3dac2d838db"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.12/index.html",
+      "sha256": "eb3e0202dbbe231bd60d1c95bf2c348efef26b4f9bc47bd023daf8583060470c"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.11/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.12/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
