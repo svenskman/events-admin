@@ -1,24 +1,24 @@
 {
-  "version": "1.3.20",
+  "version": "1.3.21",
   "released": "2026-04-29",
   "changelog": [
-    "Favicon fix"
+    "Video fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.20/server.js",
-      "sha256": "8649f0607ef2a23f43b8f52ca413f5b86c9712d9f33109e663b880b336980de4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.21/server.js",
+      "sha256": "94f780a53a737f689f512d916fb44775a1ad4041d55222179b388463c0127372"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.20/index.html",
-      "sha256": "900c643df9083e21f97884f2d4059f043c358c846f31d8fe04c4ccd048163cac"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.21/index.html",
+      "sha256": "21aedc3fb0209180ac763a764eab4d3d2371145d19234f1adad0a837d964531d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.20/package.json",
-      "sha256": "e5487ee9bedd46c9a954a0d6a61c389ee8e412a9f5183debd96540472ea7591e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.21/package.json",
+      "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
 }
