@@ -1,23 +1,23 @@
 {
-  "version": "1.3.24",
+  "version": "1.3.25",
   "released": "2026-04-29",
   "changelog": [
-    "TV fix"
+    "TV kart fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.24/server.js",
-      "sha256": "5820cecf43e32fc694bdb73725c4e9506f9b0f8e10160f32c50d3b85798fad88"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.25/server.js",
+      "sha256": "2b298f022c314fe1115d3d775f9a4de918f6300e1ac13c6466163847775af5ff"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.24/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.25/index.html",
       "sha256": "974ef8163bf32c27e6549dac6ed1ebdd830fd3662a946d911eedf631227e5da2"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.24/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.25/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
