@@ -1,23 +1,23 @@
 {
-  "version": "1.3.22",
+  "version": "1.3.23",
   "released": "2026-04-29",
   "changelog": [
-    "Video konv fix"
+    "TV Klipp fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.22/server.js",
-      "sha256": "27a7e1fb2d5edac0968c64b9ee4d403de37e7ddda2b0ac51a31d9a7029f2781d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.23/server.js",
+      "sha256": "7e90cb9b9784331243a7e32395d6129e5132a6ae0a55f6c072059773d876b948"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.22/index.html",
-      "sha256": "49edfa4e9e4d5668b1c575481ebaecc8861f70bc9d711e4556ba885fbba46e94"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.23/index.html",
+      "sha256": "974ef8163bf32c27e6549dac6ed1ebdd830fd3662a946d911eedf631227e5da2"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.22/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.23/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
