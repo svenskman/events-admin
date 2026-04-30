@@ -1,23 +1,23 @@
 {
-  "version": "1.4.1",
+  "version": "1.4.2",
   "released": "2026-04-30",
   "changelog": [
-    "GPS fix"
+    "Excalidraw, markup"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.1/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.2/server.js",
       "sha256": "49985ccc7239102c322b9ecb1101670c9917a367096c485e256d9c10273d0389"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.1/index.html",
-      "sha256": "540c8c6db92ae39a0c01724a940de3c5d63ea9df15ce1747ffd8fc856a59de00"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.2/index.html",
+      "sha256": "ff7b8b41ef34e9b345a9cadf894a5d3725f17e4cf33c628794e3b66e899e7e81"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.1/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.2/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
