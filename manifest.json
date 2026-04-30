@@ -1,23 +1,23 @@
 {
-  "version": "1.3.27",
+  "version": "1.3.28",
   "released": "2026-04-30",
   "changelog": [
-    "Tur dag fiks."
+    "TV-Duration/order fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.27/server.js",
-      "sha256": "5eb8f8fe6887bf01387059223f869165e03649a929d67511ae044eda01b902da"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.28/server.js",
+      "sha256": "51bd8e425ea07da71f546ba37668c51ff8f248c2fca88b4c0f0ecd3e3536383b"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.27/index.html",
-      "sha256": "e28b4993fafa36b375e69b061877687d0807781ca52ba0e89d6f14d4d5d8e190"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.28/index.html",
+      "sha256": "e7ccf932ee1fe4614b2853e6a7418becc83799d91001139bb65a92b18a113019"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.27/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.28/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
