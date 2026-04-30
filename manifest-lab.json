@@ -1,24 +1,24 @@
 {
-  "version": "1.4.0",
+  "version": "1.4.1",
   "released": "2026-04-30",
   "changelog": [
-    "Collabs"
+    "GPS fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.0/server.js",
-      "sha256": "1e334218bae046537ab3aadccc25abbf3b5479166c8fe7fafedc39d89b1f6b23"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.1/server.js",
+      "sha256": "49985ccc7239102c322b9ecb1101670c9917a367096c485e256d9c10273d0389"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.0/index.html",
-      "sha256": "468906080736f7e22bbb8e4d10218c117dce14383035d59f5ec31c0e37e127aa"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.1/index.html",
+      "sha256": "540c8c6db92ae39a0c01724a940de3c5d63ea9df15ce1747ffd8fc856a59de00"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.0/package.json",
-      "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.1/package.json",
+      "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
 }
