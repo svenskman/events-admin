@@ -1,23 +1,23 @@
 {
-  "version": "1.3.28",
+  "version": "1.4.0",
   "released": "2026-04-30",
   "changelog": [
-    "TV-Duration/order fix"
+    "Collabs"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.28/server.js",
-      "sha256": "51bd8e425ea07da71f546ba37668c51ff8f248c2fca88b4c0f0ecd3e3536383b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.0/server.js",
+      "sha256": "1e334218bae046537ab3aadccc25abbf3b5479166c8fe7fafedc39d89b1f6b23"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.28/index.html",
-      "sha256": "e7ccf932ee1fe4614b2853e6a7418becc83799d91001139bb65a92b18a113019"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.0/index.html",
+      "sha256": "468906080736f7e22bbb8e4d10218c117dce14383035d59f5ec31c0e37e127aa"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.3.28/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.0/package.json",
       "sha256": "ae99903045e3348488fa06d5032f9700e1f5de58bbfb345064d7f43e44758e9a"
     }
   ]
