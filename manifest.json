@@ -1,23 +1,23 @@
 {
-  "version": "1.4.2",
-  "released": "2026-04-30",
+  "version": "1.5.0",
+  "released": "2026-05-01",
   "changelog": [
-    "Excalidraw, markup"
+    "Root side, notice"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.2/server.js",
-      "sha256": "49985ccc7239102c322b9ecb1101670c9917a367096c485e256d9c10273d0389"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.0/server.js",
+      "sha256": "83fc3986d4ea1b87549811d94f3150d0d9e741fb59e2972022ad520508bdb6ab"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.2/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.0/index.html",
       "sha256": "ff7b8b41ef34e9b345a9cadf894a5d3725f17e4cf33c628794e3b66e899e7e81"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.4.2/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.0/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
