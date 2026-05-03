@@ -1,23 +1,23 @@
 {
-  "version": "1.5.7",
+  "version": "1.5.8",
   "released": "2026-05-03",
   "changelog": [
-    "Turplan fix"
+    "Debug kart fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.7/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.8/server.js",
       "sha256": "1972f7a0323791fa6c37b91cdda04617c0f347eb5a636d1a0b4a18da729a9ec2"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.7/index.html",
-      "sha256": "3a59253033529ff55bf4da358d940155c54d21a9896be4b8c2baa7c1143f3b14"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.8/index.html",
+      "sha256": "1d015ef803a9c081ccc74872b0dab49cf2e9bc663b34163eb0a56fe72d6bdddc"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.7/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.8/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
