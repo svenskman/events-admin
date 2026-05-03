@@ -1,23 +1,23 @@
 {
-  "version": "1.5.5",
+  "version": "1.5.6",
   "released": "2026-05-03",
   "changelog": [
-    "Navigerings uppdatering"
+    "Turrute fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.5/server.js",
-      "sha256": "af2e3acf86c74e94fbbcde3072b87e5c23e392829f3faab9d8e0a1f03f1578aa"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.6/server.js",
+      "sha256": "1972f7a0323791fa6c37b91cdda04617c0f347eb5a636d1a0b4a18da729a9ec2"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.5/index.html",
-      "sha256": "924b4c3ca8d08601caa82d1605ea1a844ae48d8b4814d9983a43f3fbf0de31e7"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.6/index.html",
+      "sha256": "8c13fa2902d381a5c875947a3eb993c9e4a58a01aece450a65bfdb73dd2a9a5c"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.5/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.6/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
