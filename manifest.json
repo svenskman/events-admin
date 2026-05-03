@@ -1,23 +1,23 @@
 {
-  "version": "1.5.4",
-  "released": "2026-05-02",
+  "version": "1.5.5",
+  "released": "2026-05-03",
   "changelog": [
-    "Div bug fix"
+    "Navigerings uppdatering"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.4/server.js",
-      "sha256": "9fa2af0c490b7a25effe8363ec17f275965a9a4f47292e9b1080d8afabc78e85"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.5/server.js",
+      "sha256": "af2e3acf86c74e94fbbcde3072b87e5c23e392829f3faab9d8e0a1f03f1578aa"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.4/index.html",
-      "sha256": "fcd9f0fc9b830e4dbbb4cd8bf5c8891aee4de4ad5bbfeae5e0791789aad5524f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.5/index.html",
+      "sha256": "924b4c3ca8d08601caa82d1605ea1a844ae48d8b4814d9983a43f3fbf0de31e7"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.5/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
