@@ -1,23 +1,23 @@
 {
-  "version": "1.6.2",
+  "version": "1.6.3",
   "released": "2026-05-04",
   "changelog": [
-    "Map update"
+    "Route fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.2/server.js",
-      "sha256": "f5917ef06db1d0994907ed78849fd5a328205aea0bb8c6ee9f96414e4ccbabe4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.3/server.js",
+      "sha256": "72611c695e1c925eb2975534d93d7f37591088c69f9ed0f4f0873279793bb584"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.2/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.3/index.html",
       "sha256": "070471a2b327751e042a822af3f51e1040cb0802c8949d9cda3763f51ab005c2"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.2/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.3/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
