@@ -1,23 +1,23 @@
 {
-  "version": "1.5.14",
+  "version": "1.5.15",
   "released": "2026-05-04",
   "changelog": [
-    "Tv fix"
+    "Tv-fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.14/server.js",
-      "sha256": "b16c921400648a1c72b9e5b18decd5f3e7e2ae08b08b8d45b95301cf39ae305d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.15/server.js",
+      "sha256": "1ab26568065a826201b3ffb742d34a95947faff6a75508932b0f8e660ae68ad6"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.14/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.15/index.html",
       "sha256": "9621c6b19b75b54475a01851fdf613e790326129608c0971f27f8530a41e796f"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.14/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.15/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
