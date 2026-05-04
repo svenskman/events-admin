@@ -1,23 +1,23 @@
 {
-  "version": "1.5.11",
+  "version": "1.5.12",
   "released": "2026-05-04",
   "changelog": [
-    "Turplanering fix"
+    "Bil mc fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.11/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.12/server.js",
       "sha256": "546d5e25f24b3a51973ec406385f02424ca767adf928c72b7d15e2c9f0de6cad"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.11/index.html",
-      "sha256": "bf3220b9e8ee2afadd35a525c618fb31babe891a4ec052505ba2d7822124e08f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.12/index.html",
+      "sha256": "ec224d2bca8ddf38a6bdfdbdaf17ccef11d4cfad785451af68b181af0d8490d6"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.11/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.5.12/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
