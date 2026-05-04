@@ -1,23 +1,23 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "released": "2026-05-04",
   "changelog": [
-    "Tur- vägsök."
+    "Kart Update fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.0/server.js",
-      "sha256": "1ab26568065a826201b3ffb742d34a95947faff6a75508932b0f8e660ae68ad6"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.1/server.js",
+      "sha256": "e6997b245d98558de009325e78ea29286c554a1b4e93ab3841d8a99601d03817"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.0/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.1/index.html",
       "sha256": "070471a2b327751e042a822af3f51e1040cb0802c8949d9cda3763f51ab005c2"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.1/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
