@@ -1,23 +1,23 @@
 {
-  "version": "1.6.11",
+  "version": "1.6.12",
   "released": "2026-05-05",
   "changelog": [
-    "Kart översikt"
+    "Tur-bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.11/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.12/server.js",
       "sha256": "6e15eaade13f220641b9369622c4716a5c01e9d869f1b4d2a3936e805557e701"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.11/index.html",
-      "sha256": "623b0001a9f0f11852c768ed9d2056d2f918196c1da70ac7610884e58d737d83"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.12/index.html",
+      "sha256": "38082d3fd7010048c7e91da8275ffcb6ca11d04812ef5389a3db2bfb023d0a97"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.11/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.12/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
