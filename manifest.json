@@ -1,23 +1,23 @@
 {
-  "version": "1.6.4",
-  "released": "2026-05-04",
+  "version": "1.6.5",
+  "released": "2026-05-05",
   "changelog": [
-    "Bug fixes"
+    "Kart bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.4/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.5/server.js",
       "sha256": "ecd17245efece9bfb8c05caf51276eca1495b5ccc72e1baffb8d99cc482b93a2"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.4/index.html",
-      "sha256": "6f760f1f4337d17820f33f53695ad567499bd00a1575059a1810330d2367515b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.5/index.html",
+      "sha256": "df8eb14ea05636bcd9e923bec4c9ebea6df85473fc599cd65dbb145402375440"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.5/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
