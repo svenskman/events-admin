@@ -1,23 +1,23 @@
 {
-  "version": "1.7.3",
+  "version": "1.7.4",
   "released": "2026-05-05",
   "changelog": [
-    "Avdelingsmode"
+    "Lightmode fixes"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.3/server.js",
-      "sha256": "471f4e06f077f0f3092e0cf4ca2442ccd73e6008bebd86c6e2cd7826c64d4717"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.4/server.js",
+      "sha256": "ce373347ac57f606fb7c518b44b07bbfbb19d93850bcdc82478b64cfb274f2b2"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.3/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.4/index.html",
       "sha256": "78ae9286b27941b6051f916e78ddd75e9729f60ff8f67bcfbd021da091ef76d2"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.3/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.4/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
