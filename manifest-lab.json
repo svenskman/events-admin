@@ -1,23 +1,23 @@
 {
-  "version": "1.6.19",
+  "version": "1.7.0",
   "released": "2026-05-05",
   "changelog": [
-    "Eventliste update"
+    "Costumer section"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.19/server.js",
-      "sha256": "2f9673c8cde2bef24515f605d64a79db0c0d2cc16bff62eea6e9823bd48cd3bd"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.0/server.js",
+      "sha256": "2bae92277006f94b5344d45668162504fed24487622ebdce3b3b87dcb264871b"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.19/index.html",
-      "sha256": "b55303400f9d8e0f49449a49d7975e0cfa787e5222f619dd803537652e2741dd"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.0/index.html",
+      "sha256": "124daba84bc85f2ee0fe9f4df63b085b299c3604f18f4db1502e6fdb94e0aba9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.19/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.0/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
