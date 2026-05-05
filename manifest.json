@@ -1,23 +1,23 @@
 {
-  "version": "1.6.14",
+  "version": "1.6.15",
   "released": "2026-05-05",
   "changelog": [
-    "Fix"
+    "Fixes"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.14/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.15/server.js",
       "sha256": "6e15eaade13f220641b9369622c4716a5c01e9d869f1b4d2a3936e805557e701"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.14/index.html",
-      "sha256": "708cae1310e5458062db5f96b514e4947da2d232072b78bc5de0b6a7c721068a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.15/index.html",
+      "sha256": "af4fac31f40a803bea1eb90680c5e1fe77a717d4b8fb027d233f66f882a8eb9b"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.14/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.15/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
