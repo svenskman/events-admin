@@ -1,23 +1,23 @@
 {
-  "version": "1.7.5",
+  "version": "1.7.6",
   "released": "2026-05-05",
   "changelog": [
-    "Color Fix"
+    "Färg fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.5/server.js",
-      "sha256": "51b83b6961700a023a606b51c80f783170ba2086a496679971e1ab71f68a5fe1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.6/server.js",
+      "sha256": "92943bdb5c9c47dc0156d4d3901d239565c26ddf3b6ca2748a932664255702f8"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.5/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.6/index.html",
       "sha256": "8c6a7ef317957e8919daf2e2a757cc11490db36c3a422a2df6663387f52d81e1"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.5/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.6/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
