@@ -1,23 +1,23 @@
 {
-  "version": "1.6.8",
+  "version": "1.6.9",
   "released": "2026-05-05",
   "changelog": [
-    "Kart-fix"
+    "Nav-bugs"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.8/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.9/server.js",
       "sha256": "ecd17245efece9bfb8c05caf51276eca1495b5ccc72e1baffb8d99cc482b93a2"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.8/index.html",
-      "sha256": "2db1da6c24ee6be81158069b4fdd5e81fa8d71f30f56ac5a19f2bfb7e4282e45"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.9/index.html",
+      "sha256": "8f6e23e9cf26cbf6f7577ee6c27860874af7d161aedcc7f8f6acf56d7fc8dda0"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.8/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.6.9/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
