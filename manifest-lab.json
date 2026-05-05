@@ -1,23 +1,23 @@
 {
-  "version": "1.7.0",
+  "version": "1.7.1",
   "released": "2026-05-05",
   "changelog": [
-    "Costumer section"
+    "Justering på eventlistan"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.0/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.1/server.js",
       "sha256": "2bae92277006f94b5344d45668162504fed24487622ebdce3b3b87dcb264871b"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.0/index.html",
-      "sha256": "124daba84bc85f2ee0fe9f4df63b085b299c3604f18f4db1502e6fdb94e0aba9"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.1/index.html",
+      "sha256": "1a565247e5b005bf4bcae5e49475bc44d46d3788ed1a2655e1d14c33e442c6d3"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.1/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
