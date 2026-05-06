@@ -1,23 +1,23 @@
 {
-  "version": "1.7.10",
+  "version": "1.7.11",
   "released": "2026-05-06",
   "changelog": [
-    "Kolonne fix"
+    "Fixes"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.10/server.js",
-      "sha256": "4f07b708ab92b08a4bdb3742dc75bda11c3bf35d59327bf2990f9d3832108ec4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.11/server.js",
+      "sha256": "61c599229b855fe5c40607feec1a5bffc4af0ca03980c03db67a5793a87068f8"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.10/index.html",
-      "sha256": "bccd6cea030ea85dace9e2467f5b8e93fd496a342b1c168447c739fd18feb4b2"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.11/index.html",
+      "sha256": "b155cb780949f03fd4f87473b93d5122e4af895f2981708348aa53361acc71b8"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.10/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.11/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
