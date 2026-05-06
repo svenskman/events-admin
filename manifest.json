@@ -1,23 +1,23 @@
 {
-  "version": "1.7.8",
+  "version": "1.7.9",
   "released": "2026-05-06",
   "changelog": [
-    "Kart fix"
+    "Kolonner och grafen."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.8/server.js",
-      "sha256": "92943bdb5c9c47dc0156d4d3901d239565c26ddf3b6ca2748a932664255702f8"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.9/server.js",
+      "sha256": "27443c28bdd77c3bea499e7e66f85a171b11334a671f3b900905bf7d1efc7ea8"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.8/index.html",
-      "sha256": "2892bc46ec7670b5dbb58f9f9188d53a9a5118444b1b8dbc8ee8c0494708bdd2"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.9/index.html",
+      "sha256": "edbf25cabc0d60f4a5241db3972ba7c722d45a97b01675b68b79f1d6fc0d9132"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.8/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.9/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
