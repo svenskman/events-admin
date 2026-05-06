@@ -1,23 +1,23 @@
 {
-  "version": "1.7.12",
+  "version": "1.7.13",
   "released": "2026-05-06",
   "changelog": [
-    "Div fix"
+    "Tur fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.12/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.13/server.js",
       "sha256": "b7f3262af5f9755da3c2c8a64cab40d321d4dfef3b5f0e36707109e49b76e828"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.12/index.html",
-      "sha256": "bccd6cea030ea85dace9e2467f5b8e93fd496a342b1c168447c739fd18feb4b2"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.13/index.html",
+      "sha256": "7e889adad3d0b13d62459dd8c4b818581974981b87f6b38419c878014e0f0e21"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.12/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.7.13/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
