@@ -1,23 +1,23 @@
 {
-  "version": "1.8.5",
+  "version": "1.8.6",
   "released": "2026-05-07",
   "changelog": [
-    "Fixes"
+    "Kart fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.5/server.js",
-      "sha256": "d8d3a44f9b541945dea2ddae3adf6009f3efdf238cd2e0a49c468f61d5d932cc"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.6/server.js",
+      "sha256": "08d2cbe8daa2e21453b5bd5c2990fd79f5ce33cc918fc6734a08de7c6f7b7ea2"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.5/index.html",
-      "sha256": "451f2aa03eb0899382c74704740a222dbedc0fbb0b47b133faf567dd673234ac"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.6/index.html",
+      "sha256": "6c2994ca51cf824cac912de14775ad36dbbac31a5dc57fa5808f146cd3c333ac"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.5/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.6/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
