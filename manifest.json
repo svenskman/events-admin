@@ -1,23 +1,23 @@
 {
-  "version": "1.8.9",
-  "released": "2026-05-07",
+  "version": "1.9.0",
+  "released": "2026-05-08",
   "changelog": [
-    "Mobil + Session"
+    "Mobile fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.9/server.js",
-      "sha256": "ad32fccfec86c30a67f049f7990e0f8593cc347cd4cc28e28e1743391fee1242"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.0/server.js",
+      "sha256": "0bd8642ea162abba26cbc919980a6cf67d698efafe54915192ac83d87d0ba0a7"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.9/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.0/index.html",
       "sha256": "541b3d9564669f71254198a4f1eddd4750e14dc2258f1d3ebcdbfaa6f9d10c47"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.9/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.0/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
