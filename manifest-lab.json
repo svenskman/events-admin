@@ -1,23 +1,23 @@
 {
-  "version": "1.9.1",
-  "released": "2026-05-08",
+  "version": "1.8.11",
+  "released": "2026-05-09",
   "changelog": [
-    "Div Fixes"
+    "Old Bugfixes"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.1/server.js",
-      "sha256": "34148d073ed81c4ba8d56de06407a42039d1065acb357e4654f5372b681bf65b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.11/server.js",
+      "sha256": "c8e4028acf31aa3dbda3bbdfb3354feca20b0c0ef07cc54ba8f981a94ae83efb"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.1/index.html",
-      "sha256": "5b53a48b5c8ac55dbc4455d1be898d7f7a739dbaa664dd129ef156577884683f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.11/index.html",
+      "sha256": "234c1d6a471e7d299606ff8cf3c31ffb53254996e9310d77ab78f8028ccde7ce"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.1/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.11/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
