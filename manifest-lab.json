@@ -1,23 +1,23 @@
 {
-  "version": "1.8.13",
-  "released": "2026-05-09",
+  "version": "1.8.14",
+  "released": "2026-05-10",
   "changelog": [
-    "Div fiks"
+    "GB bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.13/server.js",
-      "sha256": "3a2dbe3bfcc228d76f6529e4f5a9f0e82d74af96b7e4f157f3e8e099c3b68426"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.14/server.js",
+      "sha256": "eba4b73e11679a2d058bab71b68106a144bb4785a01328a7af94fb99d4456434"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.13/index.html",
-      "sha256": "7c572e06a1fff2c8a2cdf9e4bed0210e9d24df0e2c7a421c390d2e3149023903"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.14/index.html",
+      "sha256": "e18ca7ba17b042bc1510994c9f67fb9fc49dafaf1c34718b8259d3f6b4eec6e3"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.13/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.14/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
