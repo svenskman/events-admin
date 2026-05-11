@@ -1,23 +1,23 @@
 {
-  "version": "1.8.21",
+  "version": "1.8.22",
   "released": "2026-05-11",
   "changelog": [
-    "Settings redesign"
+    "Mobil layout justering"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.21/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.22/server.js",
       "sha256": "281633c979f8e09db7c7f0d1648fbce2a963e5725e4fdbcfa1c8718f77d70460"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.21/index.html",
-      "sha256": "e7a79088bc069d1857b9bf4699c10c53c4db9b905521416bb49a21f5b7bf6b4b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.22/index.html",
+      "sha256": "019de44affdfa619965112944b6cbff05101b0ebb767d2ec4534f627a1d95956"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.21/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.22/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
