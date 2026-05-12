@@ -1,23 +1,23 @@
 {
-  "version": "1.8.24",
+  "version": "1.8.25",
   "released": "2026-05-12",
   "changelog": [
-    "Booking av Frivillig"
+    "v1.8.25"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.24/server.js",
-      "sha256": "5bf0053607a7b03a918b422c4d093b061029f8d6b6dbc68a013ef9d84df1a9c0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.25/server.js",
+      "sha256": "a671b85aa9491f55479659cc5475597dfe73fac5e14c649c277a64bbed9d7426"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.24/index.html",
-      "sha256": "b95fea69aff663fef6da4a932201c425b3265da9fc6dedba1bb38de4f84295ac"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.25/index.html",
+      "sha256": "52ac62aab485780ea0f197b230203398a4177e0e519b89c6d0b641d7630aa236"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.24/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.25/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
