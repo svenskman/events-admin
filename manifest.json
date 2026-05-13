@@ -1,23 +1,23 @@
 {
-  "version": "1.8.40",
+  "version": "1.8.41",
   "released": "2026-05-13",
   "changelog": [
-    "Upload limits."
+    "v1.8.41"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.40/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.41/server.js",
       "sha256": "9ce80fb1212505f9f4037d11c70ac8374995f0668bc7abb15181b1142ef1e552"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.40/index.html",
-      "sha256": "32d6e8f2251271efa290bcf10b965f3343d67f1447d1f4f7de34327914ad3286"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.41/index.html",
+      "sha256": "52abd450b4bbb03a91f374e61733114f9c8b7994a7bedaff3c74ec3f577f880e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.40/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.41/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
