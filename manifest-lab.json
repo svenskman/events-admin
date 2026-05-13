@@ -1,23 +1,23 @@
 {
-  "version": "1.8.39",
+  "version": "1.8.40",
   "released": "2026-05-13",
   "changelog": [
-    "Migrering Engelsk"
+    "Upload limits."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.39/server.js",
-      "sha256": "c9dddf607efd884a10b1637261884ed70537c59783462b22d971192d9ec601b5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.40/server.js",
+      "sha256": "9ce80fb1212505f9f4037d11c70ac8374995f0668bc7abb15181b1142ef1e552"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.39/index.html",
-      "sha256": "786d52dc5ea7264d25b9ccd4567be4d0631e3ad7edd571e8dd66cbdc06bd1755"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.40/index.html",
+      "sha256": "32d6e8f2251271efa290bcf10b965f3343d67f1447d1f4f7de34327914ad3286"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.39/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.40/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
