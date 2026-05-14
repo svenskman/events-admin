@@ -1,23 +1,23 @@
 {
-  "version": "1.8.50",
+  "version": "1.8.51",
   "released": "2026-05-14",
   "changelog": [
-    "GPS bug"
+    "v1.8.51"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.50/server.js",
-      "sha256": "04b1792dc75c8e5f622661481468fdb69dea630df7a82deb1af5880a711e6872"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.51/server.js",
+      "sha256": "f792c8500d3cd1b3139d60ff30f2a4384568d8eb66717216c4c390a2235dffff"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.50/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.51/index.html",
       "sha256": "92608764364488686641b5b62167bee74939b07254f4b3313a76455b9c0153c9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.50/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.51/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
