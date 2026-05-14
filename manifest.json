@@ -1,23 +1,23 @@
 {
-  "version": "1.8.47",
+  "version": "1.8.48",
   "released": "2026-05-14",
   "changelog": [
-    "GPX Bug"
+    "GPS tracker fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.47/server.js",
-      "sha256": "d6b85606c8ddfc7ce90517f79196bfc00ba4539851fe8276ab2cb15541dc902e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.48/server.js",
+      "sha256": "fc33f4b9318539adeb5a318a0c4d9542f724c1e7b278da8c3f84db4e629c63df"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.47/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.48/index.html",
       "sha256": "92608764364488686641b5b62167bee74939b07254f4b3313a76455b9c0153c9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.47/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.48/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
