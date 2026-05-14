@@ -1,23 +1,23 @@
 {
-  "version": "1.8.56",
+  "version": "1.8.57",
   "released": "2026-05-14",
   "changelog": [
-    "Inventory Bug"
+    "Inventory bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.56/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.57/server.js",
       "sha256": "4ba55b871aca100ad621877933227d9b7da24e2cef5df8a83e9f7640882ab2d3"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.56/index.html",
-      "sha256": "b859b2c6a0a934fc69a34907ce3440825e46de346a281fbf7272e645c7049433"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.57/index.html",
+      "sha256": "96328db189ac76eb370e7d6b98aa6962add6bef159a04c4338cd4bb918a83e3f"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.56/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.57/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
