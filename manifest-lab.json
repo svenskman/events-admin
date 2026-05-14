@@ -1,23 +1,23 @@
 {
-  "version": "1.8.44",
+  "version": "1.8.45",
   "released": "2026-05-14",
   "changelog": [
-    "Notification colors"
+    "inventory bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.44/server.js",
-      "sha256": "9eb96df4dc937ca4ba2ef2a5b8fa1ff5319ddc628c8415133e9dd1395d52b85a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.45/server.js",
+      "sha256": "98217322b581182b8e064fbaf810b0d82c8337a8bdf50ba54282506ec02ab547"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.44/index.html",
-      "sha256": "0650bab084c807c5aa6c591108d102908aae058112b7c356f195a35a5e2c860a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.45/index.html",
+      "sha256": "08ac1ec96100b3355b8be917321a35e7833992d4d2435bfa56a9881eeebc6e53"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.44/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.45/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
