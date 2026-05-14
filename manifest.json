@@ -1,23 +1,23 @@
 {
-  "version": "1.8.55",
+  "version": "1.8.56",
   "released": "2026-05-14",
   "changelog": [
-    "Korrigering statiske lables"
+    "Inventory Bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.55/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.56/server.js",
       "sha256": "4ba55b871aca100ad621877933227d9b7da24e2cef5df8a83e9f7640882ab2d3"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.55/index.html",
-      "sha256": "8ad2b65280ea440b2ca2d1d9b496c4e25d06fa8addf69a8cbbdfe390d5c7e278"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.56/index.html",
+      "sha256": "b859b2c6a0a934fc69a34907ce3440825e46de346a281fbf7272e645c7049433"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.55/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.56/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
