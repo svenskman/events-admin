@@ -1,23 +1,23 @@
 {
-  "version": "1.8.52",
+  "version": "1.8.53",
   "released": "2026-05-14",
   "changelog": [
-    "v1.8.52"
+    "Tracker fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.52/server.js",
-      "sha256": "8912d3b24143cc59b9e75570c19cfcce92c1b8c16588d7d2c8517575a255da8c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.53/server.js",
+      "sha256": "73af01766cbc32f67f1ddf6c7dd4f6b104227e0e2c3ec49a1c760a556009cdd1"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.52/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.53/index.html",
       "sha256": "92608764364488686641b5b62167bee74939b07254f4b3313a76455b9c0153c9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.52/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.53/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
