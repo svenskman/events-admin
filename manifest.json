@@ -1,23 +1,23 @@
 {
-  "version": "1.8.54",
+  "version": "1.8.55",
   "released": "2026-05-14",
   "changelog": [
-    "Profile update"
+    "Korrigering statiske lables"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.54/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.55/server.js",
       "sha256": "4ba55b871aca100ad621877933227d9b7da24e2cef5df8a83e9f7640882ab2d3"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.54/index.html",
-      "sha256": "0c78f28b6f1c6bf6398d802d43dcccac98dcb838677e00eabca1bfaa17db0013"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.55/index.html",
+      "sha256": "8ad2b65280ea440b2ca2d1d9b496c4e25d06fa8addf69a8cbbdfe390d5c7e278"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.54/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.55/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
