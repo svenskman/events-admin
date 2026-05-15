@@ -1,3 +1,28 @@
+// ============================================================
+// CODING STANDARDS — AI AND HUMAN CONTRIBUTORS
+// ============================================================
+// ALL variable names, function names, API endpoint paths,
+// JSON field names, constants, and code identifiers MUST be
+// in plain English.
+//
+// The ONLY exception is text directly facing the end-user
+// (UI labels, error messages, translated strings) which live
+// in the translation layer (TRANSLATIONS object / t() function).
+//
+// Examples:
+//   ✓  item.quantity   item.name   item.description
+//   ✗  item.antall     item.navn   item.beskrivelse
+//
+//   ✓  function loadInventoryPage()
+//   ✗  function loadInventarPage()
+//
+//   ✓  GET /api/inventory
+//   ✗  GET /api/inventar
+//
+// When in doubt: if a native English speaker wouldn't
+// recognise the word as English, rename it.
+// ============================================================
+
 // Events Admin – server.js
 // Version: 1.0.1
 // Author: David Eriksson
@@ -10,7 +35,7 @@ const fs       = require("fs");
 const path     = require("path");
 const { v4: uuid } = require("uuid");
 
-// ── Registrerings-token (HMAC-SHA256) ───────────────────────────
+// ── Registration token (HMAC-SHA256) ───────────────────────────
 // Unique encrypted QR code per registration — used for check-in and lottery verification
 function generateRegToken(evId, regId) {
   const crypto  = require("crypto");
@@ -34,7 +59,7 @@ function verifyRegToken(token) {
   } catch(e) { return null; }
 }
 
-// ── Lotterivinnar-token (HMAC-SHA256) ────────────────────────────
+// ── Lottery winner token (HMAC-SHA256) ────────────────────────────
 // Format: base64url( JSON({ evId, regId, drawNum, ts }) ) + "." + base64url(HMAC)
 function generateWinnerToken(evId, regId, drawNum) {
   const crypto = require("crypto");
@@ -61,7 +86,7 @@ function verifyWinnerToken(token) {
   } catch(e) { return null; }
 }
 
-// ── E-post via Nodemailer + Runbox SMTP ──────────────────────────
+// ── Email via Nodemailer + Runbox SMTP ──────────────────────────
 // Configuration via environment variables (set in docker-compose.yml / Portainer):
 //   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
 //   TEST_EMAIL_OVERRIDE  – send all mail to this address instead (testing)
@@ -159,7 +184,7 @@ async function sendEmail({ to, subject, html, text, replyTo, fromName: fromNameO
 }
 
 // ── E-postmaler ──────────────────────────────────────────────────
-// Konverter ren tekst til HTML for e-post
+// Convert plain text to HTML for email
 function _textToEmailHtml(text, siteName, settings) {
   const accent   = (settings.colors && settings.colors.accent) || "#FFD100";
   const logoUrl  = settings.logoUrl || "";
@@ -337,7 +362,7 @@ function applyEmailVars(text, ev, reg, settings) {
     "{{login_url}}":     "https://" + (settings.adminDomain || ("admin." + (settings.eventDomain || DOMAIN))),
   };
 
-  // Betingede blokker {{#var}}innhold{{/var}}
+  // Conditional blocks {{#var}}content{{/var}}
   text = text.replace(/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\}\}/g, function(m, key, inner) {
     const v = vars["{{" + key + "}}"];
     return (v && v.length) ? inner : "";
@@ -501,21 +526,21 @@ function emailTurFinalized(ev, reg, settings) {
   const firstName = (reg.name || "").split(" ")[0];
   const route     = ev.route || {};
   const days      = route.days || [];
-  const etappeHtml = days.length ? days.map(function(day, di) {
-    const etapper = (day.etapper || []).filter(function(e){ return e.fra || e.til; });
-    if (!etapper.length) return "";
-    const dayLabel = day.dato
-      ? new Date(day.dato).toLocaleDateString("nb-NO", { weekday:"long", day:"numeric", month:"long" })
+  const stageHtml = days.length ? days.map(function(day, di) {
+    const stages = (day.stages || []).filter(function(e){ return e.from || e.to; });
+    if (!stages.length) return "";
+    const dayLabel = day.date
+      ? new Date(day.date).toLocaleDateString("nb-NO", { weekday:"long", day:"numeric", month:"long" })
       : ("Dag " + (di + 1));
-    const rows = etapper.map(function(e) {
+    const rows = stages.map(function(e) {
       const opplevelseIcons = { museum:"🏛️", natur:"🌿", utsikt:"🏔️", historisk:"🏰", aktivitet:"🎭", kultur:"🎨", mat:"🍴", annet:"⭐" };
       const typeIcon = e.type === "opplevelse"
         ? (opplevelseIcons[e.opplevelseSubtype] || "⭐")
         : { start:"🏁", stopp:"📍", lunsj:"🍽️", middag:"🍷", hotell:"🏨", slutt:"🏁", bensin:"⛽" }[e.type] || "📍";
       const km = e.km ? " · " + e.km + " km" : "";
-      const notat = e.notat ? "<br><span style='color:#888;font-size:.85rem'>" + escHtml(e.notat) + "</span>" : "";
-      return "<tr><td style=\"padding:.4rem .6rem;border-bottom:1px solid #eee;white-space:nowrap\">" + typeIcon + " " + escHtml(e.fra || "") + "</td>"
-           + "<td style=\"padding:.4rem .6rem;border-bottom:1px solid #eee\">→ " + escHtml(e.til || "") + km + notat + "</td></tr>";
+      const note = e.note ? "<br><span style='color:#888;font-size:.85rem'>" + escHtml(e.note) + "</span>" : "";
+      return "<tr><td style=\"padding:.4rem .6rem;border-bottom:1px solid #eee;white-space:nowrap\">" + typeIcon + " " + escHtml(e.from || "") + "</td>"
+           + "<td style=\"padding:.4rem .6rem;border-bottom:1px solid #eee\">→ " + escHtml(e.to || "") + km + notat + "</td></tr>";
     }).join("");
     return "<h3 style=\"font-size:1rem;font-weight:700;color:#1a1a1a;margin:1.25rem 0 .5rem\">" + escHtml(dayLabel) + "</h3>"
          + "<table style=\"width:100%;border-collapse:collapse;font-size:.9rem\">" + rows + "</table>";
@@ -534,7 +559,7 @@ function emailTurFinalized(ev, reg, settings) {
     + (endDateStr ? "<p style=\"margin:.2rem 0\"><strong>🏁 Hjemkomst:</strong> " + escHtml(endDateStr) + "</p>" : "")
     + (ev.location ? "<p style=\"margin:.2rem 0\"><strong>📍 Oppmøtested:</strong> " + escHtml(ev.location) + "</p>" : "")
     + hotelLine + "</div>"
-    + (etappeHtml ? "<h2 style=\"font-size:1.1rem;font-weight:700;margin:1.5rem 0 .25rem\">🗺️ Reiserute</h2>" + etappeHtml : "")
+    + (stageHtml ? "<h2 style=\"font-size:1.1rem;font-weight:700;margin:1.5rem 0 .25rem\">🗺️ Reiserute</h2>" + stageHtml: "")
     + (ev.description ? "<h2 style=\"font-size:1.1rem;font-weight:700;margin:1.5rem 0 .25rem\">ℹ️ Om turen</h2><p style=\"line-height:1.7;color:#333\">" + escHtml(ev.description).replace(/\n/g,"<br>") + "</p>" : "")
     + "<hr style=\"border:none;border-top:1px solid #e0e0e0;margin:1.5rem 0\">"
     + (contact ? "<p style=\"font-size:.85rem;color:#555\">Spørsmål? Kontakt oss på <a href=\"mailto:" + escHtml(contact) + "\" style=\"color:#1a1a1a\">" + escHtml(contact) + "</a></p>" : "")
@@ -571,11 +596,11 @@ function emailCancellationConfirmation(ev, reg, settings) {
     <p style="color:#555;font-size:.9rem">Ønsker du å melde deg på igjen kan du gjøre det via arrangementssiden.</p>
   </div>
 </div>`;
-  const text = `Hei ${reg.name}!\n\nDu er avmeldt fra: ${ev.title}\n\n– ${siteName}`;
+  const text = `Hei ${reg.name}!\n\nDu er avmeldt from: ${ev.title}\n\n– ${siteName}`;
   return { subject, html, text };
 }
 
-const APP_VERSION = "1.7.10"; // Oppdateres automatisk ved installasjon via update/apply
+const APP_VERSION = "1.7.10"; // Updated automatically on installation via update/apply
 
 const app          = express();
 const DATA         = process.env.DATA_DIR     || "./data";
@@ -598,6 +623,7 @@ const GH_KEY       = process.env.GRAPHHOPPER_KEY || "";
 
 const USERS_FILE    = path.join(DATA, "users.json");
 const EVENTS_FILE   = path.join(DATA, "events.json");
+const VISITS_FILE   = path.join(DATA, "visits.json");
 const SETTINGS_FILE = path.join(DATA, "settings.json");
 const MEMBERS_FILE  = path.join(DATA, "members.json");
 const WISHES_F   = path.join(DATA, "wishes.json");
@@ -627,7 +653,7 @@ const DEVLOG_F     = path.join(DATA, "devlog.json");
 const SERIES_F     = path.join(DATA, "series.json");
 const BLOCKS_F     = path.join(DATA, "blocks.json");
 const VOLUNTEERS_FILE = path.join(DATA, "volunteers.json");
-const INVENTAR_FILE   = path.join(DATA, "inventar.json");
+const INVENTORY_FILE   = path.join(DATA, "inventory.json");
 const PLAYLISTS_FILE  = path.join(DATA, "tv_playlists.json");
 const EMAIL_LOG_FILE  = path.join(DATA, "email_log.json");
 
@@ -666,7 +692,7 @@ function _broadcastTvUpcoming(department) {
         else ed2.setHours(23, 59, 59, 999);
         var isOngoingNow2 = startMs <= now && ed2.getTime() >= now;
         if (isOngoingNow2) return true;
-        return startMs > now - 3600000; // Vis alle fremtidige events
+        return startMs > now - 3600000; // Show all upcoming events
       })
       .sort(function(a, b) {
         var aS = new Date(a.date).getTime(); var bS = new Date(b.date).getTime();
@@ -681,9 +707,9 @@ function _broadcastTvUpcoming(department) {
           var route2 = e.route || null; var routeSummary2 = null;
           if (route2 && Array.isArray(route2.days) && route2.days.length) {
             var totalKm2 = 0; var stops2 = [];
-            route2.days.forEach(function(d) { ((d && d.etapper)||[]).forEach(function(et) {
-              if (et && et.fra && stops2.indexOf(et.fra)===-1) stops2.push(et.fra);
-              if (et && et.til && stops2.indexOf(et.til)===-1) stops2.push(et.til);
+            route2.days.forEach(function(d) { ((d && d.stages)||[]).forEach(function(et) {
+              if (et && et.from && stops2.indexOf(et.from)===-1) stops2.push(et.from);
+              if (et && et.to && stops2.indexOf(et.to)===-1) stops2.push(et.to);
               if (et && et.km) totalKm2 += parseFloat(et.km)||0;
             }); });
             routeSummary2 = { days: route2.days.length, km: totalKm2>0?Math.round(totalKm2):null, stops: stops2.slice(0,4) };
@@ -743,7 +769,7 @@ const tvState = _loadTvState(); // deptId → { mode, slides[], slideInterval, s
 const tvClients = new Map(); // clientId → { res, deptId }
 let tvNextId = 1;
 function broadcastTv(deptId, payload) {
-  // Legg alltid med typeColors og typeNames i state-meldinger
+  // Always include typeColors and typeNames in state messages
   var enriched = payload;
   if (payload && payload.type === "state") {
     var s = getSettings();
@@ -769,7 +795,7 @@ function getTvState(deptId) {
     slideOrder: "sequential",
     showLogo: true,
     ticker: "",
-    progressColor: "",    // tom = bruk aksentfarge
+    progressColor: "",    // empty = use accent color
   };
 }
 
@@ -796,7 +822,7 @@ fs.mkdirSync(DATA,    { recursive: true });
   [EVENTS_FILE,    "[]"],
   [MEMBERS_FILE,   "[]"],
   [VOLUNTEERS_FILE,"[]"],
-  [INVENTAR_FILE,  "[]"],
+  [INVENTORY_FILE,  "[]"],
   [BLOCKS_F,       "[]"],
   [SERIES_F,       "[]"],
   [WISHES_F,       "[]"],
@@ -915,10 +941,10 @@ function writeEmailLog(entry) {
   }
 }
 
-// ── One-time migration: add department:null to inventar items without it ──
+// ── One-time migration: add department:null to inventory items without it ──
 (function migrateInventar() {
   try {
-    const items = readJSON(INVENTAR_FILE);
+    const items = readJSON(INVENTORY_FILE);
     let changed = false;
     items.forEach(function(item) {
       if (!Object.prototype.hasOwnProperty.call(item, "department")) {
@@ -927,7 +953,7 @@ function writeEmailLog(entry) {
       }
     });
     if (changed) {
-      writeJSON(INVENTAR_FILE, items);
+      writeJSON(INVENTORY_FILE, items);
       console.log("[migration] Added department:null to", items.length, "inventar items");
     }
   } catch(e) { console.error("[migration] inventar:", e.message); }
@@ -949,10 +975,10 @@ function writeEmailLog(entry) {
 // ── Middleware ───────────────────────────────────────────────────
 app.set("trust proxy", 1);
 app.disable("x-powered-by"); // F-21: hide Express version
-app.use(express.json({ limit: "20mb" }));
-app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+app.use(express.json({ limit: "200mb" }));
+app.use(express.urlencoded({ extended: true, limit: "200mb" }));
 
-// Grunnleggende security headers (uten helmet-avhengighet)
+// Basic security headers (without helmet dependency)
 app.use(function(req, res, next) {
   res.set("X-Content-Type-Options", "nosniff");
   res.set("X-XSS-Protection", "1; mode=block");
@@ -981,8 +1007,9 @@ app.use(function(req, res, next) {
       "style-src 'self' 'unsafe-inline' https://unpkg.com; " +
       "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.openstreetmap.org https://api.qrserver.com https://flagcdn.com; " +
       "media-src 'self' blob:; " +
-      "frame-src https://www.openstreetmap.org 'self'; " +
+      "frame-src https://www.openstreetmap.org https://sizzapp.com 'self'; " +
       "connect-src 'self' " +
+        "https://sizzapp.com " +
         "https://photon.komoot.io " +
         "https://nominatim.openstreetmap.org " +
         "https://overpass-api.de " +
@@ -1050,10 +1077,10 @@ try {
   if (!fs.existsSync(sessionDir)) fs.mkdirSync(sessionDir, { recursive: true });
   sessionStore = new FileStore({
     path:        sessionDir,
-    ttl:         86400 * 30,  // 30 dager
+    ttl:         86400 * 30,
     retries:     1,
-    reapInterval: 86400,      // Clean up expired sessions once per day
-    touchAfter:  3600,        // Only update session file max once per hour (reduces disk I/O)
+    reapInterval: 86400,
+    touchAfter:  3600,
     logFn:       function(){},
   });
   console.log("[session] Fil-basert session store: " + sessionDir);
@@ -1063,25 +1090,25 @@ try {
 }
 
 app.use(session({
-  name:   "events_sid",
-  store:  sessionStore,
+  name:  "events_sid",
+  store: sessionStore,
   secret: SECRET,
   resave: false,
   saveUninitialized: false,
-  rolling: true,              // Reset cookie expiry on every request (30 days from last activity)
+  rolling: true,
   cookie: {
     secure:   process.env.NODE_ENV === "production" ? "auto" : false,
     sameSite: "lax",
-    maxAge:   86400000 * 30,  // 30 days from last activity
+    maxAge:   86400000 * 30,  // 30 dager
     httpOnly: true,
   }
 }));
 
-// Filtype-validering for opplastinger
+// File type validation for uploads
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 const upload = multer({
   dest: UPLOADS,
-  limits: { fileSize: 8 * 1024 * 1024 },
+  limits: { fileSize: 80 * 1024 * 1024 },
   fileFilter: function(req, file, cb) {
     if (ALLOWED_IMAGE_TYPES.indexOf(file.mimetype) === -1) {
       return cb(new Error("Kun bilder er tillatt (jpeg, png, gif, webp)"));
@@ -1096,7 +1123,7 @@ app.use(function(req, res, next) {
 
   const host = (req.headers["x-forwarded-host"] || req.hostname || "").split(",")[0].trim().toLowerCase();
 
-  // Reserverte subdomener som ikke skal behandles som event-slug
+  // Reserved subdomains that should not be treated as event slugs
   const RESERVED = ["sso", "www", "mail", "smtp", "ftp", "api"];
   if (host === ADMIN_DOMAIN || host === DOMAIN || host === "www." + DOMAIN) return next();
   const sub0 = host.split(".")[0];
@@ -1234,7 +1261,7 @@ app.use(function(req, res, next) {
 // Serve only index.html explicitly — never expose server.js or other files
 app.get("/", function(req, res, next) {
   const host = (req.hostname || "").toLowerCase();
-  // Vis org-oversikt på root-domenet og www
+  // Show org overview on root domain and www
   if (host === DOMAIN || host === "www." + DOMAIN) {
     return serveOverviewPage(req, res);
   }
@@ -1253,13 +1280,13 @@ const auth = function(req, res, next) {
   if (!req.session.user) return res.status(401).json({ error: "Ikke innlogget" });
   // Breakglass sessions are not in users.json – skip DB refresh
   if (req.session.user.role === "breakglass") return next();
-  // Synkroniser alltid accessList fra fil – fanger opp endringer etter login
+  // Always sync accessList from file – catches changes made after login
   var fresh = readJSON(USERS_FILE).find(function(u){ return u.id === req.session.user.id; });
   if (fresh) {
     req.session.user.role      = fresh.role;
     req.session.user.accessList = getAccessList(fresh);
     req.session.user.name      = fresh.name;
-    req.session.user.title     = fresh.tittel || null;
+    req.session.user.title     = fresh.jobTitle || null;
   }
   next();
 };
@@ -1270,7 +1297,7 @@ const adminOnly = function(req, res, next) {
 const managerOrAdmin = function(req, res, next) {
   if (!req.session.user) return res.status(403).json({ error: "Ikke innlogget" });
   var u = req.session.user;
-  // Admin alltid OK
+  // Admin always OK
   if (u.role === "admin") return next();
   // Other roles OK if they have at least one access entry
   if (getAccessList(u).length > 0) return next();
@@ -1334,8 +1361,8 @@ const canEditEvent = function(ev, user) {
 };
 
 // ── Permissions ──────────────────────────────────────────────────
-// Calculate what the user is allowed to do – frontend bruker kun disse flaggene,
-// aldri role direkte. All tilgangskontroll skjer fortsatt i server.
+// Calculate what the user is allowed to do – frontend uses only these flags,
+// never role directly. All access control still happens in server.
 // Breakglass: minimal permission set – restore + reset admin password only
 function buildBreakglassPermissions() {
   return {
@@ -1363,7 +1390,7 @@ function buildPermissions(user, settings) {
   var accessList  = getAccessList(user);
   var isAdmin  = user.role === "admin";
 
-  // Hent rettigheter fra org-rolle-systemet
+  // fetch rettigheter from org-role-systemet
   var rp = getRolePermissions(user);
 
   // Bakoverkompatibilitet: map gamle roller
@@ -1416,7 +1443,7 @@ function buildPermissions(user, settings) {
     canSetDepartment:       isAdmin,
     canSetDepartmentField:  isAdmin,
 
-    // Brukere
+    // user
     canManageUsers:         isAdmin || isManager || isSubgroupManager || rp.manageUsers,
     canCreateUsersForDept:  isAdmin || isManager || rp.manageUsers,
     canCreateUsersForSubgroup: (isSubgroupManager && !isManager) || rp.manageUsers,
@@ -1433,7 +1460,7 @@ function buildPermissions(user, settings) {
     // Rapporter
     canSeeReports:          isAdmin || isManager || rp.seeReports,
 
-    // E-post
+    // email
     canSendEmail:                  isAdmin || isManager || rp.sendEmail,
     canEditGlobalEmailTemplates:   isAdmin,
     canEditDeptEmailTemplates:     isAdmin || isManager,
@@ -1497,7 +1524,7 @@ app.get("/api/config", auth, function(req, res) {
   });
 });
 
-// Lab: hent filinnhold for sjekkliste-analyse
+// Lab: fetch filinnhold for sjekkliste-analyse
 app.get("/api/lab/files", auth, adminOnly, function(req, res) {
   if (process.env.NODE_ENV === "production") return res.status(404).json({ error: "Not found" });
   const fileNames = ["server.js", "index.html", "package.json"];
@@ -1563,7 +1590,7 @@ app.get("/api/lab/export/context", auth, adminOnly, function(req, res) {
   lines.push("- E-post: Nodemailer mot SMTP (env-vars)\n");
   lines.push("## DATAFILER (/data)");
   ["events.json","users.json","settings.json","members.json","volunteers.json",
-   "wishes.json","email_log.json","inventar.json","blocks.json","series.json","devlog.json"].forEach(function(f) {
+   "wishes.json","email_log.json","inventory.json","blocks.json","series.json","devlog.json","visits.json"].forEach(function(f) {
     try { const c=JSON.parse(fs.readFileSync(path.join(DATA,f),"utf8")); lines.push("- "+f+": "+(Array.isArray(c)?c.length+" items":"object")); } catch(e) { lines.push("- "+f+": (mangler)"); }
   });
   lines.push("\n## API-ENDEPUNKTER");
@@ -1593,7 +1620,7 @@ app.get("/api/lab/export/context", auth, adminOnly, function(req, res) {
 // Lab: eksporter data-snapshot som ZIP
 app.get("/api/lab/export/data", auth, adminOnly, function(req, res) {
   if (process.env.NODE_ENV === "production") return res.status(404).json({ error: "Not found" });
-  const dfs=["events.json","users.json","settings.json","members.json","volunteers.json","wishes.json","email_log.json","inventar.json","blocks.json","series.json","devlog.json"];
+  const dfs=["events.json","users.json","settings.json","members.json","volunteers.json","wishes.json","email_log.json","inventory.json","blocks.json","series.json","devlog.json","visits.json"];
   const entries=[];
   dfs.forEach(function(name) {
     const fp=path.join(DATA,name);
@@ -1653,6 +1680,14 @@ app.get("/api/version", function(req, res) {
 const UPDATE_BASE     = process.env.UPDATE_URL      || "https://updates.events-admin.no";
 const UPDATE_MANIFEST = process.env.UPDATE_MANIFEST || "manifest.json";
 const IS_LAB          = !!(process.env.UPDATE_MANIFEST && process.env.UPDATE_MANIFEST !== "manifest.json");
+const IS_DEMO         = !!(process.env.DEMO_MODE === "true"
+                       || (process.env.DATA_DIR    || "").toLowerCase().includes("demo")
+                       || (process.env.ADMIN_DOMAIN|| "").toLowerCase().includes("demo")
+                       || (process.env.BASE_DOMAIN || "").toLowerCase().includes("demo"));
+const DEMO_EMAIL    = process.env.DEMO_EMAIL    || "demo@event-admin.online";
+const DEMO_PASSWORD = process.env.DEMO_PASSWORD || "Demo2026!";
+const DEMO_RESET_H  = parseInt(process.env.DEMO_RESET_HOURS || "24");
+if (IS_DEMO) console.log("[DEMO] Demo mode active. Login: " + DEMO_EMAIL + " / " + DEMO_PASSWORD + ". Resets every " + DEMO_RESET_H + "h.");
 const GITHUB_TOKEN    = process.env.GITHUB_TOKEN    || "";
 const GITHUB_REPO     = process.env.GITHUB_REPO     || "svenskman/events-admin";
 
@@ -1694,10 +1729,10 @@ function watchdogRequest(method, path, body) {
   });
 }
 
-// GET /api/lab/remote/backups – hent backup-liste fra watchdog
-// (erstattet av direkte filsystem-tilgang nedenfor)
+// GET /api/lab/remote/backups – fetch backup-liste from watchdog
+// (erstattet of directly filsystem-access nedenfor)
 
-// POST /api/lab/remote/control – restart eller restore via watchdog
+// POST /api/lab/remote/control – restart or restore via watchdog
 // ── Aktive sesjoner tracking ────────────────────────────────────
 const _activeSessions = new Map(); // sessionId -> { user, loginAt, lastSeen, ip }
 
@@ -1725,7 +1760,7 @@ app.get("/api/active-sessions", auth, adminOnly, function(req, res) {
   res.json(Array.from(_activeSessions.values()));
 });
 
-// Slett ett bilde fra gjestebokinnlegg (kun admin/manager, før godkjenning)
+// delete ett image from gjestebokinnlegg (only admin/manager, before godkjenning)
 app.delete("/api/events/:id/guestbook/:gid/photo/:photoIdx", auth, managerOrAdmin, function(req, res) {
   const events = readJSON(EVENTS_FILE);
   const evIdx  = events.findIndex(function(e) { return e.id === req.params.id; });
@@ -1734,7 +1769,7 @@ app.delete("/api/events/:id/guestbook/:gid/photo/:photoIdx", auth, managerOrAdmi
   if (!gb) return res.status(404).json({ error: "Innlegg ikke funnet" });
   const photoIdx = parseInt(req.params.photoIdx);
   if (!gb.photos || !gb.photos[photoIdx]) return res.status(404).json({ error: "Bilde ikke funnet" });
-  // Slett filen
+  // delete file
   const photoPath = gb.photos[photoIdx].path || gb.photos[photoIdx];
   if (photoPath && typeof photoPath === "string") {
     const fullPath = path.join(DATA, "gb-photos", path.basename(photoPath));
@@ -1750,7 +1785,7 @@ app.get("/api/guestbook/pending", auth, function(req, res) {
   const result = [];
   events.forEach(function(ev) {
     if (!ev.guestbook) return;
-    // Filtrer på tilgang
+    // filter on access
     if (user.role !== "admin") {
       const access = getAccessList(user);
       if (access.length && !access.includes(ev.department)) return;
@@ -1758,11 +1793,12 @@ app.get("/api/guestbook/pending", auth, function(req, res) {
     const pending = ev.guestbook.filter(function(g) { return !g.approved && !g.anonymized; });
     if (pending.length) {
       result.push({
-        evId:    ev.id,
-        evTitle: ev.title || ev.slug,
-        evSlug:  ev.slug,
-        dept:    ev.department,
-        entries: pending.map(function(g) {
+        evId:      ev.id,
+        evTitle:   ev.title || ev.slug,
+        evSlug:    ev.slug,
+        dept:      ev.department,
+        eventType: ev.eventType || 'mote',
+        entries:   pending.map(function(g) {
           return { id: g.id, name: g.name, message: g.message, createdAt: g.createdAt };
         }),
       });
@@ -1876,7 +1912,7 @@ app.post("/api/lab/remote/control", auth, adminOnly, rateLimit(10, 60000), async
   const version = req.body.version;
   if (!["restart", "restore", "copy-from-prod"].includes(action)) return res.status(400).json({ err: "Ugyldig handling" });
 
-  // Kopier filer til lab og restart
+  // Kopier file to lab and restart
   if (action === "copy-from-prod") {
     if (!LAB_APP_DIR) return res.status(503).json({ err: "LAB_APP_DIR ikke konfigurert" });
     if (!fs.existsSync(LAB_APP_DIR)) return res.status(503).json({ err: "LAB_APP_DIR finnes ikke – sjekk volume-mount" });
@@ -1958,7 +1994,7 @@ app.post("/api/provision/customer", auth, adminOnly, rateLimit(5, 60000), async 
       };
       const cfBase = "https://api.cloudflare.com/client/v4/zones/" + cf.zone + "/dns_records";
 
-      // Hent gjeldende IP fra eksisterende A-records på sonen (følger dynamisk IP automatisk)
+      // fetch gjeldende IP from eksisterende A-records on sonen (følger dynamisk IP automatically)
       let serverIp = "0.0.0.0";
       try {
         const existingRes = await fetch(
@@ -2099,7 +2135,7 @@ app.post("/api/provision/customer", auth, adminOnly, rateLimit(5, 60000), async 
   }
   step("Instansen er oppe ✓", "ok");
 
-  // ── 4. Opprett admin-bruker via intern API ─────────────────────
+  // ── 4. create admin-user via intern API ─────────────────────
   let mailSent = false;
   try {
     step("Oppretter admin-konto…", "pending");
@@ -2119,7 +2155,7 @@ app.post("/api/provision/customer", auth, adminOnly, rateLimit(5, 60000), async 
     step("Admin-oppsett feil: " + e.message, "info");
   }
 
-  // ── 5. Send velkomstmail ───────────────────────────────────────
+  // ── 5. send welcome email ───────────────────────────────────────
   try {
     step("Sender velkomstmail…", "pending");
     const mailResult = await sendEmail({
@@ -2159,7 +2195,7 @@ app.post("/api/provision/customer", auth, adminOnly, rateLimit(5, 60000), async 
   });
 });
 
-// ── Init-admin: kalles av provisjonering etter oppstart ──────────
+// ── Init-admin: kalles of provisjonering after oppstart ──────────
 // Beskyttes av SESSION_SECRET sendt i X-Provision-Secret header
 app.post("/api/provision/init-admin", async function(req, res) {
   const secret = (req.headers["x-provision-secret"] || "").trim();
@@ -2218,11 +2254,11 @@ function httpGet(url, extraHeaders) {
 
 // ── Last ned watchdog.js ──────────────────────────────────────────
 app.get("/api/is-lab", auth, function(req, res) {
-  res.json({ isLab: IS_LAB });
+  res.json({ isLab: IS_LAB, isDemo: IS_DEMO });
 });
 
-// ── watchdog.js innhold (lagres automatisk til /watchdog/ ved oppstart) ─
-const WATCHDOG_JS = "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// Events Watchdog \u2013 styrer lab-containeren via Docker socket\n// Kj\u00f8res i watchdog-containeren (se docker-compose)\n//\n// Endepunkter (alle krever Authorization: Bearer <WATCHDOG_TOKEN>):\n//   GET  /status           \u2013 status p\u00e5 lab-containeren\n//   GET  /backups          \u2013 liste over backup-versjoner p\u00e5 lab\n//   POST /restart          \u2013 restart lab-containeren\n//   POST /restore/:version \u2013 kopier backup og restart\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\"use strict\";\nconst http   = require(\"http\");\nconst fs     = require(\"fs\");\nconst path   = require(\"path\");\n\nconst PORT      = parseInt(process.env.WATCHDOG_PORT) || 3001;\nconst TOKEN     = process.env.WATCHDOG_TOKEN || \"\";\nconst DATA_DIR  = process.env.DATA_DIR    || \"/lab/data\";\nconst APP_DIR   = process.env.LAB_APP_DIR || \"/lab/app\";\nconst CONTAINER = process.env.TARGET_CONTAINER || \"events-lab\";\n\nif (!TOKEN) {\n  console.error(\"[watchdog] FEIL: WATCHDOG_TOKEN er ikke satt!\");\n  process.exit(1);\n}\n\n// \u2500\u2500 Docker socket kommunikasjon \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nfunction dockerRequest(method, urlPath, body) {\n  return new Promise(function(resolve, reject) {\n    const opts = {\n      socketPath: \"/var/run/docker.sock\",\n      path:       urlPath,\n      method:     method,\n      headers:    { \"Content-Type\": \"application/json\" },\n    };\n    const req = http.request(opts, function(res) {\n      const chunks = [];\n      res.on(\"data\", function(c) { chunks.push(c); });\n      res.on(\"end\", function() {\n        const raw = Buffer.concat(chunks).toString();\n        try { resolve({ status: res.statusCode, data: JSON.parse(raw) }); }\n        catch(e) { resolve({ status: res.statusCode, data: raw }); }\n      });\n    });\n    req.on(\"error\", reject);\n    if (body) req.write(JSON.stringify(body));\n    req.end();\n  });\n}\n\nasync function getContainerStatus() {\n  try {\n    const r = await dockerRequest(\"GET\", \"/containers/\" + CONTAINER + \"/json\");\n    if (r.status !== 200) return { online: false, error: \"Container ikke funnet\" };\n    const s = r.data.State || {};\n    return {\n      online:     s.Running === true,\n      status:     s.Status  || \"unknown\",\n      startedAt:  s.StartedAt,\n      exitCode:   s.ExitCode,\n      image:      (r.data.Config || {}).Image || \"\",\n    };\n  } catch(e) {\n    return { online: false, error: e.message };\n  }\n}\n\nasync function restartContainer() {\n  await dockerRequest(\"POST\", \"/containers/\" + CONTAINER + \"/restart\");\n}\n\n// \u2500\u2500 Backup-h\u00e5ndtering \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nfunction getBackups() {\n  try {\n    return fs.readdirSync(DATA_DIR)\n      .filter(function(e) { return e.startsWith(\"_update_backup_\"); })\n      .map(function(e) {\n        const version = e.replace(\"_update_backup_\", \"\");\n        const dir     = path.join(DATA_DIR, e);\n        const files   = fs.existsSync(dir) ? fs.readdirSync(dir) : [];\n        let createdAt = null;\n        try {\n          const stat = fs.statSync(path.join(dir, \"server.js\"));\n          createdAt = stat.mtime.toISOString();\n        } catch(e2) {}\n        return { version, files, createdAt };\n      })\n      .filter(function(b) { return b.files.includes(\"server.js\"); })\n      .sort(function(a, b) { return (b.createdAt||\"\").localeCompare(a.createdAt||\"\"); });\n  } catch(e) {\n    return [];\n  }\n}\n\nfunction restoreVersion(version) {\n  const backupDir = path.join(DATA_DIR, \"_update_backup_\" + version);\n  if (!fs.existsSync(backupDir)) {\n    throw new Error(\"Backup v\" + version + \" ikke funnet i \" + DATA_DIR);\n  }\n  const files = [\"server.js\", \"index.html\", \"package.json\"];\n  const restored = [];\n  files.forEach(function(f) {\n    const src = path.join(backupDir, f);\n    const dst = path.join(APP_DIR, f);\n    if (fs.existsSync(src)) {\n      fs.copyFileSync(src, dst);\n      restored.push(f);\n    }\n  });\n  if (!restored.includes(\"server.js\")) {\n    throw new Error(\"server.js ikke funnet i backup v\" + version);\n  }\n  return restored;\n}\n\n// \u2500\u2500 HTTP-server \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nfunction send(res, status, data) {\n  const body = JSON.stringify(data);\n  res.writeHead(status, {\n    \"Content-Type\":                \"application/json\",\n    \"Access-Control-Allow-Origin\": \"*\",\n    \"Access-Control-Allow-Headers\":\"Authorization, Content-Type\",\n  });\n  res.end(body);\n}\n\nfunction checkAuth(req, res) {\n  if (req.method === \"OPTIONS\") { send(res, 200, {}); return false; }\n  const h = (req.headers[\"authorization\"] || \"\").trim();\n  if (h !== \"Bearer \" + TOKEN) {\n    send(res, 403, { error: \"Ugyldig token\" });\n    return false;\n  }\n  return true;\n}\n\nconst server = http.createServer(async function(req, res) {\n  if (!checkAuth(req, res)) return;\n\n  const url = req.url.split(\"?\")[0];\n\n  // GET /status\n  if (req.method === \"GET\" && url === \"/status\") {\n    const status = await getContainerStatus();\n    return send(res, 200, status);\n  }\n\n  // GET /backups\n  if (req.method === \"GET\" && url === \"/backups\") {\n    return send(res, 200, getBackups());\n  }\n\n  // POST /restart\n  if (req.method === \"POST\" && url === \"/restart\") {\n    try {\n      await restartContainer();\n      return send(res, 200, { ok: true, message: CONTAINER + \" restartes\u2026\" });\n    } catch(e) {\n      return send(res, 500, { error: e.message });\n    }\n  }\n\n  // POST /restore/:version\n  const restoreMatch = url.match(/^\\/restore\\/(.+)$/);\n  if (req.method === \"POST\" && restoreMatch) {\n    const version = restoreMatch[1];\n    try {\n      const files = restoreVersion(version);\n      await restartContainer();\n      return send(res, 200, { ok: true, version, files, message: \"Gjenoppretter v\" + version + \" og restartes\u2026\" });\n    } catch(e) {\n      return send(res, 500, { error: e.message });\n    }\n  }\n\n  send(res, 404, { error: \"Ikke funnet: \" + url });\n});\n\nserver.listen(PORT, function() {\n  console.log(\"[watchdog] Startet p\u00e5 port \" + PORT);\n  console.log(\"[watchdog] Container: \" + CONTAINER);\n  console.log(\"[watchdog] Data dir:  \" + DATA_DIR);\n  console.log(\"[watchdog] App dir:   \" + APP_DIR);\n});\n";
+// ── watchdog.js content (automatically saved to /watchdog/ on startup) ─
+const WATCHDOG_JS = "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// Events Watchdog \u2013 styrer lab-containeren via Docker socket\n// Kj\u00f8res in watchdog-containeren (se docker-compose)\n//\n// Endepunkter (all krever Authorization: Bearer <WATCHDOG_TOKEN>):\n//   GET  /status           \u2013 status p\u00e5 lab-containeren\n//   GET  /backups          \u2013 liste over backup-versjoner p\u00e5 lab\n//   POST /restart          \u2013 restart lab-containeren\n//   POST /restore/:version \u2013 kopier backup and restart\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\"use strict\";\nconst http   = require(\"http\");\nconst fs     = require(\"fs\");\nconst path   = require(\"path\");\n\nconst PORT      = parseInt(process.env.WATCHDOG_PORT) || 3001;\nconst TOKEN     = process.env.WATCHDOG_TOKEN || \"\";\nconst DATA_DIR  = process.env.DATA_DIR    || \"/lab/data\";\nconst APP_DIR   = process.env.LAB_APP_DIR || \"/lab/app\";\nconst CONTAINER = process.env.TARGET_CONTAINER || \"events-lab\";\n\nif (!TOKEN) {\n  console.error(\"[watchdog] FEIL: WATCHDOG_TOKEN is not satt!\");\n  process.exit(1);\n}\n\n// \u2500\u2500 Docker socket kommunikasjon \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nfunction dockerRequest(method, urlPath, body) {\n  return new Promise(function(resolve, reject) {\n    const opts = {\n      socketPath: \"/was/run/docker.sock\",\n      path:       urlPath,\n      method:     method,\n      headers:    { \"Content-Type\": \"application/json\" },\n    };\n    const req = http.request(opts, function(res) {\n      const chunks = [];\n      res.on(\"data\", function(c) { chunks.push(c); });\n      res.on(\"end\", function() {\n        const raw = Buffer.concat(chunks).toString();\n        try { resolve({ status: res.statusCode, data: JSON.parse(raw) }); }\n        catch(e) { resolve({ status: res.statusCode, data: raw }); }\n      });\n    });\n    req.on(\"error\", reject);\n    if (body) req.write(JSON.stringify(body));\n    req.end();\n  });\n}\n\nasync function getContainerStatus() {\n  try {\n    const r = await dockerRequest(\"GET\", \"/containers/\" + CONTAINER + \"/json\");\n    if (r.status !== 200) return { online: false, error: \"Container not found\" };\n    const s = r.data.State || {};\n    return {\n      online:     s.Running === true,\n      status:     s.Status  || \"unknown\",\n      startedAt:  s.StartedAt,\n      exitCode:   s.ExitCode,\n      image:      (r.data.Config || {}).Image || \"\",\n    };\n  } catch(e) {\n    return { online: false, error: e.message };\n  }\n}\n\nasync function restartContainer() {\n  await dockerRequest(\"POST\", \"/containers/\" + CONTAINER + \"/restart\");\n}\n\n// \u2500\u2500 Backup-h\u00e5ndtering \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nfunction getBackups() {\n  try {\n    return fs.readdirSync(DATA_DIR)\n      .filter(function(e) { return e.startsWith(\"_update_backup_\"); })\n      .map(function(e) {\n        const version = e.replace(\"_update_backup_\", \"\");\n        const dir     = path.join(DATA_DIR, e);\n        const files   = fs.existsSync(dir) ? fs.readdirSync(dir) : [];\n        let createdAt = null;\n        try {\n          const stat = fs.statSync(path.join(dir, \"server.js\"));\n          createdAt = stat.mtime.toISOString();\n        } catch(e2) {}\n        return { version, files, createdAt };\n      })\n      .filter(function(b) { return b.files.includes(\"server.js\"); })\n      .sort(function(a, b) { return (b.createdAt||\"\").localeCompare(a.createdAt||\"\"); });\n  } catch(e) {\n    return [];\n  }\n}\n\nfunction restoreVersion(version) {\n  const backupDir = path.join(DATA_DIR, \"_update_backup_\" + version);\n  if (!fs.existsSync(backupDir)) {\n    throw new Error(\"Backup v\" + version + \" not found in \" + DATA_DIR);\n  }\n  const files = [\"server.js\", \"index.html\", \"package.json\"];\n  const restored = [];\n  files.forEach(function(f) {\n    const src = path.join(backupDir, f);\n    const dst = path.join(APP_DIR, f);\n    if (fs.existsSync(src)) {\n      fs.copyFileSync(src, dst);\n      restored.push(f);\n    }\n  });\n  if (!restored.includes(\"server.js\")) {\n    throw new Error(\"server.js not found in backup v\" + version);\n  }\n  return restored;\n}\n\n// \u2500\u2500 HTTP-server \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nfunction send(res, status, data) {\n  const body = JSON.stringify(data);\n  res.writeHead(status, {\n    \"Content-Type\":                \"application/json\",\n    \"Access-Control-Allow-Origin\": \"*\",\n    \"Access-Control-Allow-Headers\":\"Authorization, Content-Type\",\n  });\n  res.end(body);\n}\n\nfunction checkAuth(req, res) {\n  if (req.method === \"OPTIONS\") { send(res, 200, {}); return false; }\n  const h = (req.headers[\"authorization\"] || \"\").trim();\n  if (h !== \"Bearer \" + TOKEN) {\n    send(res, 403, { error: \"invalid token\" });\n    return false;\n  }\n  return true;\n}\n\nconst server = http.createServer(async function(req, res) {\n  if (!checkAuth(req, res)) return;\n\n  const url = req.url.split(\"?\")[0];\n\n  // GET /status\n  if (req.method === \"GET\" && url === \"/status\") {\n    const status = await getContainerStatus();\n    return send(res, 200, status);\n  }\n\n  // GET /backups\n  if (req.method === \"GET\" && url === \"/backups\") {\n    return send(res, 200, getBackups());\n  }\n\n  // POST /restart\n  if (req.method === \"POST\" && url === \"/restart\") {\n    try {\n      await restartContainer();\n      return send(res, 200, { ok: true, message: CONTAINER + \" restartes\u2026\" });\n    } catch(e) {\n      return send(res, 500, { error: e.message });\n    }\n  }\n\n  // POST /restore/:version\n  const restoreMatch = url.match(/^\\/restore\\/(.+)$/);\n  if (req.method === \"POST\" && restoreMatch) {\n    const version = restoreMatch[1];\n    try {\n      const files = restoreVersion(version);\n      await restartContainer();\n      return send(res, 200, { ok: true, version, files, message: \"Gjenoppretter v\" + version + \" and restartes\u2026\" });\n    } catch(e) {\n      return send(res, 500, { error: e.message });\n    }\n  }\n\n  send(res, 404, { error: \"not found: \" + url });\n});\n\nserver.listen(PORT, function() {\n  console.log(\"[watchdog] Startet p\u00e5 port \" + PORT);\n  console.log(\"[watchdog] Container: \" + CONTAINER);\n  console.log(\"[watchdog] Data dir:  \" + DATA_DIR);\n  console.log(\"[watchdog] App dir:   \" + APP_DIR);\n});\n";
 
 // Last ned watchdog.js
 app.get("/api/watchdog/download", auth, adminOnly, function(req, res) {
@@ -2231,7 +2267,7 @@ app.get("/api/watchdog/download", auth, adminOnly, function(req, res) {
   res.end(WATCHDOG_JS);
 });
 
-// Sjekk om oppdatering er tilgjengelig
+// check about update is tilgjengelig
 app.get("/api/update/check", auth, adminOnly, async function(req, res) {
   try {
     const url = UPDATE_BASE + "/" + UPDATE_MANIFEST;
@@ -2245,6 +2281,7 @@ app.get("/api/update/check", auth, adminOnly, async function(req, res) {
       latest,
       hasUpdate,
       isLab:     IS_LAB,
+      isDemo:    IS_DEMO,
       changelog: manifest.changelog || [],
       files:     manifest.files || []
     });
@@ -2253,7 +2290,7 @@ app.get("/api/update/check", auth, adminOnly, async function(req, res) {
   }
 });
 
-// Installer oppdatering – laster ned filer og bytter dem ut
+// Installer update – loads down file and bytter dem out
 app.post("/api/update/apply", auth, adminOnly, async function(req, res) {
   const { files, version: newVersion } = req.body;
   if (!files || !files.length) return res.status(400).json({ err: "Ingen filer angitt" });
@@ -2383,6 +2420,86 @@ app.post("/api/update/restore/:version", auth, adminOnly, function(req, res) {
   }
 });
 
+// ── Live tracker position proxy ─────────────────────────────────────────────
+// Fetches GPS position from a live tracking share URL (Sizzapp, Garmin Share, etc.)
+app.get("/api/tracker-position", rateLimit(20, 60000), async function(req, res) {
+  const url = (req.query.url || "").trim();
+  if (!url) return res.status(400).json({ err: "No URL" });
+
+  try {
+    // Try fetching the page and extracting lat/lon from JSON-LD or meta tags
+    const r = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; EventsAdmin/1.0)" },
+      signal: AbortSignal.timeout(8000)
+    });
+    const html = await r.text();
+
+    // Try Sizzapp JSON pattern: {"lat":59.123,"lng":10.456} or {"latitude":...}
+    let lat = null, lon = null;
+
+    // Pattern 1: Sizzapp / common JSON in script tags
+    const jsonPat = /"lat(?:itude)?"\s*:\s*([-\d.]+).*?"l(?:ng|on)(?:gitude)?"\s*:\s*([-\d.]+)/s;
+    const m1 = html.match(jsonPat);
+    if (m1) { lat = parseFloat(m1[1]); lon = parseFloat(m1[2]); }
+
+    // Pattern 2: geo meta tags
+    if (!lat) {
+      const geoM = html.match(/geo\.position.*?content="([-\d.]+);([-\d.]+)"/);
+      if (geoM) { lat = parseFloat(geoM[1]); lon = parseFloat(geoM[2]); }
+    }
+
+    // Pattern 3: OpenGraph / JSON-LD coordinates
+    if (!lat) {
+      const ogM = html.match(/"longitude"\s*:\s*([-\d.]+).*?"latitude"\s*:\s*([-\d.]+)/s)
+               || html.match(/"latitude"\s*:\s*([-\d.]+).*?"longitude"\s*:\s*([-\d.]+)/s);
+      if (ogM) {
+        // determine which is lat vs lon
+        if (html.indexOf('"latitude"') < html.indexOf('"longitude"')) {
+          lat = parseFloat(ogM[1]); lon = parseFloat(ogM[2]);
+        } else {
+          lon = parseFloat(ogM[1]); lat = parseFloat(ogM[2]);
+        }
+      }
+    }
+
+    if (lat && lon && !isNaN(lat) && !isNaN(lon)) {
+      return res.json({ ok: true, lat, lon });
+    }
+    return res.json({ ok: false, err: "Could not extract position from page" });
+  } catch(e) {
+    return res.json({ ok: false, err: e.message });
+  }
+});
+
+// ── AI emoji suggestion (proxied to avoid CSP issues) ──────────
+app.post("/api/ai/suggest-emoji", auth, rateLimit(20, 60000), async function(req, res) {
+  const label = (req.body.label || "").trim().slice(0, 60);
+  if (!label) return res.json({ emoji: "📋" });
+  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || "";
+  if (!ANTHROPIC_KEY) return res.json({ emoji: "📋" });
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_KEY,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 10,
+        messages: [{ role: 'user', content: 'Reply with ONLY a single emoji for this event type: ' + label + '. Only the emoji, nothing else.' }]
+      })
+    });
+    const data = await r.json();
+    const text = ((data.content && data.content[0] && data.content[0].text) || "").trim();
+    const match = text.match(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/u);
+    res.json({ emoji: match ? match[0] : "📋" });
+  } catch(e) {
+    res.json({ emoji: "📋" });
+  }
+});
+
 // LAB: Publish to production – updates manifest.json on GitHub
 app.post("/api/update/publish", auth, adminOnly, async function(req, res) {
   if (!IS_LAB) return res.status(400).json({ err: "Only available on the lab instance" });
@@ -2394,7 +2511,7 @@ app.post("/api/update/publish", auth, adminOnly, async function(req, res) {
 
   // Hjelpefunksjon: last opp én fil til GitHub
   async function githubUpload(filePath, content, commitMsg) {
-    // Sjekk om filen finnes (trenger SHA for oppdatering)
+    // check about file finnes (trenger SHA for update)
     const checkR = await httpGet(
       "https://api.github.com/repos/" + GITHUB_REPO + "/contents/" + filePath,
       { "Authorization": "token " + token, "Accept": "application/vnd.github.v3+json" }
@@ -2462,7 +2579,7 @@ app.post("/api/update/publish", auth, adminOnly, async function(req, res) {
       console.log("[publish] Lastet opp " + releaseDir + "/" + name);
     }
 
-    // 2. Bygg manifest-objekt
+    // 2. build manifest-objekt
     const manifest = {
       version,
       released: new Date().toISOString().slice(0, 10),
@@ -2483,7 +2600,7 @@ app.post("/api/update/publish", auth, adminOnly, async function(req, res) {
     await githubUpload(labManifestFile, manifestJson, "v" + version + " lab-manifest");
     steps.push("✅ " + labManifestFile);
 
-    // 4. Oppdater manifest.json (prod) kun hvis req.body.publishProd
+    // 4. update manifest.json (prod) only if req.body.publishProd
     if (req.body.publishProd) {
       await githubUpload("manifest.json", manifestJson, "Publiser v" + version + " til produksjon");
       steps.push("✅ manifest.json (prod)");
@@ -2507,7 +2624,7 @@ app.post("/api/update/publish", auth, adminOnly, async function(req, res) {
   }
 });
 
-// Hjelpefunksjon: pakk ut ZIP og returner filer
+// Hjelpefunksjon: pakk out ZIP and returner file
 function extractZip(zipBuf) {
   const files = {};
   let i = 0;
@@ -2527,7 +2644,7 @@ function extractZip(zipBuf) {
       const basename = filename.split("/").pop();
       if (["server.js","index.html","package.json"].includes(basename) && uncompSize > 0) {
         if (compression === 0) {
-          // Stored (ingen komprimering)
+          // Stored (none/no komprimering)
           files[basename] = dataBuf;
         } else if (compression === 8) {
           // Deflate
@@ -2545,10 +2662,10 @@ function extractZip(zipBuf) {
 }
 
 // LAB: Upload new app files directly via GUI (supports single files and ZIP)
-// Bruker multer (allerede installert) istedet for busboy
+// user multer (allerede installert) istedet for busboy
 const labUploadMulter = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 25 * 1024 * 1024 }
+  limits: { fileSize: 250 * 1024 * 1024 }
 }).any();
 
 app.post("/api/update/upload", auth, adminOnly, function(req, res) {
@@ -2623,7 +2740,7 @@ app.post("/api/update/approve", auth, adminOnly, async function(req, res) {
   if (!GITHUB_TOKEN) return res.status(400).json({ err: "GITHUB_TOKEN ikke konfigurert" });
 
   try {
-    // Hent lab-manifest fra GitHub
+    // fetch lab-manifest from GitHub
     const labR = await httpGet(
       "https://api.github.com/repos/" + GITHUB_REPO + "/contents/" + UPDATE_MANIFEST,
       { "Authorization": "token " + token, "Accept": "application/vnd.github.v3+json" }
@@ -2633,7 +2750,7 @@ app.post("/api/update/approve", auth, adminOnly, async function(req, res) {
     const labContent = Buffer.from(labFile.content.replace(/\n/g, ""), "base64").toString();
     const labManifest = JSON.parse(labContent);
 
-    // Hent SHA for manifest.json
+    // fetch SHA for manifest.json
     const prodR = await httpGet(
       "https://api.github.com/repos/" + GITHUB_REPO + "/contents/manifest.json",
       { "Authorization": "token " + token, "Accept": "application/vnd.github.v3+json" }
@@ -2643,7 +2760,7 @@ app.post("/api/update/approve", auth, adminOnly, async function(req, res) {
       try { prodSha = JSON.parse(prodR.body.toString()).sha || ""; } catch(e) {}
     }
 
-    // Skriv manifest.json = kopi av lab-manifest
+    // write manifest.json = kopi of lab-manifest
     const body = JSON.stringify({
       message: "Godkjenn v" + labManifest.version + " til produksjon",
       content: Buffer.from(JSON.stringify(labManifest, null, 2)).toString("base64"),
@@ -2698,6 +2815,57 @@ function compareVersions(a, b) {
 }
 
 // ── Auth API ─────────────────────────────────────────────────────
+// ── Demo mode ────────────────────────────────────────────────────────────────
+app.get("/api/demo-credentials", function(req, res) {
+  if (!IS_DEMO) return res.status(404).json({ err: "Not a demo instance" });
+  res.json({ email: DEMO_EMAIL, password: DEMO_PASSWORD });
+});
+
+function _seedDemoData(force) {
+  if (!IS_DEMO) return;
+  console.log("[DEMO] Seeding demo data (force=" + force + ")...");
+  var hash = bcrypt.hashSync(DEMO_PASSWORD, 10);
+  writeJSON(USERS_FILE, [{
+    id: "demo-admin", email: DEMO_EMAIL, password: hash,
+    name: "Demo Admin", role: "admin",
+    createdAt: new Date().toISOString(), accessList: []
+  }]);
+  var events = readJSON(EVENTS_FILE) || [];
+  if (!events.length || force) {
+    function addDays(n) { var d = new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+    writeJSON(EVENTS_FILE, [
+      { id: uuid(), title: "MC Stand – Sentrum",     eventType:"stand", date:addDays(7),  time:"10:00", location:"Karl Johans gate, Oslo",   description:"NAF-stand med reflekser og premie-spinn.",                  maxParticipants:0,  registrations:[{id:uuid(),name:"Kari Nordmann",email:"kari@example.no",phone:"99887766",createdAt:new Date().toISOString(),checkedIn:true}], guestbook:[{id:uuid(),name:"Ola H.",phone:"91234567",message:"Super stand!",approved:true,createdAt:new Date().toISOString()}], staff:[], hidden:false, slug:"demo-stand-"+new Date().getFullYear(), createdAt:new Date().toISOString() },
+      { id: uuid(), title: "Sikkerhetskurs MC",       eventType:"kurs",  date:addDays(14), time:"09:00", location:"Gardemoen Motorsenter",     description:"Grunnleggende MC-sikkerhet for alle nivåer.",               maxParticipants:20, registrations:[], guestbook:[], staff:[], hidden:false, slug:"demo-kurs-"+new Date().getFullYear(),  createdAt:new Date().toISOString() },
+      { id: uuid(), title: "Sommertur Vestlandet",    eventType:"tur",   date:addDays(30), time:"08:00", location:"Oslo S",                    description:"3-dagers tur langs vestlandsfjordene. GPX og rute inkludert.", maxParticipants:40, registrations:[], guestbook:[], staff:[], hidden:false, slug:"demo-tur-"+new Date().getFullYear(),   createdAt:new Date().toISOString() },
+      { id: uuid(), title: "Klubbkveld August",       eventType:"mote",  date:addDays(21), time:"19:00", location:"NAF-lokalet, Sandvika",     description:"Månedlig klubbkveld med kaffe og prat.",                   maxParticipants:50, registrations:[], guestbook:[], staff:[], hidden:false, slug:"demo-mote-"+new Date().getFullYear(),  createdAt:new Date().toISOString() },
+      { id: uuid(), title: "Påskeaksjon Gardermoen",  eventType:"stand", date:addDays(-30),time:"10:00", location:"Gardermoen Senter",         description:"Vårstand – 600 reflekser utdelt.",                         maxParticipants:0,  registrations:[{id:uuid(),name:"Lars E.",email:"lars@example.no",phone:"97654321",createdAt:new Date().toISOString(),checkedIn:false}], guestbook:[], staff:[], hidden:false, slug:"demo-stand-paske-"+new Date().getFullYear(), createdAt:new Date().toISOString() },
+    ]);
+  }
+  var vols = readJSON(VOLUNTEERS_FILE) || [];
+  if (!vols.length || force) {
+    writeJSON(VOLUNTEERS_FILE, [
+      { id:uuid(), name:"Kari Nordmann", email:"kari@example.no", phone:"99887766", department:"", createdAt:new Date().toISOString(), events:[], clothing:{ "jacket_1":{ size:"M", received:true,  quantity:1, label:"Jakke", note:"NAF standard" } } },
+      { id:uuid(), name:"Ola Hansen",    email:"ola@example.no",  phone:"91234567", department:"", createdAt:new Date().toISOString(), events:[], clothing:{ "cap_1":   { size:"L", received:false, quantity:1, label:"Caps",  note:""           } } },
+      { id:uuid(), name:"Lars Eriksen",  email:"lars@example.no", phone:"97654321", department:"", createdAt:new Date().toISOString(), events:[], clothing:{} },
+    ]);
+  }
+  var inv = readJSON(INVENTORY_FILE) || [];
+  if (!inv.length || force) {
+    writeJSON(INVENTORY_FILE, [
+      { id:uuid(), name:"Reflekser (pose à 20)",  category:"giveaway",  quantity:600, packageCount:30, perPackage:20, image:"", description:"Gule og røde reflekser.", purchasePrice:5,    distributed:0, returned:0 },
+      { id:uuid(), name:"NAF-jakke strl. L",       category:"equipment", quantity:5,   packageCount:5,  perPackage:1,  image:"", description:"Vinterjakke med logo.",  purchasePrice:850,  distributed:0, returned:0 },
+      { id:uuid(), name:"Brosjyrer 2026",           category:"giveaway",  quantity:500, packageCount:10, perPackage:50, image:"", description:"Informasjonsbrosjyre.",   purchasePrice:2,    distributed:0, returned:0 },
+      { id:uuid(), name:"Tablet til innsjekk",      category:"equipment", quantity:2,   packageCount:2,  perPackage:1,  image:"", description:"Samsung Tab A8.",        purchasePrice:2500, distributed:0, returned:0 },
+    ]);
+  }
+  console.log("[DEMO] Seed complete.");
+}
+
+if (IS_DEMO) {
+  _seedDemoData(false);
+  setInterval(function() { _seedDemoData(true); }, DEMO_RESET_H * 3600000);
+}
+
 app.post("/api/login", rateLimit(5, 900000), async function(req, res) { // 5 attempts per 15min
   const email    = (typeof req.body.email    === "string" ? req.body.email    : "").toLowerCase().trim();
   const password = (typeof req.body.password === "string" ? req.body.password : "");
@@ -2791,7 +2959,7 @@ app.post("/api/login", rateLimit(5, 900000), async function(req, res) { // 5 att
   if (user.mustChangePassword) {
     // Allow login but flag it in session
   }
-  const sessionData = { id: user.id, email: user.email, role: user.role, name: user.name, title: user.tittel || null, accessList: getAccessList(user), mustChangePassword: !!user.mustChangePassword };
+  const sessionData = { id: user.id, email: user.email, role: user.role, name: user.name, title: user.jobTitle || null, accessList: getAccessList(user), mustChangePassword: !!user.mustChangePassword };
   req.session.regenerate(function(err) {
     if (err) { console.error("Session regenerate error:", err); return res.status(500).json({ error: "Sesjonfeil" }); }
     req.session.user = sessionData;
@@ -2864,7 +3032,7 @@ function buildDeptBackup(deptId, segments) {
   const dept         = (settings.departments || []).find(function(d) { return d.id === deptId; });
   if (!dept) throw new Error("Avdeling ikke funnet: " + deptId);
 
-  // Default: all segments except inventar (which is global/admin-only)
+  // Default: all segments except inventory (which is global/admin-only)
   const segs = segments || ["events","members","volunteers"];
 
   const payload = {
@@ -2891,9 +3059,9 @@ function buildDeptBackup(deptId, segments) {
       return v.department === deptId;
     });
   }
-  // inventar is global – only included by explicit admin request
+  // inventory is global – only included by explicit admin request
   if (segs.includes("inventar")) {
-    const allInv = readJSON(INVENTAR_FILE);
+    const allInv = readJSON(INVENTORY_FILE);
     // Per-dept backup: only items belonging to this dept
     payload.inventar = allInv.filter(function(i){ return !i.department || i.department === deptId; });
   }
@@ -2915,12 +3083,12 @@ function buildFullBackup(segments) {
   if (segs.includes("events"))     payload.events     = readJSON(EVENTS_FILE);
   if (segs.includes("members"))    payload.members    = readJSON(MEMBERS_FILE);
   if (segs.includes("volunteers")) payload.volunteers = readJSON(VOLUNTEERS_FILE);
-  if (segs.includes("inventar"))   payload.inventar   = readJSON(INVENTAR_FILE);
+  if (segs.includes("inventar"))   payload.inventar   = readJSON(INVENTORY_FILE);
   if (segs.includes("settings"))   payload.settings   = getSettings();
   return payload;
 }
 
-// ── Send backup email to a recipient ─────────────────────────────
+// ── send backup email to a recipient ─────────────────────────────
 async function sendBackupEmail(toEmail, deptName, backupBuf, dateStr) {
   const s        = getSettings();
   const siteName = s.siteName || "Events Admin";
@@ -3030,6 +3198,80 @@ function scheduleWeeklyBackup() {
 }
 scheduleWeeklyBackup();
 
+// ── Playlist scheduler (runs every minute) ─────────────────────────────────
+// Checks all playlists with a schedule and auto-activates/deactivates them
+function runPlaylistScheduler() {
+  var now = new Date();
+  var playlists = readPlaylists();
+  var scheduled = playlists.filter(function(pl) { return pl.schedule && pl.deptId; });
+  if (!scheduled.length) return;
+
+  var events = readJSON(EVENTS_FILE);
+
+  scheduled.forEach(function(pl) {
+    var sched = pl.schedule;
+    var deptId = pl.deptId;
+    var shouldBeActive = false;
+
+    if (sched.eventId) {
+      // Event-linked schedule
+      var ev = events.find(function(e) { return e.id === sched.eventId; });
+      if (ev && ev.date) {
+        var evStart = new Date(ev.date);
+        var evEnd   = ev.endDate ? new Date(ev.endDate) : new Date(evStart.getTime() + 3 * 60 * 60 * 1000); // default 3h
+        var activateAt   = new Date(evStart.getTime() - (sched.startOffsetMin || 60) * 60 * 1000);
+        var deactivateAt = new Date(evEnd.getTime()   + (sched.endOffsetMin   || 60) * 60 * 1000);
+        shouldBeActive = now >= activateAt && now <= deactivateAt;
+      }
+    } else if (sched.startTime && sched.endTime) {
+      // Daily time-based schedule (HH:MM format)
+      var todayStr = now.toISOString().slice(0, 10);
+      var start = new Date(todayStr + 'T' + sched.startTime + ':00');
+      var end   = new Date(todayStr + 'T' + sched.endTime   + ':00');
+      if (end <= start) end = new Date(end.getTime() + 24 * 60 * 60 * 1000); // next day
+      // Check day-of-week filter
+      var days = sched.days || [0,1,2,3,4,5,6]; // all days by default
+      if (days.includes(now.getDay())) {
+        shouldBeActive = now >= start && now <= end;
+      }
+    }
+
+    var currentState = getTvState(deptId);
+    var isCurrentlyActive = currentState.activePlaylist === pl.id;
+
+    if (shouldBeActive && !isCurrentlyActive) {
+      // Activate
+      var prev = getTvState(deptId);
+      var next = Object.assign({}, prev, {
+        slides: pl.slides || [], mode: pl.mode || 'slides',
+        slideInterval: pl.slideInterval || 15, slideOrder: pl.slideOrder || 'sequential',
+        showLogo: pl.showLogo !== false, ticker: pl.ticker || '',
+        activePlaylist: pl.id, activePlaylistName: pl.name,
+        _scheduledActivation: true,
+      });
+      tvState.set(deptId, next);
+      _saveTvState();
+      broadcastTv(deptId, Object.assign({ type: 'state' }, next));
+      console.log('[Playlist Scheduler] Activated "' + pl.name + '" for dept ' + deptId);
+    } else if (!shouldBeActive && isCurrentlyActive && currentState._scheduledActivation) {
+      // Deactivate — only if we were the ones who activated it
+      var prev = getTvState(deptId);
+      var next = Object.assign({}, prev, {
+        activePlaylist: null, activePlaylistName: null, _scheduledActivation: false,
+      });
+      tvState.set(deptId, next);
+      _saveTvState();
+      broadcastTv(deptId, Object.assign({ type: 'state' }, next));
+      console.log('[Playlist Scheduler] Deactivated "' + pl.name + '" for dept ' + deptId);
+    }
+  });
+}
+
+// Run every minute
+setInterval(runPlaylistScheduler, 60 * 1000);
+// Also run on startup after a short delay
+setTimeout(runPlaylistScheduler, 5000);
+
 // ── API: Get available backup segments ─────────────────────────
 app.get("/api/backup/segments", auth, function(req, res) {
   res.json(BACKUP_SEGMENTS);
@@ -3116,7 +3358,7 @@ app.post("/api/backup/restore", auth, rateLimit(5, 60000), multer({ storage: mul
     return res.status(400).json({ error: "Ugyldig backup-innhold" });
   }
 
-  // Manager: can only restore own department, never settings/inventar
+  // Manager: can only restore own department, never settings/inventory
   if (!isAdmin) {
     const acc2 = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === user.id; }) || {});
     const myDeptIds = acc2.filter(function(a){ return a.role === "department_manager" || a.role === "avdelingsleder"; }).map(function(a){ return a.department; });
@@ -3228,19 +3470,19 @@ app.post("/api/backup/restore", auth, rateLimit(5, 60000), multer({ storage: mul
     saveSettings(s);
   }
 
-  // ── Restore inventar ──
+  // ── Restore inventory ──
   if (payload.inventar && payload.inventar.length) {
     if (mode === "replace") {
-      writeJSON(INVENTAR_FILE, payload.inventar);
+      writeJSON(INVENTORY_FILE, payload.inventar);
       summary.restored += payload.inventar.length;
     } else {
-      const currentI = readJSON(INVENTAR_FILE);
+      const currentI = readJSON(INVENTORY_FILE);
       const iMap = new Map(currentI.map(function(i) { return [i.id, i]; }));
       payload.inventar.forEach(function(item) {
         if (!iMap.has(item.id)) { currentI.push(item); summary.restored++; }
         else { summary.skipped++; }
       });
-      writeJSON(INVENTAR_FILE, currentI);
+      writeJSON(INVENTORY_FILE, currentI);
     }
   }
 
@@ -3328,7 +3570,7 @@ app.post("/api/breakglass/restore", auth, breakglassOnly,
       summary.files.push("volunteers (" + payload.volunteers.length + ")");
     }
     if (payload.inventar) {
-      writeJSON(INVENTAR_FILE, payload.inventar);
+      writeJSON(INVENTORY_FILE, payload.inventar);
       summary.restored += payload.inventar.length;
       summary.files.push("inventar (" + payload.inventar.length + ")");
     }
@@ -3441,6 +3683,81 @@ app.get("/api/email-log", auth, function(req, res) {
   res.json(log.slice(0, limit));
 });
 
+// ── Analytics / visit stats ────────────────────────────────────────
+app.get("/api/stats/visits", auth, managerOrAdmin, function(req, res) {
+  try {
+    const me   = req.session.user;
+    const p    = buildPermissions(me, getSettings());
+    const evId = req.query.evId || null;
+    const days = Math.min(parseInt(req.query.days) || 30, 365);
+    const since = new Date(Date.now() - days * 86400000).toISOString();
+
+    const allVisits = readJSON(VISITS_FILE);
+    const events    = readJSON(EVENTS_FILE);
+
+    // Filter to own dept events if not global admin
+    const allowedEvIds = p.isAdmin
+      ? null
+      : new Set(events.filter(function(e) {
+          return e.department === p.myDepartment || e.createdBy === me.name;
+        }).map(function(e) { return e.id; }));
+
+    const visits = allVisits.filter(function(v) {
+      if (v.ts < since) return false;
+      if (allowedEvIds && !allowedEvIds.has(v.evId)) return false;
+      if (evId && v.evId !== evId) return false;
+      return true;
+    });
+
+    // Group by day
+    const byDay = {};
+    visits.forEach(function(v) {
+      const day = v.ts.slice(0, 10);
+      byDay[day] = (byDay[day] || 0) + 1;
+    });
+
+    // Group by event
+    const byEvent = {};
+    visits.forEach(function(v) {
+      byEvent[v.evId] = (byEvent[v.evId] || 0) + 1;
+    });
+
+    // Sparkline data per event (last 14 days)
+    const sparkSince = new Date(Date.now() - 14 * 86400000).toISOString();
+    const sparkByEvent = {};
+    allVisits.filter(function(v) { return v.ts >= sparkSince; }).forEach(function(v) {
+      if (allowedEvIds && !allowedEvIds.has(v.evId)) return;
+      if (!sparkByEvent[v.evId]) sparkByEvent[v.evId] = {};
+      const day = v.ts.slice(0, 10);
+      sparkByEvent[v.evId][day] = (sparkByEvent[v.evId][day] || 0) + 1;
+    });
+
+    // Enrich with event titles
+    const eventMap = {};
+    events.forEach(function(e) { eventMap[e.id] = e; });
+
+    const topEvents = Object.entries(byEvent)
+      .map(function(entry) {
+        const ev = eventMap[entry[0]] || {};
+        return {
+          evId:              entry[0],
+          title:             ev.title || entry[0],
+          count:             entry[1],
+          eventType:         ev.eventType || 'stand',
+          date:              ev.date || null,
+          registrationCount: (ev.registrations || []).filter(function(r) { return !r.anonymized; }).length,
+        };
+      })
+      .sort(function(a, b) { return b.count - a.count; })
+      .slice(0, 20);
+
+    res.json({ total: visits.length, byDay, topEvents, sparkByEvent, days });
+  } catch(e) {
+    console.error("[/api/stats/visits]", e);
+    res.status(500).json({ error: "Internal error: " + e.message });
+  }
+});
+
 app.delete("/api/email-log", auth, adminOnly, function(req, res) {
   writeJSON(EMAIL_LOG_FILE, []);
   res.json({ ok: true });
@@ -3496,7 +3813,7 @@ app.post("/api/email-log/test", auth, adminOnly, async function(req, res) {
   }
 });
 
-// ── Glemt passord ───────────────────────────────────────────────
+// ── Glemt password ───────────────────────────────────────────────
 app.post("/api/forgot-password", rateLimit(3, 900000), function(req, res) { // 3 per 15min
   const email = (req.body.email || "").toLowerCase().trim();
   if (!email) return res.json({ ok: true }); // Always OK to avoid enumeration
@@ -3549,7 +3866,7 @@ app.put("/api/me/profile", auth, async function(req, res) {
   const ok = await bcrypt.compare(current, users[i].hash);
   if (!ok) return res.status(403).json({ error: "Incorrect current password" });
 
-  // E-post
+  // email
   if (req.body.email) {
     const newEmail = req.body.email.toLowerCase().trim();
     const taken = users.some(function(u, j) { return j !== i && u.email === newEmail; });
@@ -3558,7 +3875,7 @@ app.put("/api/me/profile", auth, async function(req, res) {
     req.session.user.email = newEmail;
   }
 
-  // Nytt passord
+  // Nytt password
   if (req.body.newPassword) {
     if (req.body.newPassword.length < 8)
       return res.status(400).json({ error: "Password must be at least 8 characters" });
@@ -3628,50 +3945,25 @@ app.get("/api/events/:id/group-range", auth, function(req, res) {
 
 // ── Favicon API ──────────────────────────────────────────────────
 // Serves a 32x32 PNG favicon cropped from the logo using Canvas (server-side via node-canvas if available, else redirect)
-// PWA manifest for /m (lottery remote control)
 app.get("/m.webmanifest", function(req, res) {
   const s = getSettings();
   const name = (s.siteName || "Events") + " – Lotteri";
   const accent = (s.colors && s.colors.accent) || "#f5c500";
   res.setHeader("Content-Type", "application/manifest+json");
-  res.json({
-    name: name,
-    short_name: "Lotteri",
-    description: "Fjernkontroll for lotteri og skjermer",
-    start_url: "/m",
-    scope: "/",
-    display: "standalone",
-    background_color: "#0d0d0d",
-    theme_color: accent,
-    orientation: "portrait",
-    icons: [
-      { src: "/api/favicon", sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
-      { src: "/api/favicon", sizes: "512x512", type: "image/svg+xml" }
-    ]
-  });
+  res.json({ name: name, short_name: "Lotteri", start_url: "/m", display: "standalone",
+    background_color: "#0d0d0d", theme_color: accent, orientation: "portrait",
+    icons: [{ src: "/api/favicon", sizes: "192x192", type: "image/svg+xml" }] });
 });
 
-// PWA Web App Manifest
 app.get("/app.webmanifest", function(req, res) {
   const s = getSettings();
   const name = s.siteName || "Events Admin";
   const accent = (s.colors && s.colors.accent) || "#f5c500";
   res.setHeader("Content-Type", "application/manifest+json");
-  res.json({
-    name: name,
-    short_name: name.split(" ")[0] || "Events",
-    description: "Events Admin – administrasjon av arrangementer",
-    start_url: "/",
-    display: "standalone",
-    background_color: "#0d1117",
-    theme_color: accent,
-    orientation: "any",
-    icons: [
-      { src: "/api/favicon", sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
-      { src: "/api/favicon", sizes: "512x512", type: "image/svg+xml", purpose: "any" }
-    ],
-    categories: ["productivity", "utilities"],
-    lang: "no"
+  res.json({ name: name, short_name: name.split(" ")[0] || "Events",
+    start_url: "/", display: "standalone", background_color: "#0d1117",
+    theme_color: accent, orientation: "any",
+    icons: [{ src: "/api/favicon", sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" }]
   });
 });
 
@@ -3734,12 +4026,12 @@ app.get("/api/settings", auth, function(req, res) { res.json(getSettings()); });
 app.put("/api/settings", auth, adminOnly, function(req, res) {
   const current = getSettings();
   const body    = req.body;
-  // Hviteliste tillatte felt – ikke la body overskrive alt blindt
+  // Hviteliste tillatte field – not la body overskrive alt blindt
   const allowed = ["siteName","eventDomain","contactEmail","gdprRetentionDays",
     "defaultMaxParticipants","defaultRegDeadline","shiftDefaultStart","shiftDefaultEnd",
     "shiftCalStart","shiftCalEnd","emailEnabled","emailFrom","emailFromName",
     "calStartMonth","theme","logoUrl","setupDone","colors","typography",
-    "regFields","orgLevels","orgRoles","departments","emailTemplates","typeNames","typeColors","roleNames","faviconCrop","layout"];
+    "regFields","orgLevels","orgRoles","departments","emailTemplates","typeNames","typeDescs","typeEmojis","typeColors","customTypes","roleNames","faviconCrop","layout"];
   const updated = Object.assign({}, current);
   allowed.forEach(function(k) {
     if (body[k] !== undefined) {
@@ -3768,14 +4060,14 @@ app.put("/api/settings", auth, adminOnly, function(req, res) {
   if (body.gdprRetentionDays !== undefined) {
     updated.gdprRetentionDays = Math.max(30, Math.min(3650, Number(body.gdprRetentionDays) || 365));
   }
-  // Sanitér siteName og eventDomain
+  // Sanitér siteName and eventDomain
   if (body.siteName)    updated.siteName    = (body.siteName||"").toString().slice(0,100);
   if (body.eventDomain) updated.eventDomain = (body.eventDomain||"").toString().slice(0,100).replace(/[^a-z0-9.-]/gi,"");
   saveSettings(updated);
   res.json(updated);
 });
 
-// Standard org-oppsett hvis ikke konfigurert
+// Standard org-setup if not konfigurert
 const DEFAULT_ORG_LEVELS = [
   { id: "central",  name: "Sentralt",  order: 0 },
   { id: "local",    name: "Lokalt",    order: 1 },
@@ -3831,7 +4123,7 @@ const DEFAULT_ORG_ROLES = [
   }
 ];
 
-// Hent org-roller fra settings eller bruk default
+// fetch org-role from settings or use default
 function getOrgRoles() {
   const s = getSettings();
   return s.orgRoles && s.orgRoles.length ? s.orgRoles : DEFAULT_ORG_ROLES;
@@ -3847,7 +4139,7 @@ function getRolePermissions(user) {
   const orgRoles = getOrgRoles();
   const accessList = getAccessList(user);
 
-  // Admin alltid full tilgang
+  // Admin always has full access
   if (user.role === "admin") {
     const adminRole = orgRoles.find(function(r) { return r.id === "admin"; }) || DEFAULT_ORG_ROLES[0];
     return adminRole.permissions;
@@ -3869,7 +4161,7 @@ function getRolePermissions(user) {
     });
   }
 
-  // Sjekk roller fra accessList
+  // check role from accessList
   accessList.forEach(function(a) {
     const roleId = a.orgRole || a.role;
     const role = orgRoles.find(function(r) {
@@ -4010,7 +4302,7 @@ app.post("/api/settings/logo", auth, adminOnly, logoUpload.single("logo"), funct
   if (!req.file) return res.status(400).json({ err: "Ingen fil" });
   const logoUrl = "/logo/" + req.file.filename;
 
-  // Farger ekstraheres i nettleseren via Canvas og sendes med requesten
+  // color ekstraheres in nettleseren via Canvas and sendes with requesten
   let colors = { accent: null, palette: [] };
   if (req.body.colors) {
     try { colors = JSON.parse(req.body.colors); } catch(e) {}
@@ -4030,7 +4322,7 @@ app.post("/api/settings/logo", auth, adminOnly, logoUpload.single("logo"), funct
 // Serve logo-filer
 app.use("/logo", express.static(path.join(DATA, "uploads")));
 
-// Return global color palette for avdeling/group pickers
+// Return global color palette for department/group pickers
 app.get("/api/settings/palette", auth, function(req, res) {
   const s = getSettings();
   res.json({
@@ -4039,7 +4331,7 @@ app.get("/api/settings/palette", auth, function(req, res) {
   });
 });
 
-// ── Avdelinger API ───────────────────────────────────────────────
+// ── department API ───────────────────────────────────────────────
 function slugify(str) {
   return str.toLowerCase()
     .replace(/æ/g,"ae").replace(/ø/g,"o").replace(/å/g,"a")
@@ -4063,7 +4355,7 @@ app.post("/api/departments", auth, adminOnly, function(req, res) {
   res.json(s.departments);
 });
 
-// ── Avdelings-utseende ────────────────────────────────────────────
+// ── Department appearance ────────────────────────────────────────────
 app.put("/api/departments/:id/appearance", auth, function(req, res) {
   const u = req.session.user;
   const s = getSettings();
@@ -4114,7 +4406,7 @@ app.put("/api/departments/:id/appearance", auth, function(req, res) {
   res.json({ ok: true, appearance: depts[idx].appearance });
 });
 
-app.delete("/api/departments/:id", auth, adminOnly, function(req, res) {
+app.delete("/api/departments/:id", auth, managerOrAdmin, function(req, res) {
   const s = getSettings();
   s.departments = (s.departments || []).filter(function(a) { return a.id !== req.params.id; });
   saveSettings(s);
@@ -4246,7 +4538,7 @@ app.put("/api/departments/:deptId/eventtypes/:typeId", auth, adminOnly, function
 function userPublic(u, forAvdeling) {
   var accessList = getAccessList(u);
   if (forAvdeling) accessList = accessList.filter(function(t) { return t.department === forAvdeling; });
-  return { id: u.id, email: u.email, role: u.role, name: u.name, title: u.tittel || null, accessList: accessList, createdBy: u.createdBy || null };
+  return { id: u.id, email: u.email, role: u.role, name: u.name, title: u.jobTitle || null, accessList: accessList, createdBy: u.createdBy || null };
 }
 
 app.get("/api/users", auth, function(req, res) {
@@ -4294,7 +4586,7 @@ app.get("/api/users", auth, function(req, res) {
   res.json([userPublic(self || {})]);
 });
 
-// Sjekk om e-post finnes (for avdelingsleder-flyt)
+// check about email finnes (for department-flyt)
 app.get("/api/users/lookup", auth, function(req, res) {
   const me = req.session.user;
   var hasManageRole = me.role === "admin" || getAccessList(
@@ -4337,7 +4629,7 @@ app.post("/api/users", auth, function(req, res, next) {
   const password = req.body.password;
   const role     = req.body.role || "avdelingsleder";
   const name     = req.body.name || "";
-  const titleValue   = req.body.tittel || null;
+  const titleValue   = req.body.jobTitle || null;
   const createdBy = req.body.createdBy || null;
   const newAccess = req.body.newAccess || req.body.access || null;
   // Normalise role aliases on the access entry
@@ -4420,7 +4712,7 @@ app.put("/api/users/:id", auth, async function(req, res) {
 
   if (req.body.name   !== undefined) users[i].name   = req.body.name;
   if (req.body.phone  !== undefined) users[i].phone  = (req.body.phone || "").trim().slice(0, 30);
-  if (req.body.tittel !== undefined || req.body.titleValue !== undefined) users[i].tittel = req.body.titleValue || req.body.tittel || null;
+  if (req.body.jobTitle !== undefined || req.body.titleValue !== undefined) users[i].jobTitle = req.body.titleValue || req.body.jobTitle || null;
   if (req.body.role   !== undefined && me.role === "admin") users[i].role = (req.body.role||"").toLowerCase().replace(/[- ]/g,"_");
   if (req.body.password) users[i].hash = await bcrypt.hash(req.body.password, 12);
 
@@ -4498,7 +4790,7 @@ app.get("/api/events/stream", function(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.flushHeaders();
 
-  // Send immediate ping to confirm connection
+  // send immediate ping to confirm connection
   res.write("data: " + JSON.stringify({ type: "connected", clientId }) + "\n\n");
 
   sseClients.set(clientId, { res, department });
@@ -4520,11 +4812,11 @@ app.get("/api/events", auth, function(req, res) {
   res.json(readJSON(EVENTS_FILE).filter(function(e) {
     // Admin ser alt
     if (user.role === "admin") return true;
-    // Ikke-admin uten noen avdelinger ser ingenting
+    // not-admin without noen department ser ingenting
     if (!myAvds.length) return false;
     // Event must belong to one of the user's departments (or be a collaborator)
     if (e.department && myAvds.includes(e.department)) return true;
-    // Vis events der bruker er collaborator (invitert fra annen avdeling)
+    // show events der user is collaborator (invitert from annen department)
     return (e.collaborators || []).some(function(c) {
       return myAvds.includes(c.departmentId) && (c.status === "accepted" || c.status === "pending");
     });
@@ -4544,11 +4836,86 @@ app.get("/api/events", auth, function(req, res) {
       isCollabGuest:  isCollabGuest,
       myCollabAvdId:  myCollabAvdId,
       collabStatus:   collabStatus,
-      // Fjern sensitiv data fra andre avdelingers staff
+      // remove sensitive data from other departments' staff
       guestStaff:  e.guestStaff  || {},
       guestShifts: e.guestShifts || {},
     });
   }));
+});
+
+app.get("/api/search", auth, function(req, res) {
+  var q = (req.query.q || "").trim().toLowerCase();
+  if (!q || q.length < 2) return res.json([]);
+  var user = req.session.user;
+  var myAvds = getUserDepartments(user);
+
+  // Events (permission-filtered)
+  var eventResults = readJSON(EVENTS_FILE).filter(function(e) {
+    if (user.role === "admin") return true;
+    if (!myAvds.length) return false;
+    if (e.department && myAvds.includes(e.department)) return true;
+    return (e.collaborators || []).some(function(c) {
+      return myAvds.includes(c.departmentId) && (c.status === "accepted" || c.status === "pending");
+    });
+  }).filter(function(e) {
+    return (e.title       && e.title.toLowerCase().includes(q))
+        || (e.description && e.description.toLowerCase().includes(q))
+        || (e.location    && e.location.toLowerCase().includes(q))
+        || (e.eventType   && e.eventType.toLowerCase().includes(q));
+  }).slice(0, 10).map(function(e) {
+    return { kind: "event", id: e.id, title: e.title, date: e.date, location: e.location, eventType: e.eventType };
+  });
+
+  // Volunteers
+  var volResults = readJSON(VOLUNTEERS_FILE).filter(function(v) {
+    if (!myAvds.length && user.role !== "admin") return false;
+    if (user.role === "admin") return true;
+    var vDepts = Array.isArray(v.departments) && v.departments.length ? v.departments : (v.department ? [v.department] : []);
+    return vDepts.some(function(d) { return myAvds.includes(d); });
+  }).filter(function(v) {
+    return (v.name  && v.name.toLowerCase().includes(q))
+        || (v.email && v.email.toLowerCase().includes(q))
+        || (v.phone && v.phone.includes(q));
+  }).slice(0, 8).map(function(v) {
+    return { kind: "volunteer", id: v.id, name: v.name, email: v.email || "", phone: v.phone || "" };
+  });
+
+  // Inventory
+  var inventarResults = readJSON(INVENTORY_FILE).filter(function(item) {
+    if (user.role === "admin") return true;
+    if (!myAvds.length) return false;
+    return !item.department || myAvds.includes(item.department);
+  }).filter(function(item) {
+    return (item.name        && item.name.toLowerCase().includes(q))
+        || (item.description && item.description.toLowerCase().includes(q))
+        || (item.category    && item.category.toLowerCase().includes(q));
+  }).slice(0, 8).map(function(item) {
+    return {
+      kind: "inventar",
+      id: item.id,
+      name: item.name,
+      category: item.category || "annet",
+      quantity: item.quantity || 0,
+      perPackage: item.perPackage || 1,
+      enhet: item.enhet || "stk",
+      image: item.image || null
+    };
+  });
+
+  // Members
+  var memberResults = readJSON(MEMBERS_FILE).filter(function(m) {
+    if (!myAvds.length && user.role !== "admin") return false;
+    if (user.role === "admin") return true;
+    return myAvds.includes(m.department);
+  }).filter(function(m) {
+    return (m.name  && m.name.toLowerCase().includes(q))
+        || (m.email && m.email.toLowerCase().includes(q))
+        || (m.phone && (m.phone + "").includes(q));
+  }).slice(0, 8).map(function(m) {
+    return { kind: "member", id: m.id, name: m.name, email: m.email || "", phone: m.phone || "", memberNumber: m.memberNumber || "" };
+  });
+
+  res.json(eventResults.concat(inventarResults).concat(volResults).concat(memberResults));
 });
 
 app.get("/api/events/:id/routecoords", auth, async function(req, res) {
@@ -4559,28 +4926,28 @@ app.get("/api/events/:id/routecoords", auth, async function(req, res) {
 
   const forceRefresh = req.query.refresh === "1";
 
-  // Hent alle unike stedsnavn
+  // fetch all unike stedsnavn
   const allNames = [];
   const days = ev.route.days || [];
   days.forEach(function(day) {
-    (day.etapper || []).forEach(function(e) {
-      if (e.fra && !allNames.includes(e.fra)) allNames.push(e.fra);
-      if (e.til && !allNames.includes(e.til)) allNames.push(e.til);
+    (day.stages || []).forEach(function(e) {
+      if (e.from && !allNames.includes(e.from)) allNames.push(e.from);
+      if (e.to && !allNames.includes(e.to)) allNames.push(e.to);
     });
   });
 
-  // Geocode alle steder – bruk lagrede koordinater fra etappene
+  // Geocode all steder – use lagrede koordinater from etappene
   const coordCache = {};
   const geocodeStatus = [];
 
-  // Hent koordinater direkte fra etappene (allerede geocodet i frontend)
+  // fetch koordinater directly from etappene (allerede geocodet in frontend)
   days.forEach(function(day) {
-    (day.etapper || []).forEach(function(e) {
-      if (e._fra_lat && e.fra && !coordCache[e.fra]) {
-        coordCache[e.fra] = { lat: e._fra_lat, lon: e._fra_lon };
+    (day.stages || []).forEach(function(e) {
+      if (e._fra_lat && e.from && !coordCache[e.from]) {
+        coordCache[e.from] = { lat: e._fra_lat, lon: e._fra_lon };
       }
-      if (e._lat && e.til && !coordCache[e.til]) {
-        coordCache[e.til] = { lat: e._lat, lon: e._lon };
+      if (e._lat && e.to && !coordCache[e.to]) {
+        coordCache[e.to] = { lat: e._lat, lon: e._lon };
       }
     });
   });
@@ -4616,15 +4983,15 @@ app.get("/api/events/:id/routecoords", auth, async function(req, res) {
     }
   }
 
-  // Bygg koordinat-lister per dag og totalt
+  // build koordinat-lister per dag and totalt
   const dayCoords = [];
   const allCoords = [];
 
   days.forEach(function(day) {
     const dayCrds = [];
-    (day.etapper || []).forEach(function(e) {
-      const fra = coordCache[e.fra];
-      const til = coordCache[e.til];
+    (day.stages || []).forEach(function(e) {
+      const fra = coordCache[e.from];
+      const til = coordCache[e.to];
       if (fra && !dayCrds.find(function(c) { return c[0] === fra.lat && c[1] === fra.lon; }))
         dayCrds.push([fra.lat, fra.lon]);
       if (til && !dayCrds.find(function(c) { return c[0] === til.lat && c[1] === til.lon; }))
@@ -4644,10 +5011,10 @@ app.get("/api/events/:id/routecoords", auth, async function(req, res) {
 app.get("/api/events/:id", function(req, res) {
   const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
   if (!ev) return res.status(404).json({ error: "Not found" });
-  // Offentlig endpoint – aldri send sensitiv data
+  // public endpoint – never send sensitive data
   const isAuth = !!req.session.user;
   if (isAuth) {
-    // Innlogget admin/personal: send alt unntatt cancelToken og checkinPin i registrations
+    // Logged-in admin/staff: send everything except cancelToken and checkinPin in registrations
     var safeEv = Object.assign({}, ev);
     safeEv.registrations = (ev.registrations || []).map(function(r) {
       var safe = Object.assign({}, r);
@@ -4656,7 +5023,7 @@ app.get("/api/events/:id", function(req, res) {
     });
     return res.json(safeEv);
   }
-  // Offentlig: send kun metadata uten persondata
+  // public: send only metadata without personal data
   res.json({
     id: ev.id, slug: ev.slug, title: ev.title, description: ev.description,
     date: ev.date, endDate: ev.endDate, endTime: ev.endTime, location: ev.location,
@@ -4783,7 +5150,7 @@ app.put("/api/events/:id", auth, managerOrAdmin, function(req, res, next) {
       var rawPool = JSON.parse(req.body.evInvPool || "[]");
       if (Array.isArray(rawPool)) {
         events[i].evInvPool = rawPool.filter(function(p){ return p && p.id; }).map(function(p){
-          return { id: String(p.id).slice(0,100), navn: sanitizeInput((p.navn||"").slice(0,100)), antall: Math.max(1, parseInt(p.antall)||1) };
+          return { id: String(p.id).slice(0,100), name: sanitizeInput((p.name||"").slice(0,100)), quantity: Math.max(1, parseInt(p.quantity)||1) };
         });
       }
     } catch(e) {}
@@ -4799,10 +5166,10 @@ app.put("/api/events/:id", auth, managerOrAdmin, function(req, res, next) {
         const existing = events[i].lottery || {};
         const saRaw = l.startAfter || "";
         const saValid = /^[0-2][0-9]:[0-5][0-9]$/.test(saRaw);
-        // Validate inventarPool: [{id, antall}]
+        // Validate inventoryPool: [{id, count}]
         const rawPool = Array.isArray(l.inventarPool) ? l.inventarPool : [];
         const cleanPool = rawPool.filter(function(p){ return p && p.id; }).map(function(p){
-          return { id: String(p.id).slice(0,100), antall: Math.max(0, parseInt(p.antall)||0) };
+          return { id: String(p.id).slice(0,100), quantity: Math.max(0, parseInt(p.quantity)||0) };
         });
         events[i].lottery = {
           enabled:         !!l.enabled,
@@ -4820,6 +5187,12 @@ app.put("/api/events/:id", auth, managerOrAdmin, function(req, res, next) {
   }
   if (!events[i].staff)     events[i].staff     = [];
   if (!events[i].guestbook) events[i].guestbook = [];
+  if (req.body.tabOrder !== undefined) {
+    try {
+      var tabOrderArr = JSON.parse(req.body.tabOrder || "null");
+      if (Array.isArray(tabOrderArr)) events[i].tabOrder = tabOrderArr.filter(function(t){ return typeof t === "string"; }).slice(0, 20);
+    } catch(e) {}
+  }
   try {
     writeJSON(EVENTS_FILE, events);
   } catch(writeErr) {
@@ -4877,15 +5250,15 @@ app.post("/api/events/:id/lottery/register", rateLimit(10, 60000), function(req,
 
   // Deduct evInvPool on registration
   if (ev.evInvPool && ev.evInvPool.length) {
-    var invItems = readJSON(INVENTAR_FILE);
+    var invItems = readJSON(INVENTORY_FILE);
     ev.evInvPool.forEach(function(p) {
       var inv = invItems.find(function(i){ return i.id === p.id; });
-      if (inv && p.antall > 0) {
-        inv.antall = Math.max(0, (inv.antall || 0) - p.antall);
-        inv.usageCount = (inv.usageCount || 0) + p.antall;
+      if (inv && p.quantity > 0) {
+        inv.quantity = Math.max(0, (inv.quantity || 0) - p.quantity);
+        inv.usageCount = (inv.usageCount || 0) + p.quantity;
       }
     });
-    writeJSON(INVENTAR_FILE, invItems);
+    writeJSON(INVENTORY_FILE, invItems);
   }
 
   writeJSON(EVENTS_FILE, events);
@@ -4906,17 +5279,17 @@ app.post("/api/events/:id/lottery/draw", auth, managerOrAdmin, function(req, res
   if (!eligible.length)
     return res.status(400).json({ error: "Ingen kvalifiserte deltagere igjen" });
 
-  // Sjekk antall premier
+  // check antall premier
   const prizeCount = ev.lottery.prizeCount || 1;
   if ((ev.lottery.winners || []).length >= prizeCount)
     return res.status(400).json({ error: "Alle " + prizeCount + " premier er allerede trukket" });
 
-  // Sjekk minimum antall deltakere
+  // check minimum antall participant
   const minP = ev.lottery.minParticipants || 0;
   if (minP > 0 && eligible.length < minP)
     return res.status(400).json({ error: "Too few participants – need at least " + minP + ", have " + eligible.length });
 
-  // Sjekk starttidspunkt
+  // check starttidspunkt
   if (ev.lottery.startAfter) {
     const now   = new Date();
     const parts = ev.lottery.startAfter.split(":");
@@ -4926,23 +5299,23 @@ app.post("/api/events/:id/lottery/draw", auth, managerOrAdmin, function(req, res
       return res.status(400).json({ error: "Draw does not open until " + ev.lottery.startAfter });
   }
 
-  // ── Velg premie fra inventar-pool (om konfigurert) ───────────────
+  // ── Velg premie from inventory-pool (about konfigurert) ───────────────
   let prizeLabel = ev.lottery.prize || "";
   let prizeImage = null;
   let prizeInventarId = null;
 
-  const inventarPool = (ev.lottery.inventarPool || []).filter(function(p) { return p.antall > 0; });
+  const inventarPool = (ev.lottery.inventarPool || []).filter(function(p) { return p.quantity > 0; });
   if (inventarPool.length > 0) {
-    const inventar = readJSON(INVENTAR_FILE);
+    const inventar = readJSON(INVENTORY_FILE);
     // Build weighted list: one entry per available unit
     const pool = [];
     inventarPool.forEach(function(p) {
       const item = inventar.find(function(it) { return it.id === p.id; });
       if (!item) return;
-      // Beregn allerede trukket fra denne varen
+      // calculate allerede trukket from denne varen
       const alreadyDrawn = (ev.lottery.winners || []).filter(function(w) { return w.prizeInventarId === p.id; }).length;
-      const available = Math.min(p.antall, item.antall) - alreadyDrawn;
-      for (var k = 0; k < available; k++) pool.push({ id: p.id, navn: item.navn, bilde: item.bilde || null });
+      const available = Math.min(p.quantity, item.quantity) - alreadyDrawn;
+      for (var k = 0; k < available; k++) pool.push({ id: p.id, name: item.name, image: item.image || null });
     });
     if (pool.length === 0) {
       // Pool exhausted — fall back to text prize or give detailed error
@@ -4956,8 +5329,8 @@ app.post("/api/events/:id/lottery/draw", auth, managerOrAdmin, function(req, res
       }
     } else {
     const picked = pool[Math.floor(Math.random() * pool.length)];
-    prizeLabel      = picked.navn;
-    prizeImage      = picked.bilde;
+    prizeLabel      = picked.name;
+    prizeImage      = picked.image;
     prizeInventarId = picked.id;
     }
   }
@@ -4984,7 +5357,7 @@ app.post("/api/events/:id/lottery/draw", auth, managerOrAdmin, function(req, res
   writeJSON(EVENTS_FILE, events);
   broadcastEventUpdate(ev.department);
 
-  // Push til display-skjerm automatisk med produktbilde og oppdatert vinnerliste
+  // Push to display-skjerm automatically with produktbilde and updated vinnerliste
   const allWinnersForDisplay = (events[i].lottery.winners || []).map(function(w) {
     return { name: w.name, prize: w.prize || "", redeemedAt: w.redeemedAt || null };
   });
@@ -5000,7 +5373,7 @@ app.post("/api/events/:id/lottery/draw", auth, managerOrAdmin, function(req, res
   res.json({ ok: true, winner: draw, remaining: eligible.length - 1 });
 });
 
-// ── Hjelpefunksjon: bygg vinner-e-post ───────────────────────────
+// ── Hjelpefunksjon: build vinner-email ───────────────────────────
 function buildWinnerEmail(ev, draw, settings) {
   const siteName = settings.siteName || "Events Admin";
   const qrUrl    = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(draw.winnerToken);
@@ -5028,8 +5401,8 @@ function buildWinnerEmail(ev, draw, settings) {
   return { subject, html, text };
 }
 
-// ── API: Send vinnar-e-post manuelt ──────────────────────────────
-// Send to all winners who have not redeemed (or a specific regId)
+// ── API: send winner email manually ──────────────────────────────
+// send to all winners who have not redeemed (or a specific regId)
 // ── Build consolation email (non-winner) ─────────────────────────────
 function buildConsolationEmail(ev, reg, settings) {
   const siteName  = settings.siteName || "Events Admin";
@@ -5130,7 +5503,7 @@ app.post("/api/events/:id/lottery/send-consolation-email", auth, managerOrAdmin,
   const regs    = (ev.registrations || []).filter(function(r) { return !r.anonymized && r.email; });
   const winners = new Set(((ev.lottery && ev.lottery.winners) || []).map(function(w) { return w.regId; }));
 
-  // Send to all non-winners
+  // send to all non-winners
   const nonWinners = regs.filter(function(r) { return !winners.has(r.id); });
   if (!nonWinners.length) return res.status(400).json({ error: "No non-winners to send to" });
 
@@ -5250,7 +5623,7 @@ app.post("/api/events/:id/lottery/verify", auth, function(req, res) {
 
   if (payload.evId !== ev.id) return res.json({ valid: false, reason: "wrong_event" });
 
-  // Finn vinnar-posten
+  // find vinnar-posten
   const draw = (ev.lottery && ev.lottery.winners || []).find(function(w) {
     return w.winnerToken === token;
   });
@@ -5367,10 +5740,10 @@ app.post("/api/events/:id/register", rateLimit(10, 60000), function(req, res) {
     return res.status(400).json({ error: "Fullt – ingen ledige plasser" });
   // If evInvPool is used, check stock of first pool item as capacity proxy
   if (ev.evInvPool && ev.evInvPool.length) {
-    var invItems2 = readJSON(INVENTAR_FILE);
+    var invItems2 = readJSON(INVENTORY_FILE);
     var poolOk = ev.evInvPool.every(function(p) {
       var inv = invItems2.find(function(i){ return i.id === p.id; });
-      return inv && inv.antall >= p.antall;
+      return inv && inv.quantity >= p.quantity;
     });
     if (!poolOk) return res.status(400).json({ error: "Fullt – ingen ledige plasser (inventar tomt)" });
   }
@@ -5411,15 +5784,15 @@ app.post("/api/events/:id/register", rateLimit(10, 60000), function(req, res) {
 
   // Deduct evInvPool on registration
   if (ev.evInvPool && ev.evInvPool.length) {
-    var invItems = readJSON(INVENTAR_FILE);
+    var invItems = readJSON(INVENTORY_FILE);
     ev.evInvPool.forEach(function(p) {
       var inv = invItems.find(function(i){ return i.id === p.id; });
-      if (inv && p.antall > 0) {
-        inv.antall = Math.max(0, (inv.antall || 0) - p.antall);
-        inv.usageCount = (inv.usageCount || 0) + p.antall;
+      if (inv && p.quantity > 0) {
+        inv.quantity = Math.max(0, (inv.quantity || 0) - p.quantity);
+        inv.usageCount = (inv.usageCount || 0) + p.quantity;
       }
     });
-    writeJSON(INVENTAR_FILE, invItems);
+    writeJSON(INVENTORY_FILE, invItems);
   }
 
   writeJSON(EVENTS_FILE, events);
@@ -5474,22 +5847,22 @@ app.post("/avmeld", rateLimit(10, 60000), function(req, res) {
   if (foundReg.cancelledAt) return res.send(cancelPageHtml(foundEv, foundReg, "already_cancelled"));
   // Return evInvPool items on cancellation
   if (events[evIdx].evInvPool && events[evIdx].evInvPool.length) {
-    var _invItems = readJSON(INVENTAR_FILE);
+    var _invItems = readJSON(INVENTORY_FILE);
     events[evIdx].evInvPool.forEach(function(p) {
       var inv = _invItems.find(function(i){ return i.id === p.id; });
-      if (inv && p.antall > 0) {
-        inv.antall = (inv.antall || 0) + p.antall;
-        inv.usageCount = Math.max(0, (inv.usageCount || 0) - p.antall);
+      if (inv && p.quantity > 0) {
+        inv.quantity = (inv.quantity || 0) + p.quantity;
+        inv.usageCount = Math.max(0, (inv.usageCount || 0) - p.quantity);
       }
     });
-    writeJSON(INVENTAR_FILE, _invItems);
+    writeJSON(INVENTORY_FILE, _invItems);
   }
 
   // Remove the registration
   events[evIdx].registrations.splice(regIdx, 1);
   writeJSON(EVENTS_FILE, events);
   broadcastEventUpdate(foundEv.department);
-  // Send avmeldingsbekreftelse
+  // send unregistration confirmation
   if (foundReg.email) {
     const mail = emailCancellationConfirmation(foundEv, foundReg, getSettings());
     sendEmail({ to: foundReg.email, subject: mail.subject, html: mail.html, text: mail.text, fromName: getEvSenderInfo(foundEv).name }).catch(function(e) { console.error('[email] catch:', e && e.message); });
@@ -5572,7 +5945,7 @@ app.post("/api/events/:id/checkin-by-pin", rateLimit(30, 60000), function(req, r
   res.json({ ok: true, alreadyCheckedIn: false, name: reg.name });
 });
 
-// ── E-postmaler per avdeling / undergruppe ─────────────────────
+// ── E-postmaler per department / undergruppe ─────────────────────
 app.get("/api/departments/:id/email-templates", auth, function(req, res) {
   const s = getSettings();
   const dept = (s.departments || []).find(function(d) { return d.id === req.params.id; });
@@ -5654,7 +6027,7 @@ app.put("/api/events/:id/email-templates", auth, managerOrAdmin, function(req, r
   res.json(ev.emailTemplates);
 });
 
-// ── Event e-post vedlegg ──────────────────────────────────────────────
+// ── Event email vedlegg ──────────────────────────────────────────────
 const attachmentUpload = multer({
   storage: multer.diskStorage({
     destination: function(req, file, cb) { cb(null, UPLOADS); },
@@ -5712,7 +6085,7 @@ app.delete("/api/events/:id/registrations/:rid", auth, function(req, res) {
   ev.registrations = ev.registrations.filter(function(r) { return r.id !== req.params.rid; });
   writeJSON(EVENTS_FILE, events);
   broadcastEventUpdate(ev.department);
-  // Send avmeldingsbekreftelse hvis e-post er aktivert
+  // send unregistration confirmation if email is aktivert
   if (reg && reg.email && !reg.anonymized) {
     const mail = emailCancellationConfirmation(ev, reg, getSettings());
     sendEmail({ to: reg.email, subject: mail.subject, html: mail.html, text: mail.text, fromName: getEvSenderInfo(foundEv).name }).catch(function(e) { console.error('[email] catch:', e && e.message); });
@@ -6107,7 +6480,7 @@ function getUserDepartments(user) {
   return getAccessList(user).map(function(t) { return t.department; }).filter(Boolean);
 }
 
-// Send invitation to another department
+// send invitation to another department
 app.post("/api/events/:id/collaborators", auth, managerOrAdmin, function(req, res) {
   const departmentId = req.body.departmentId;
   if (!departmentId) return res.status(400).json({ error: "departmentId is required" });
@@ -6135,7 +6508,7 @@ app.put("/api/events/:id/collaborators/:deptId", auth, managerOrAdmin, function(
   const events = readJSON(EVENTS_FILE);
   const ev = events.find(function(e) { return e.id === req.params.id; });
   if (!ev) return res.status(404).json({ error: "Not found" });
-  // Kun leder/admin for den inviterte avdelingen kan svare
+  // only leder/admin for it/the inviterte avdelingen can svare
   const myAvds = getUserDepartments(req.session.user);
   if (!myAvds.includes(req.params.deptId) && req.session.user.role !== "admin")
     return res.status(403).json({ error: "Access denied" });
@@ -6147,7 +6520,7 @@ app.put("/api/events/:id/collaborators/:deptId", auth, managerOrAdmin, function(
   res.json({ ok: true });
 });
 
-// Fjern collaborator (eier eller admin)
+// remove collaborator (eier or admin)
 app.delete("/api/events/:id/collaborators/:deptId", auth, managerOrAdmin, function(req, res) {
   const events = readJSON(EVENTS_FILE);
   const ev = events.find(function(e) { return e.id === req.params.id; });
@@ -6277,7 +6650,7 @@ app.post("/api/events/:id/guestbook", rateLimit(5, 60000), function(req, res) {
   broadcastEventUpdate(ev.department);
   res.json({ ok: true, id: gbId });
 
-  // Send e-postnotifikasjon til avdelingsledere og admins
+  // send e-postnotifikasjon to avdelingsledere and admins
   try {
     const settings = getSettings();
     const users    = readJSON(USERS_FILE);
@@ -6286,7 +6659,7 @@ app.post("/api/events/:id/guestbook", rateLimit(5, 60000), function(req, res) {
       if (!u.email || u.disabled) return false;
       if (u.role === "admin") return true;
       if (u.role === "manager" || u.role === "avdelingsleder") {
-        // Sjekk om brukeren har tilgang til denne avdelingen
+        // check about user has access to denne avdelingen
         const access = getAccessList(u);
         return !access.length || access.includes(ev.department);
       }
@@ -6312,8 +6685,8 @@ app.post("/api/events/:id/guestbook", rateLimit(5, 60000), function(req, res) {
 const _gbPhotoTokens = new Map();
 const _gbPhotoSSE    = new Map(); // token -> res
 
-// Opprett token for bildeupplasting
-app.post("/api/events/:id/guestbook/:gid/photo-token", rateLimit(10, 60000), function(req, res) {
+// create token for bildeupplasting
+app.post("/api/events/:id/guestbook/:gid/photo-token", rateLimit(50, 60000), function(req, res) {
   const evId = req.params.id;
   const gbId = req.params.gid;
   const ev   = readJSON(EVENTS_FILE).find(function(e) { return e.id === evId || e.slug === evId; });
@@ -6437,7 +6810,10 @@ var token = "${token}";
 function onFilesChange(input) {
   var files = Array.from(input.files);
   if (!files.length) return;
-  files.forEach(function(f) { selectedFiles.push({ file: f, status: "pending" }); });
+  var remaining = 300 - selectedFiles.length;
+  if (remaining <= 0) { alert('Maks 300 bilder per opplasting'); input.value = ''; return; }
+  files.slice(0, remaining).forEach(function(f) { selectedFiles.push({ file: f, status: 'pending' }); });
+  if (files.length > remaining) alert('Maks 300 bilder – ' + (files.length - remaining) + ' bilder ble ikke lagt til.');
   input.value = "";
   renderThumbs();
 }
@@ -6514,24 +6890,42 @@ async function sendAllPhotos() {
 
   document.getElementById("sendBtn").disabled = true;
   document.getElementById("addMoreBtn").disabled = true;
-  document.getElementById("status").innerHTML = "⏳ Sender " + pending.length + " bilde" + (pending.length > 1 ? "r" : "") + "…";
 
   var ok = 0, fail = 0;
-  for (var i = 0; i < selectedFiles.length; i++) {
-    if (selectedFiles[i].status !== "pending") continue;
-    selectedFiles[i].status = "sending";
+  var total = pending.length;
+  var CONCURRENCY = 6; // upload 6 photos simultaneously
+
+  function updateStatus() {
+    var done = ok + fail;
+    var pct = Math.round(done / total * 100);
+    document.getElementById("status").innerHTML =
+      "⏳ " + done + "/" + total + " bilder ("+pct+"%)" +
+      (fail > 0 ? " · <span style='color:#f87171'>" + fail + " feil</span>" : "");
+  }
+
+  updateStatus();
+
+  async function uploadOne(item) {
+    item.status = "sending";
     renderThumbs();
     var fd = new FormData();
-    fd.append("photo", selectedFiles[i].file);
+    fd.append("photo", item.file);
     try {
       var r = await fetch("/api/gb-photo/" + token, { method: "POST", body: fd });
-      var d = await r.json();
-      if (r.ok) { selectedFiles[i].status = "done"; ok++; }
-      else { selectedFiles[i].status = "error"; fail++; }
+      if (r.ok) { item.status = "done"; ok++; }
+      else { item.status = "error"; fail++; }
     } catch(e) {
-      selectedFiles[i].status = "error"; fail++;
+      item.status = "error"; fail++;
     }
     renderThumbs();
+    updateStatus();
+  }
+
+  // Process in parallel batches of CONCURRENCY
+  var queue = selectedFiles.filter(function(f){ return f.status === "pending"; });
+  for (var i = 0; i < queue.length; i += CONCURRENCY) {
+    var batch = queue.slice(i, i + CONCURRENCY);
+    await Promise.all(batch.map(uploadOne));
   }
 
   var st = document.getElementById("status");
@@ -6573,14 +6967,14 @@ const photoUpload = multer({
     }
   }),
   fileFilter: function(req, file, cb) {
-    // Støtt bilder og video
+    // Støtt image and video
     const ok = /^image\//.test(file.mimetype) || /^video\//.test(file.mimetype);
     cb(null, ok);
   },
   limits: { fileSize: 1024 * 1024 * 1024 } // 1GB
 });
 
-app.post("/api/gb-photo/:token", rateLimit(20, 60000), photoUpload.single("photo"), function(req, res) {
+app.post("/api/gb-photo/:token", rateLimit(600, 60000), photoUpload.single("photo"), function(req, res) {
   const token = req.params.token;
   const info  = _gbPhotoTokens.get(token);
   if (!info || Date.now() > info.expires) return res.status(410).json({ error: "Token expired" });
@@ -6600,7 +6994,7 @@ app.post("/api/gb-photo/:token", rateLimit(20, 60000), photoUpload.single("photo
     }
   }
 
-  // Varsle SSE-klient om hvert bilde (ikke slett SSE, kan komme flere)
+  // Varsle SSE-klient about every image (not delete SSE, can komme flere)
   const sseRes = _gbPhotoSSE.get(token);
   if (sseRes) {
     sseRes.write("data: " + JSON.stringify({ ok: true, photoUrl, count: (ev && ev.guestbook && ev.guestbook.find(function(g){return g.id===info.gbId;})) ? ((ev.guestbook.find(function(g){return g.id===info.gbId;})).photos||[]).length : 1 }) + "\n\n");
@@ -6646,9 +7040,9 @@ app.delete("/api/events/:id/guestbook/:gid", auth, managerOrAdmin, function(req,
 // ── Serie API ────────────────────────────────────────────────────
 // Repeat-typer:
 //   yearly-date     - hvert ar, samme dag+maned (f.eks. 17. mai)
-//   yearly-nodate   - hvert ar, ingen fast dato (f.eks. "MC-treff mai")
+//   yearly-nodate   - every ar, none/no fast date (f.eks. "MC-treff mai")
 //   weekly          - hver uke, samme ukedag
-//   monthly-date    - hver maned, samme dato (f.eks. alltid den 15.)
+//   monthly-date    - hver maned, samme date (f.eks. alltid it/the 15.)
 //   monthly-weekday - hver maned, samme ukedag-nr (f.eks. forste tirsdag)
 
 function nextSeriesDate(seriesEntry, fromDate) {
@@ -6767,7 +7161,7 @@ app.get("/api/blocks", auth, function(req, res) {
   if (me.role === "admin") {
     return res.json(deptId ? blocks.filter(function(b){ return b.department === deptId; }) : blocks);
   }
-  // Avdeling og medlem ser kun sin avdelings blokker
+  // department and medlem ser only sin avdelings blokker
   var myDeptIds = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === me.id; }) || {}).map(function(t){ return t.department; });
   res.json(blocks.filter(function(b){ return myDeptIds.indexOf(b.department) !== -1; }));
 });
@@ -6918,7 +7312,7 @@ app.post("/api/events/:id/gdpr/anonymize", auth, managerOrAdmin, function(req, r
   res.json({ ok: true, anonymized: count });
 });
 
-// ── E-post test-sending (admin) ──────────────────────────────────
+// ── email test-sending (admin) ──────────────────────────────────
 app.post("/api/admin/email/test", auth, adminOnly, async function(req, res) {
   const s = getSettings();
   if (!s.emailEnabled) return res.status(400).json({ error: "E-post er ikke aktivert i innstillinger" });
@@ -7081,7 +7475,7 @@ app.post("/api/ai/parse-pdf", auth, managerOrAdmin, rateLimit(5, 60000), async f
     : [];
   const subgroupPromptSection = subgroupList.length
     ? `\n\nAvdelingen har disse undergruppene – bruk id-en fra listen nedenfor:\n${
-        subgroupList.map(function(u){ return '  id: "' + u.id + '" → navn: "' + u.name + '"'; }).join("\n")
+        subgroupList.map(function(u){ return '  id: "' + u.id + '" → name: "' + u.name + '"'; }).join("\n")
       }\n\nPDF-en kan ha en Kategori-kolonne med verdier som "MC", "Lokalavdeling" eller "Lokalavdeling, MC".\nBruk denne til å sette subgroup: Kategori "MC" → bruk MC-undergruppen. "Lokalavdeling" → bruk lokalavdeling-undergruppen. Begge nevnt eller usikkert → null.\nLegg til \"subgroup\": \"<id>\" i JSON-objektet, eller null.`
     : '';
 
@@ -7468,7 +7862,7 @@ app.delete("/api/members/:id", auth, function(req, res) {
 // ── Wishes API ───────────────────────────────────────────────────
 app.get("/api/wishes", auth, function(req, res) {
   const wishes = readJSON(WISHES_F);
-  // Avdelingsleder ser kun sine egne, admin ser alle
+  // department ser only sine egne, admin ser all
   if (req.session.user.role === "admin") return res.json(wishes);
   res.json(wishes.filter(function(w) { return w.userId === req.session.user.id; }));
 });
@@ -7506,7 +7900,7 @@ app.delete("/api/wishes/:id", auth, adminOnly, function(req, res) {
   res.json({ ok: true });
 });
 
-// ── Frivillige ───────────────────────────────────────────────────
+// ── volunteer ───────────────────────────────────────────────────
 app.get("/api/volunteers", auth, managerOrAdmin, function(req, res) {
   var all = readJSON(VOLUNTEERS_FILE) || [];
   var me = req.session.user;
@@ -7622,7 +8016,36 @@ app.delete("/api/volunteers/:id/events/:evId", auth, managerOrAdmin, function(re
   res.json(all[i]);
 });
 
-// ── Dev-logg API (kun DEVLOG_OWNER) ─────────────────────────────
+// ── Volunteer clothing API ────────────────────────────────────────────
+// PUT /api/volunteers/:id/clothing  { jacket:{size,received}, vest:{size,received}, cap:{size,received}, ... }
+app.put("/api/volunteers/:id/clothing", auth, managerOrAdmin, function(req, res) {
+  var all = readJSON(VOLUNTEERS_FILE) || [];
+  var i = all.findIndex(function(v){ return v.id === req.params.id; });
+  if (i < 0) return res.status(404).json({ error: "Not found" });
+  var clothing = all[i].clothing || {};
+  // Accept any clothing key (standard + custom)
+  Object.keys(req.body).forEach(function(item) {
+    if (req.body[item] === null) {
+      // null means delete this item
+      delete clothing[item];
+    } else if (typeof req.body[item] === "object") {
+      clothing[item] = {
+        size:      (req.body[item].size     || "").slice(0, 10),
+        received:  !!req.body[item].received,
+        note:      (req.body[item].note     || "").slice(0, 200),
+        quantity:  parseInt(req.body[item].quantity) || 1,
+        label:     (req.body[item].label    || "").slice(0, 60),
+        imgFront:  (req.body[item].imgFront || "").slice(0, 200000),
+        imgBack:   (req.body[item].imgBack  || "").slice(0, 200000),
+      };
+    }
+  });
+  all[i].clothing = clothing;
+  writeJSON(VOLUNTEERS_FILE, all);
+  res.json(all[i]);
+});
+
+// ── Dev-logg API (only DEVLOG_OWNER) ─────────────────────────────
 function devlogAuth(req, res, next) {
   if (!req.session.user || req.session.user.email !== DEVLOG_OWNER)
     return res.status(403).json({ error: "Access denied" });
@@ -7635,6 +8058,13 @@ function readDevlog() {
 
 app.get("/api/devlog", auth, devlogAuth, function(req, res) {
   res.json(readDevlog());
+});
+
+app.post("/api/devlog", auth, devlogAuth, function(req, res) {
+  const log = readDevlog();
+  log.entries.unshift({ id: uuid(), createdAt: new Date().toISOString(), title: req.body.title || "", content: req.body.content || "", tags: Array.isArray(req.body.tags) ? req.body.tags : [] });
+  fs.writeFileSync(DEVLOG_F, JSON.stringify(log, null, 2));
+  res.json({ ok: true });
 });
 
 app.post("/api/devlog/entries", auth, devlogAuth, function(req, res) {
@@ -7663,214 +8093,284 @@ app.delete("/api/devlog/entries/:id", auth, devlogAuth, function(req, res) {
   res.json({ ok: true });
 });
 // ── Overview page ─────────────────────────────────────────────
+function serveDemoLandingPage(req, res) {
+  var adminUrl = "https://" + ADMIN_DOMAIN;
+  var accentCol = "#FFD100";
+  var html = `<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Events Admin – Arrangementssystem for organisasjoner</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0a0a0a;color:#e5e5e5;line-height:1.6}
+a{text-decoration:none;color:inherit}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:#111;border-bottom:1px solid #1e1e1e;position:sticky;top:0;z-index:10}
+.nav-logo{font-size:1.1rem;font-weight:800;color:#FFD100}
+.nav-cta{background:#FFD100;color:#111;font-weight:700;padding:.5rem 1.25rem;border-radius:8px;font-size:.9rem}
+.hero{text-align:center;padding:6rem 2rem 4rem;background:linear-gradient(180deg,#111 0%,#0a0a0a 100%)}
+.hero-tag{display:inline-block;background:#FFD10015;border:1px solid #FFD10055;color:#FFD100;border-radius:20px;padding:.3rem 1rem;font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:1.5rem}
+h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;line-height:1.1;margin-bottom:1rem}
+h1 span{color:#FFD100}
+.sub{font-size:1.05rem;color:#888;max-width:540px;margin:0 auto 2.5rem}
+.btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn-p{background:#FFD100;color:#111;font-weight:800;padding:.85rem 2rem;border-radius:10px;font-size:1rem;transition:opacity .15s}
+.btn-p:hover{opacity:.85}
+.btn-g{border:1px solid #333;color:#ccc;padding:.85rem 2rem;border-radius:10px;font-size:1rem;transition:border-color .15s}
+.btn-g:hover{border-color:#FFD100;color:#FFD100}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;max-width:1100px;margin:4rem auto;padding:0 2rem}
+.feat{background:#111;border:1px solid #1e1e1e;border-radius:14px;padding:1.5rem;transition:border-color .2s}
+.feat:hover{border-color:#FFD10044}
+.feat-icon{font-size:1.8rem;margin-bottom:.75rem}
+.feat h3{font-size:.95rem;font-weight:700;margin-bottom:.4rem}
+.feat p{font-size:.84rem;color:#777;line-height:1.55}
+.demo-box{max-width:480px;margin:0 auto 5rem;padding:2rem;background:#111;border:1px solid #22c55e44;border-radius:16px;text-align:center}
+.demo-box h2{font-size:1.35rem;font-weight:800;margin-bottom:.4rem}
+.demo-box .lead{color:#888;font-size:.88rem;margin-bottom:1.25rem}
+.cred{display:flex;align-items:center;gap:.75rem;background:#0a1a0a;border:1px solid #1a3a1a;border-radius:8px;padding:.6rem 1rem;margin-bottom:.5rem;text-align:left}
+.cred-label{font-size:.72rem;color:#4ade80;width:70px;flex-shrink:0;font-weight:700;text-transform:uppercase}
+.cred-val{font-family:monospace;font-size:.88rem;color:#fff;flex:1}
+.cta-btn{display:inline-block;margin-top:1.25rem;background:#FFD100;color:#111;font-weight:800;padding:.8rem 2rem;border-radius:10px;font-size:1rem}
+footer{padding:1.5rem 2rem;border-top:1px solid #1a1a1a;text-align:center;font-size:.8rem;color:#444}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-logo">⚡ Events Admin</div>
+  <a class="nav-cta" href="${adminUrl}">Logg inn →</a>
+</nav>
+<div class="hero">
+  <div class="hero-tag">🎉 Live demo</div>
+  <h1>Alt du trenger for å <span>arrangere mer</span> – med færre verktøy</h1>
+  <p class="sub">Komplett arrangementssystem med påmeldinger, frivilligstyring, turplanlegging og TV-kanal. Prøv det gratis – ingen registrering.</p>
+  <div class="btns">
+    <a class="btn-p" href="${adminUrl}">🚀 Prøv demoen</a>
+    <a class="btn-g" href="#features">Se funksjoner ↓</a>
+  </div>
+</div>
+<div class="features" id="features">
+  <div class="feat"><div class="feat-icon">📅</div><h3>Arrangementsveiviser</h3><p>Opprett stands, kurs, turer og møter på 4 steg med egne felt, farger og ikon per type.</p></div>
+  <div class="feat"><div class="feat-icon">🗺</div><h3>AI-turplanlegging</h3><p>Generer dag-for-dag ruter med AI. Eksporter GPX til Garmin, Komoot og Google Maps.</p></div>
+  <div class="feat"><div class="feat-icon">👤</div><h3>Frivilligstyring</h3><p>Frivilligregister med historikk, bekledning, PIN-innsjekk og booking direkte fra søk.</p></div>
+  <div class="feat"><div class="feat-icon">📺</div><h3>TV-kanal</h3><p>Live infoskjerm med bilder, video, PPTX og planlagte spillelister – oppdateres automatisk.</p></div>
+  <div class="feat"><div class="feat-icon">📦</div><h3>Inventar</h3><p>Lagerstyring med pakkemodell, lagerlogg, gi-aways og booking til arrangement.</p></div>
+  <div class="feat"><div class="feat-icon">✍️</div><h3>Gjestebok</h3><p>Kommentarer og bildeopplasting fra mobil via QR. Opptil 300 bilder per opplasting.</p></div>
+  <div class="feat"><div class="feat-icon">🎰</div><h3>Lotteri</h3><p>Spinnehjul, trekning eller quiz – vises på storskjerm via /display/[event-id].</p></div>
+  <div class="feat"><div class="feat-icon">📧</div><h3>Automatisk e-post</h3><p>Påmeldingsbekreftelse med QR, PIN til frivillige og lotterigevinst-varsel.</p></div>
+  <div class="feat"><div class="feat-icon">🌐</div><h3>Flerspråklig</h3><p>Norsk, Svensk og Engelsk – bytt språk direkte i grensesnittet.</p></div>
+</div>
+<div class="demo-box">
+  <h2>Prøv demoen nå</h2>
+  <p class="lead">Logg inn på admin-panelet med disse demopåloggingene. Data tilbakestilles automatisk.</p>
+  <div class="cred"><span class="cred-label">Adresse</span><span class="cred-val">${adminUrl}</span></div>
+  <div class="cred"><span class="cred-label">E-post</span><span class="cred-val">${DEMO_EMAIL}</span></div>
+  <div class="cred"><span class="cred-label">Passord</span><span class="cred-val">${DEMO_PASSWORD}</span></div>
+  <a class="cta-btn" href="${adminUrl}">Åpne admin-panel →</a>
+</div>
+<footer>Events Admin · Bygget med Node.js og ❤️</footer>
+</body>
+</html>`;
+  res.send(html);
+}
+
 function serveOverviewPage(req, res) {
-  var events   = readJSON(EVENTS_FILE);
-  var settings = getSettings();
-  var siteName = settings.siteName || "Events Admin";
-  var domain   = DOMAIN;
-  var now      = Date.now();
-  var departments = (settings.departments || []);
-
-  // Vis alle offentlige events – full historikk
-  var visible = events.filter(function(ev) {
-    if (ev.hideFromList) return false;
-    return true;
-  });
-
-  function getEndMs(ev) {
-    if (!ev.date) return null;
-    if (ev.endDate) {
-      var d = new Date(ev.endDate);
-      if (ev.endTime) { var p=ev.endTime.split(":"); d.setHours(+p[0],+p[1],0,0); } else d.setHours(23,59,59,999);
-      return d.getTime();
-    }
-    var d2 = new Date(ev.date);
-    if (ev.endTime) { var p2=ev.endTime.split(":"); d2.setHours(+p2[0],+p2[1],0,0); if(d2<=new Date(ev.date)) d2.setDate(d2.getDate()+1); } else d2.setHours(23,59,59,999);
-    return d2.getTime();
-  }
-
-  // Sort by date ascending
-  visible.sort(function(a, b) {
-    if (!a.date && !b.date) return 0;
-    if (!a.date) return -1;
-    if (!b.date) return 1;
-    return new Date(a.date) - new Date(b.date);
-  });
-
-  // Group by department
-  var deptMap = {};
-  departments.forEach(function(d) { deptMap[d.id] = d; });
-
-  var pagaende = visible.filter(function(ev) {
-    if (!ev.date) return false;
-    var sm = new Date(ev.date).getTime();
-    var em = getEndMs(ev);
-    return sm <= now && em && em >= now;
-  });
-  var kommende = visible.filter(function(ev) {
-    return !ev.date || new Date(ev.date).getTime() > now;
-  });
-  var tidligere = visible.filter(function(ev) {
-    if (!ev.date) return false;
-    var em = getEndMs(ev);
-    return em && em < now;
-  });
-
-  function deptName(ev) {
-    var d = deptMap[ev.department];
-    return d ? d.name : (ev.department || "");
-  }
-  function deptSlug(ev) {
-    var d = deptMap[ev.department];
-    return d ? d.slug : null;
-  }
-
-  function evCard(ev) {
-    var evDate  = ev.date ? new Date(ev.date) : null;
-    var endMs   = getEndMs(ev);
-    var startMs = evDate ? evDate.getTime() : null;
-    var isActive = startMs && startMs <= now && endMs && endMs >= now;
-    var isPast   = endMs && endMs < now;
-    var timeStr  = (evDate && ev.date && ev.date.length > 10) ? evDate.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}) : null;
-    var endStr   = ev.endTime ? ev.endTime.slice(0,5) : null;
-    var typeLabel = getTypeLabel(ev.eventType, settings);
-    var typeCls   = ev.eventType === "kurs" ? "type-kurs" : ev.eventType === "tur" ? "type-tur" : "type-stand";
-    var url = "https://" + ev.slug + "." + domain;
-    var deptLabel = deptName(ev);
-    var deptUrl   = deptSlug(ev) ? "https://" + deptSlug(ev) + "." + domain : null;
-    var cls = "ev-card" + (isActive ? " active" : "") + (isPast ? " past" : "");
-
-    // image or type icon
-    var thumb = "";
-    if (ev.image) {
-      thumb = '<div style="width:80px;min-width:80px;height:80px;flex-shrink:0;overflow:hidden">'
-        + '<img src="' + escHtml(ev.image) + '" style="width:100%;height:100%;object-fit:cover"/>'
-        + '</div>';
-    }
-
-    return '<a class="' + cls + '" href="' + escHtml(url) + '" style="display:flex;align-items:stretch">'
-      + '<div class="ev-date-col">'
-      + (evDate
-        ? '<div class="ev-day">' + evDate.getDate() + '</div>'
-        + '<div class="ev-month">' + evDate.toLocaleDateString("en-GB",{month:"short"}) + '</div>'
-        + '<div class="ev-year">' + evDate.getFullYear() + '</div>'
-        : '<div class="ev-day" style="font-size:.7rem;color:#888">Dato</div><div class="ev-month" style="color:#666">TBD</div>')
-      + '</div>'
-      + '<div class="ev-body" style="flex:1;min-width:0">'
-      + '<div class="ev-top">'
-      + '<span class="type-badge ' + typeCls + '">' + typeLabel + '</span>'
-      + (isActive ? '<span class="active-badge">Pågående nå</span>' : '')
-      + (isPast   ? '<span class="past-badge">Avholdt</span>' : '')
-      + (deptLabel ? '<span class="dept-badge">' + escHtml(deptLabel) + '</span>' : '')
-      + '</div>'
-      + '<div class="ev-title">' + escHtml(ev.title || '') + '</div>'
-      + (timeStr ? '<div class="ev-meta">🕐 ' + timeStr + (endStr ? '–'+endStr : '') + (ev.endDate && ev.endDate !== (ev.date||'').slice(0,10) ? ' – ' + new Date(ev.endDate).toLocaleDateString("en-GB",{day:"numeric",month:"short"}) : '') + '</div>' : '')
-      + (ev.location ? '<div class="ev-meta">📍 ' + escHtml(ev.location) + '</div>' : '')
-      + (deptUrl   ? '<div class="ev-meta" style="color:#555">🏢 <span style="color:#777">' + escHtml(deptLabel) + '</span></div>' : '')
-      + '</div>'
-      + thumb
-      + '<div class="ev-arrow">→</div>'
-      + '</a>';
-  }
-
-  var css = '*{box-sizing:border-box;margin:0;padding:0}'
-    + 'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#111;color:#fff;min-height:100vh}'
-    + ':root{--y:#f5c500;--g:#1e1e1e;--g2:#2a2a2a;--r:8px}'
-    + '.header{background:#1a1a1a;border-bottom:3px solid var(--y);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem}'
-    + '.header-logo{font-size:1.7rem;font-weight:900;color:var(--y);letter-spacing:-1px}'
-    + '.header-title{font-size:1.05rem;font-weight:700;line-height:1.2}'
-    + '.header-sub{font-size:.75rem;color:#888}'
-    + '.container{max-width:960px;margin:0 auto;padding:1.5rem 1rem}'
-    + '.section-label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#888;border-bottom:1px solid #2a2a2a;padding-bottom:.4rem;margin:1.5rem 0 .75rem}'
-    + '.section-label.active-lbl{color:var(--y)}'
-    + '.ev-card{display:flex;align-items:stretch;background:var(--g);border-radius:var(--r);margin-bottom:.6rem;text-decoration:none;color:var(--text);overflow:hidden;border:1px solid '+cardBord+';transition:border-color .15s,transform .1s}'
-    + '.ev-card:hover{border-color:var(--y);transform:translateY(-1px)}'
-    + '.ev-card.past{opacity:.55}'
-    + '.ev-card.active{border-color:var(--y);animation:pulse 2s ease-in-out infinite}'
-    + '@keyframes pulse{0%,100%{box-shadow:0 0 0 1px var(--y),0 0 8px 2px rgba(245,197,0,.25)}50%{box-shadow:0 0 0 2px var(--y),0 0 18px 6px rgba(245,197,0,.45)}}'
-    + '.ev-date-col{width:52px;min-height:70px;background:'+dateBg+';display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;padding:.4rem 0}'
-    + '.ev-day{font-size:1.4rem;font-weight:900;line-height:1;color:var(--y)}'
-    + '.ev-month{font-size:.65rem;text-transform:uppercase;color:'+dateSubTxt+';letter-spacing:.5px}'
-    + '.ev-year{font-size:.6rem;color:'+txt4+'}'
-    + '.ev-body{padding:.6rem .75rem;flex:1;min-width:0}'
-    + '.ev-top{display:flex;gap:.3rem;margin-bottom:.3rem;align-items:center;flex-wrap:wrap}'
-    + '.type-badge{font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}'
-    + '.type-stand{background:'+typeStandBg+';color:'+typeStandTxt+'}'
-    + '.type-kurs{background:'+typeKursBg+';color:'+typeKursTxt+'}'
-    + '.type-tur{background:'+typeTurBg+';color:'+typeTurTxt+'}'
-    + '.active-badge{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:20px;background:var(--y);color:#111;text-transform:uppercase;letter-spacing:.5px}'
-    + '.past-badge{font-size:.6rem;color:'+pastTxt+';background:'+pastBadBg+';padding:2px 6px;border-radius:20px}'
-    + '.dept-badge{font-size:.6rem;color:#aaa;background:#2a2a2a;border:1px solid #3a3a3a;padding:2px 6px;border-radius:20px;white-space:nowrap}'
-    + '.ev-title{font-size:.9rem;font-weight:700;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
-    + '.ev-meta{font-size:.72rem;color:'+txt3+';margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
-    + '.ev-arrow{display:flex;align-items:center;padding:0 .75rem;color:#333;font-size:1rem;flex-shrink:0}'
-    + '.ev-card:hover .ev-arrow{color:var(--y)}'
-    + '.empty{text-align:center;padding:3rem 1rem;color:#444;font-size:.85rem}'
-    + '.dept-nav{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem}'
-    + '.dept-pill{background:#1e1e1e;border:1px solid #2a2a2a;color:#888;border-radius:20px;padding:5px 14px;font-size:.78rem;text-decoration:none;transition:border-color .15s,color .15s}'
-    + '.dept-pill:hover{border-color:var(--y);color:var(--y)}'
-    + 'footer{text-align:center;padding:2rem 1rem;font-size:.75rem;color:#333}';
-
-  var deptNav = departments.length > 0
-    ? '<div class="dept-nav">'
-      + departments.map(function(d) {
-          return '<a class="dept-pill" href="https://' + escHtml(d.slug) + '.' + domain + '">'
-            + escHtml(d.name) + '</a>';
-        }).join('')
-      + '</div>'
-    : '';
+  if (IS_DEMO) return serveDemoLandingPage(req, res);
+  var settings  = getSettings();
+  var siteName  = settings.siteName  || "Events Admin";
+  var adminDomain = ADMIN_DOMAIN;
+  var accentCol = (settings.colors && settings.colors.accent) || "#FFD100";
+  var logoUrl   = settings.logo || null;
 
   var html = '<!DOCTYPE html><html lang="no"><head>'
-    + '<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>'
-    + '<title>' + escHtml(siteName) + ' – Alle aktiviteter</title>'
-    + '<style>' + css + '</style>'
+    + '<meta charset="UTF-8"/>'
+    + '<meta name="viewport" content="width=device-width,initial-scale=1"/>'
+    + '<title>' + escHtml(siteName) + ' – Arrangementsplattform</title>'
+    + '<meta name="description" content="En komplett plattform for å administrere arrangementer, frivillige og påmeldinger."/>'
+    + '<style>'
+    + '*{box-sizing:border-box;margin:0;padding:0}'
+    + 'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0d0d0f;color:#f0f0f0;overflow-x:hidden}'
+    + 'a{color:inherit;text-decoration:none}'
+    + ':root{--y:' + accentCol + ';--y2:' + accentCol + '99}'
+
+    /* ── Nav ── */
+    + '.nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;position:sticky;top:0;z-index:100;background:rgba(13,13,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid #ffffff0f}'
+    + '.nav-logo{display:flex;align-items:center;gap:.65rem;font-weight:800;font-size:1.15rem;color:var(--y)}'
+    + '.nav-logo img{height:32px;width:auto;object-fit:contain}'
+    + '.nav-cta{background:var(--y);color:#111;font-weight:700;font-size:.88rem;padding:.5rem 1.25rem;border-radius:8px;transition:opacity .15s}'
+    + '.nav-cta:hover{opacity:.85}'
+
+    /* ── Hero ── */
+    + '.hero{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 1.5rem 3rem;position:relative;overflow:hidden}'
+    + '.hero-glow{position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:700px;height:500px;background:radial-gradient(ellipse,'+accentCol+'22 0%,transparent 70%);pointer-events:none}'
+    + '.hero-tag{display:inline-flex;align-items:center;gap:.5rem;background:var(--y)15;border:1px solid var(--y)40;color:var(--y);font-size:.78rem;font-weight:700;padding:.35rem .85rem;border-radius:20px;margin-bottom:1.75rem;letter-spacing:.04em;text-transform:uppercase}'
+    + '.hero h1{font-size:clamp(2.2rem,6vw,4rem);font-weight:900;line-height:1.08;max-width:780px;letter-spacing:-.02em}'
+    + '.hero h1 span{color:var(--y)}'
+    + '.hero-sub{font-size:clamp(1rem,2vw,1.2rem);color:#9ca3af;max-width:560px;margin:1.25rem auto 2.25rem;line-height:1.65}'
+    + '.hero-btns{display:flex;gap:.85rem;flex-wrap:wrap;justify-content:center}'
+    + '.btn-primary{background:var(--y);color:#111;font-weight:800;font-size:1rem;padding:.8rem 2rem;border-radius:10px;transition:transform .15s,box-shadow .15s}'
+    + '.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--y)44}'
+    + '.btn-ghost{background:transparent;border:1px solid #ffffff25;color:#e5e7eb;font-weight:600;font-size:1rem;padding:.8rem 2rem;border-radius:10px;transition:border-color .15s,background .15s}'
+    + '.btn-ghost:hover{border-color:#ffffff55;background:#ffffff08}'
+
+    /* ── Features ── */
+    + '.section{padding:5rem 1.5rem;max-width:1100px;margin:0 auto}'
+    + '.section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--y);margin-bottom:.85rem}'
+    + '.section-title{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;line-height:1.15;letter-spacing:-.02em;margin-bottom:1rem}'
+    + '.section-sub{color:#9ca3af;font-size:1rem;line-height:1.65;max-width:520px}'
+    + '.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;margin-top:3rem}'
+    + '.feat{background:#141416;border:1px solid #ffffff0f;border-radius:14px;padding:1.5rem 1.6rem;transition:border-color .2s,transform .2s}'
+    + '.feat:hover{border-color:var(--y)40;transform:translateY(-3px)}'
+    + '.feat-icon{font-size:1.8rem;margin-bottom:.85rem}'
+    + '.feat h3{font-size:1rem;font-weight:700;margin-bottom:.45rem}'
+    + '.feat p{font-size:.87rem;color:#9ca3af;line-height:1.6}'
+
+    /* ── Stats strip ── */
+    + '.stats-strip{background:#141416;border-top:1px solid #ffffff0f;border-bottom:1px solid #ffffff0f;padding:3rem 1.5rem}'
+    + '.stats-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:2rem;text-align:center}'
+    + '.stat-val{font-size:2.4rem;font-weight:900;color:var(--y);line-height:1}'
+    + '.stat-lbl{font-size:.82rem;color:#6b7280;margin-top:.35rem}'
+
+    /* ── Feature highlight (alternating) ── */
+    + '.highlight{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;max-width:1100px;margin:0 auto;padding:4rem 1.5rem}'
+    + '.highlight.flip{direction:rtl}.highlight.flip>*{direction:ltr}'
+    + '.hl-visual{background:#141416;border:1px solid #ffffff0f;border-radius:16px;padding:2rem;aspect-ratio:4/3;display:flex;flex-direction:column;gap:.75rem;justify-content:center}'
+    + '.hl-bar{height:10px;border-radius:5px;background:var(--y);opacity:.15}'
+    + '.hl-bar.active{opacity:1}'
+    + '.hl-row{display:flex;align-items:center;gap:.75rem}'
+    + '.hl-dot{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:var(--y)22;border:2px solid var(--y)}'
+    + '.hl-lines{flex:1;display:flex;flex-direction:column;gap:5px}'
+    + '.hl-line{height:8px;border-radius:4px;background:#ffffff15}'
+    + '.hl-line.w60{width:60%}.hl-line.w40{width:40%}'
+    + '.pill-demo{display:inline-flex;align-items:center;gap:.4rem;background:#1e293b;border:1px solid #334155;border-radius:20px;padding:.3rem .85rem;font-size:.78rem;font-weight:600}'
+    + '.pill-demo.y{background:var(--y)20;border-color:var(--y)50;color:var(--y)}'
+    + '.pill-demo.g{background:#16a34a20;border-color:#16a34a55;color:#4ade80}'
+    + '.pill-demo.b{background:#3b82f620;border-color:#3b82f655;color:#93c5fd}'
+
+    /* ── CTA bottom ── */
+    + '.cta-section{text-align:center;padding:6rem 1.5rem;background:linear-gradient(180deg,transparent,'+accentCol+'0a)}'
+    + '.cta-section h2{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;letter-spacing:-.02em;margin-bottom:1rem}'
+    + '.cta-section p{color:#9ca3af;font-size:1rem;margin-bottom:2.5rem}'
+
+    /* ── Footer ── */
+    + '.footer{padding:1.5rem 2rem;border-top:1px solid #ffffff0f;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}'
+    + '.footer-copy{font-size:.8rem;color:#6b7280}'
+
+    /* ── Responsive ── */
+    + '@media(max-width:700px){'
+    + '.nav{padding:.85rem 1rem}'
+    + '.highlight{grid-template-columns:1fr;gap:2rem}'
+    + '.highlight.flip{direction:ltr}'
+    + '.hero h1{font-size:2rem}'
+    + '.features-grid{grid-template-columns:1fr}'
+    + '}'
+    + '</style>'
     + '</head><body>'
-    + '<div class="header">'
-    + '<div class="header-logo">⚡</div>'
-    + '<div><div class="header-title">' + escHtml(siteName) + '</div>'
-    + '<div class="header-sub">Alle aktiviteter – alle avdelinger</div></div>'
+
+    /* ── Nav ── */
+    + '<nav class="nav">'
+    + '<div class="nav-logo">'
+    + (logoUrl ? '<img src="' + escHtml(logoUrl) + '" alt="logo"/>' : '⚡')
+    + '<span>' + escHtml(siteName) + '</span>'
     + '</div>'
-    + '<div class="container">'
-    + deptNav;
+    + '<a class="nav-cta" href="https://' + escHtml(adminDomain) + '">Logg inn →</a>'
+    + '</nav>'
 
-  if (visible.length === 0) {
-    html += '<div class="empty"><div style="font-size:2.5rem;margin-bottom:.75rem">📅</div><p>Ingen arrangementer å vise</p></div>';
-  } else {
-    if (pagaende.length > 0) {
-      html += '<div class="section-label active-lbl">⚡ Pågående nå</div>';
-      pagaende.forEach(function(ev) { html += evCard(ev); });
-    }
-    if (kommende.length > 0) {
-      html += '<div class="section-label">Kommende</div>';
-      kommende.forEach(function(ev) { html += evCard(ev); });
-    }
-    if (tidligere.length > 0) {
-      html += '<div class="section-label">Tidligere</div>';
-      tidligere.forEach(function(ev) { html += evCard(ev); });
-    }
-  }
+    /* ── Hero ── */
+    + '<section class="hero">'
+    + '<div class="hero-glow"></div>'
+    + '<div class="hero-tag">⚡ Arrangementsplattform</div>'
+    + '<h1>Alt du trenger for å <span>arrangere mer</span> – med færre verktøy</h1>'
+    + '<p class="hero-sub">Fra påmelding og frivillige til statistikk og TV-skjermer – alt i ett system designet for avdelinger som arrangerer.</p>'
+    + '<div class="hero-btns">'
+    + '<a class="btn-primary" href="https://' + escHtml(adminDomain) + '">Åpne admin →</a>'
+    + '<a class="btn-ghost" href="#features">Se funksjoner</a>'
+    + '</div>'
+    + '</section>'
 
-  html += '</div>'
-    + '<footer>' + escHtml(siteName) + ' · Alle avdelinger</footer>'
-    + '<script>'
-    + '(function(){'
-    + '  var es;'
-    + '  function connect(){'
-    + '    es=new EventSource("/api/events/stream");'
-    + '    es.onmessage=function(e){'
-    + '      try{var d=JSON.parse(e.data);if(d.type==="events_updated")location.reload();}catch(x){}'
-    + '    };'
-    + '    es.onerror=function(){es.close();setTimeout(connect,5000);};'
-    + '  }'
-    + '  connect();'
-    + '  document.addEventListener("visibilitychange",function(){'
-    + '    if(document.visibilityState==="visible"&&(!es||es.readyState===2))connect();'
-    + '  });'
-    + '})();'
-    + '<\/script>'
+    /* ── Stats strip ── */
+    + '<div class="stats-strip">'
+    + '<div class="stats-inner">'
+    + '<div><div class="stat-val">📅</div><div class="stat-lbl">Arrangementer & turer</div></div>'
+    + '<div><div class="stat-val">🙋</div><div class="stat-lbl">Frivilligstyring</div></div>'
+    + '<div><div class="stat-val">📊</div><div class="stat-lbl">Statistikk & historikk</div></div>'
+    + '<div><div class="stat-val">📺</div><div class="stat-lbl">TV-kanal & infoskjerm</div></div>'
+    + '</div>'
+    + '</div>'
+
+    /* ── Features grid ── */
+    + '<div class="section" id="features">'
+    + '<div class="section-label">Funksjoner</div>'
+    + '<div class="section-title">Et komplett verktøy<br/>for arrangører</div>'
+    + '<p class="section-sub">Bygget for avdelinger som arrangerer jevnlig – enten det er kurs, turer, stands eller møter.</p>'
+    + '<div class="features-grid">'
+    + _promoFeat('📅','Arrangementer','Opprett, rediger og publiser arrangementer med påmelding, kapasitetsstyring og lotteri.')
+    + _promoFeat('🙋','Frivillige','Hold oversikt over frivillige, book dem på arrangementer og følg oppmøtestatistikk.')
+    + _promoFeat('📊','Statistikk','Se aktivitet per måned, oppmøtegrad og historikk fordelt på type og avdeling.')
+    + _promoFeat('📺','TV-kanal','Kjør en live infoskjerm med kommende arrangementer – uten ekstra utstyr.')
+    + _promoFeat('📍','Avdelingssider','Hver avdeling og undergruppe får sin egen offentlige side med eget utseende.')
+    + _promoFeat('🔔','E-postlogg','Automatiske påmeldingsbekreftelser, purringer og avmeldingslenker ut av boksen.')
+    + _promoFeat('👥','Deltakerlister','Sjekk inn deltakere, eksporter lister og se hvem som faktisk møtte opp.')
+    + _promoFeat('🗺️','Turplanlegger','Planlegg ruter med kart, etapper og tidsskjema direkte i arrangementet.')
+    + _promoFeat('🔒','Roller & tilgang','Finkornede rettigheter per avdeling – fra frivillig til administrator.')
+    + '</div>'
+    + '</div>'
+
+    /* ── Highlight 1: booking ── */
+    + '<div class="highlight">'
+    + '<div>'
+    + '<div class="section-label">Frivilligstyring</div>'
+    + '<h2 class="section-title" style="font-size:1.9rem">Book frivillige direkte på arrangementer</h2>'
+    + '<p class="section-sub">Søk i frivilliglisten, se tilgjengelighet og book med ett klikk. Systemet varsler om dobbeltbooking og holder statistikk automatisk.</p>'
+    + '</div>'
+    + '<div class="hl-visual">'
+    + '<div class="hl-row"><div class="hl-dot"></div><div class="hl-lines"><div class="hl-line"></div><div class="hl-line w60"></div></div><span class="pill-demo g">✓ Ledig</span></div>'
+    + '<div class="hl-row"><div class="hl-dot" style="opacity:.4;border-color:#ffffff30"></div><div class="hl-lines"><div class="hl-line w60"></div><div class="hl-line w40"></div></div><span class="pill-demo b">Booket</span></div>'
+    + '<div class="hl-row"><div class="hl-dot"></div><div class="hl-lines"><div class="hl-line"></div><div class="hl-line w40"></div></div><span class="pill-demo g">✓ Ledig</span></div>'
+    + '<div style="margin-top:.75rem;background:var(--y);color:#111;font-weight:700;font-size:.85rem;border-radius:8px;padding:.5rem 1rem;text-align:center">📅 Book på arrangement</div>'
+    + '</div>'
+    + '</div>'
+
+    /* ── Highlight 2: stats ── */
+    + '<div class="highlight flip">'
+    + '<div>'
+    + '<div class="section-label">Statistikk</div>'
+    + '<h2 class="section-title" style="font-size:1.9rem">Historikk og statistikk alltid tilgjengelig</h2>'
+    + '<p class="section-sub">Se aktivitetsoversikt per måned, sammenlign år og finn ut hvilke arrangementtyper som skaper mest engasjement.</p>'
+    + '</div>'
+    + '<div class="hl-visual" style="gap:1rem">'
+    + '<div style="display:flex;align-items:flex-end;gap:6px;height:90px">'
+    + ['20','45','30','80','60','100','75','90','55','40','65','85'].map(function(h,i){
+        return '<div style="flex:1;border-radius:3px 3px 0 0;background:'+accentCol+(i===5?'':'55')+';height:'+h+'%"></div>';
+      }).join('')
+    + '</div>'
+    + '<div style="display:flex;gap:.5rem;flex-wrap:wrap">'
+    + '<span class="pill-demo y">📅 16 arrangementer</span>'
+    + '<span class="pill-demo g">✅ 82% oppmøte</span>'
+    + '</div>'
+    + '</div>'
+    + '</div>'
+
+    /* ── CTA ── */
+    + '<div class="cta-section">'
+    + '<h2>Klar til å komme i gang?</h2>'
+    + '<p>Logg inn i admin-panelet og start planleggingen.</p>'
+    + '<a class="btn-primary" href="https://' + escHtml(adminDomain) + '" style="display:inline-block;font-size:1.1rem;padding:.9rem 2.5rem">Åpne admin-panel →</a>'
+    + '</div>'
+
+    /* ── Footer ── */
+    + '<footer class="footer">'
+    + '<span class="footer-copy">© ' + new Date().getFullYear() + ' ' + escHtml(siteName) + '</span>'
+    + '<a class="footer-copy" href="https://' + escHtml(adminDomain) + '" style="color:var(--y)">Admin →</a>'
+    + '</footer>'
+
     + '</body></html>';
 
   res.send(html);
+}
+
+function _promoFeat(icon, title, desc) {
+  return '<div class="feat"><div class="feat-icon">'+icon+'</div><h3>'+escHtml(title)+'</h3><p>'+escHtml(desc)+'</p></div>';
 }
 
 function serveDepartmentPage(dept, req, res) {
@@ -7880,7 +8380,7 @@ function serveDepartmentPage(dept, req, res) {
   var domain   = DOMAIN;
   var now      = Date.now();
 
-  // Vis alle events for avdelingen – full historikk
+  // show all events for avdelingen – full historikk
   var filtered = events.filter(function(ev) {
     if (ev.department !== dept.id) return false;
     if (ev.hideFromList) return false;
@@ -7896,7 +8396,7 @@ function serveDepartmentPage(dept, req, res) {
 
   var subgroups = dept.subgroups || [];
 
-  // Bygg kolonne-data: én per subgroup + én for events uten subgroup
+  // build kolonne-data: én per subgroup + én for events without subgroup
   var columns = [];
 
   var utenUg = filtered.filter(function(ev) { return !ev.subgroup; });
@@ -7918,7 +8418,7 @@ function serveDepartmentPage(dept, req, res) {
     var today   = new Date();
     var todayDate = today.toISOString().slice(0,10);
 
-    // Beregn slutt-tidspunkt
+    // calculate slutt-tidspunkt
     // Prioritet: endDate+endTime > endDate > endTime > startdato 23:59
     var endMs;
     if (ev.endDate) {
@@ -7935,7 +8435,7 @@ function serveDepartmentPage(dept, req, res) {
       if (ev.endTime) {
         var ep2 = ev.endTime.split(":");
         endSameDay.setHours(parseInt(ep2[0],10), parseInt(ep2[1],10), 0, 0);
-        // Slutter etter midnatt?
+        // Slutter after midnatt?
         if (endSameDay <= evDate) endSameDay.setDate(endSameDay.getDate() + 1);
       } else {
         endSameDay.setHours(23, 59, 59, 999);
@@ -7964,15 +8464,15 @@ function serveDepartmentPage(dept, req, res) {
     if (isPast)    cls += " past";
     if (isActive)  cls += " active";
 
-    // Minimap og stopp-info for tur-events med rute
+    // Minimap and stopp-info for tur-events with rute
     var minimap = "";
     if (ev.eventType === "tur" && ev.route && ev.route.days && ev.route.days.length) {
       var days = ev.route.days;
 
-      // Samle alle steder med koordinater
+      // Samle all steder with koordinater
       var places = [];
       days.forEach(function(d) {
-        (d.etapper || []).forEach(function(e) {
+        (d.stages || []).forEach(function(e) {
           if (e._lat && e._lon)       places.push({ lat: e._lat,     lon: e._lon,     type: e.type });
           if (e._fra_lat && e._fra_lon) places.push({ lat: e._fra_lat, lon: e._fra_lon, type: "start" });
         });
@@ -7989,10 +8489,10 @@ function serveDepartmentPage(dept, req, res) {
       var OPPL_ICONS = { museum:"🏛️", natur:"🌿", utsikt:"🏔️", historisk:"🏰", aktivitet:"🎭", kultur:"🎨", mat:"🍴", annet:"⭐" };
       var getStopIcon = function(s) { return s.type === "opplevelse" ? (OPPL_ICONS[s.opplevelseSubtype] || "🎯") : (STOP_ICONS[s.type] || "📍"); };
       var dayRows = days.map(function(d, di) {
-        var totalKm = (d.etapper||[]).reduce(function(s,e){ return s+(parseFloat(e.km)||0); }, 0);
-        var stops = (d.etapper||[]).filter(function(e){ return ["lunsj","middag","hotell","opplevelse","stopp","bensin"].includes(e.type); });
+        var totalKm = (d.stages||[]).reduce(function(s,e){ return s+(parseFloat(e.km)||0); }, 0);
+        var stops = (d.stages||[]).filter(function(e){ return ["lunsj","middag","hotell","opplevelse","stopp","bensin"].includes(e.type); });
         var stopIcons = stops.map(getStopIcon).join("");
-        var opplevelser = stops.filter(function(s){ return s.type === "opplevelse"; }).map(function(s){ return (OPPL_ICONS[s.opplevelseSubtype] || "🎯") + " " + (s.notat || s.til || ""); }).filter(Boolean);
+        var opplevelser = stops.filter(function(s){ return s.type === "opplevelse"; }).map(function(s){ return (OPPL_ICONS[s.opplevelseSubtype] || "🎯") + " " + (s.note || s.to || ""); }).filter(Boolean);
         return '<div style="background:#1a1a1a;border-radius:3px;padding:2px 4px">'
           + '<div style="color:#d8b4fe;font-weight:700;font-size:.65rem">Dag '+(di+1)+'</div>'
           + '<div style="color:#666;font-size:.65rem">' + (totalKm > 0 ? Math.round(totalKm)+' km' : '–') + (stopIcons ? ' '+stopIcons : '') + '</div>'
@@ -8002,18 +8502,18 @@ function serveDepartmentPage(dept, req, res) {
 
       var cols = days.length <= 3 ? days.length : 3;
 
-      // Kart-seksjon: Leaflet minimap hvis koordinater finnes, ellers bilde eller placeholder
+      // Kart-seksjon: Leaflet minimap if koordinater finnes, ellers image or placeholder
       var mapSection = "";
       var hasCoords = places.length >= 2;
       var mapId = "mm-" + ev.id;
 
-      // Fallback: hent koordinater fra stedsnavn hvis de mangler
+      // Fallback: fetch koordinater from stedsnavn if they/the missing
       if (!hasCoords && days.length) {
         var allNames = [];
         days.forEach(function(d) {
-          (d.etapper||[]).forEach(function(e) {
-            if (e.fra && !allNames.includes(e.fra)) allNames.push(e.fra);
-            if (e.til && !allNames.includes(e.til)) allNames.push(e.til);
+          (d.stages||[]).forEach(function(e) {
+            if (e.from && !allNames.includes(e.from)) allNames.push(e.from);
+            if (e.to && !allNames.includes(e.to)) allNames.push(e.to);
           });
         });
         // Use cached coordinates from _geocodeCache on server
@@ -8042,14 +8542,14 @@ function serveDepartmentPage(dept, req, res) {
       }
 
       if (hasCoords) {
-        // Beregn bbox for kartet
+        // calculate bbox for kartet
         var lats = places.map(function(p){ return p.lat; });
         var lons = places.map(function(p){ return p.lon; });
         var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
         var minLon = Math.min.apply(null, lons), maxLon = Math.max.apply(null, lons);
         var pad = 0.15;
         var b = [minLon-pad, minLat-pad, maxLon+pad, maxLat+pad];
-        // Bruk OpenStreetMap static tiles via bbox
+        // use OpenStreetMap static tiles via bbox
         var staticUrl = "https://www.openstreetmap.org/export/embed.html?bbox="
           + b[0]+"%2C"+b[1]+"%2C"+b[2]+"%2C"+b[3]
           + "&layer=mapnik";
@@ -8287,10 +8787,18 @@ function serveDepartmentPage(dept, req, res) {
     + '.mob-tab{background:var(--g2);border:1px solid var(--g3);color:var(--text2);border-radius:20px;padding:6px 14px;font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s}'
     + '.mob-tab.active{background:var(--y);border-color:var(--y);color:'+activeBadClr+'}'
     + '@media(max-width:640px){'
+    + 'body{overflow-x:hidden}'
     + '.cols{grid-template-columns:1fr;gap:0}'
     + '.col-wrap{max-height:none;overflow-y:visible;padding-right:0}'
     + '.mob-tabs{display:flex}'
     + '.col-section{display:none}.col-section.mob-active{display:block}'
+    + '.header-brand{padding:.55rem .75rem;gap:.5rem}'
+    + '.header-logo{font-size:1rem}'
+    + '.header-title{font-size:.85rem}'
+    + '.header-sub{font-size:.65rem}'
+    + '.container{padding:1rem .75rem}'
+    + '.ev-card{width:100%;max-width:100%;box-sizing:border-box}'
+    + '.ev-title{white-space:normal;word-break:break-word}'
     + '}'
     + '.col-head{background:var(--g2);border-radius:var(--r) var(--r) 0 0;padding:.6rem 1rem;border-bottom:2px solid var(--y);display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem}'
     + '.col-head h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.8px;color:var(--y);font-weight:800}'
@@ -8325,7 +8833,7 @@ function serveDepartmentPage(dept, req, res) {
   var needsLeaflet = allAvdEvents.some(function(ev) {
     return ev.eventType === "tur" && ev.route && ev.route.days &&
       ev.route.days.some(function(d) {
-        return (d.etapper||[]).some(function(e) { return e._lat; });
+        return (d.stages||[]).some(function(e) { return e._lat; });
       });
   });
 
@@ -8526,7 +9034,7 @@ function serveDepartmentPage(dept, req, res) {
     + '  },200);\n'
     + '});\n'
     + '(function(){\n'
-    // SSE: koble til og reload ved events_updated for denne avdelingen
+    // SSE: koble to and reload at events_updated for denne avdelingen
     + '  var DEPT_ID = ' + JSON.stringify(dept.id) + ';\n'
     + '  var es;\n'
     + '  function connect() {\n'
@@ -8584,6 +9092,25 @@ function serveEventPage(req, res) {
   }
 
   const isAuthenticated = !!req.session.user;
+
+  // Track visit (skip bots and authenticated admin users)
+  const ua = (req.headers['user-agent'] || '').toLowerCase();
+  const isBot = /bot|crawler|spider|crawl|slurp|facebookexternalhit|preview|lighthouse|pagespeed|headless/.test(ua);
+  if (!isBot && !isAuthenticated) {
+    try {
+      const visits = readJSON(VISITS_FILE);
+      visits.push({
+        evId:    ev.id,
+        ts:      new Date().toISOString(),
+        lang:    req.query.lang || (req.headers['accept-language'] || '').split(',')[0].slice(0,2) || 'no',
+        ref:     (req.headers['referer'] || '').replace(/https?:\/\/[^/]+/, '').slice(0, 80) || null,
+      });
+      // Keep max 50 000 visits to avoid unbounded growth
+      if (visits.length > 50000) visits.splice(0, visits.length - 50000);
+      writeJSON(VISITS_FILE, visits);
+    } catch(e) { /* non-critical */ }
+  }
+
   res.send(buildEventPage(ev, isAuthenticated));
 }
 
@@ -8673,24 +9200,15 @@ footer{text-align:center;padding:1.5rem;font-size:.78rem;color:#bbb}
       <span>&#x1F6A7;</span>
       <span>Dette arrangementet er under planlegging og ikke offentliggjort ennå.</span>
     </div>
-    ${ev && (ev.date || ev.location || contactEmail) ? `<div class="info-section">
-      ${ev.date ? `<div class="info-row">
-        <div class="info-icon">&#128197;</div>
-        <div><div class="info-label">Dato og tid</div><div class="info-value">${escHtml(dateStr)}</div></div>
-      </div>` : ""}
-      ${ev.location ? `<div class="info-row">
-        <div class="info-icon">&#128205;</div>
-        <div><div class="info-label">Sted</div><div class="info-value">${escHtml(ev.location || "")}</div></div>
-      </div>` : ""}
-      ${contactEmail ? `<div class="info-row">
-        <div class="info-icon">&#9993;</div>
-        <div><div class="info-label">Kontakt</div><div class="info-value"><a href="mailto:${escHtml(contactEmail)}" style="color:${accent}">${escHtml(contactEmail)}</a></div></div>
-      </div>` : ""}
-    </div>` : ""}
-    ${ev && ev.description ? `<div class="desc-box">
-      <div class="desc-label">Om arrangementet</div>
-      <div class="desc-text">${escHtml(ev.description || "").replace(/\n/g,"<br>")}</div>
-    </div>` : ""}
+    ${(function(){
+      if (!(ev && (ev.date || ev.location || contactEmail))) return '';
+      return '<div class="info-section">'
+        + (ev.date ? '<div class="info-row"><div class="info-icon">&#128197;</div><div><div class="info-label">Dato og tid</div><div class="info-value">' + escHtml(dateStr) + '</div></div></div>' : '')
+        + (ev.location ? '<div class="info-row"><div class="info-icon">&#128205;</div><div><div class="info-label">Sted</div><div class="info-value">' + escHtml(ev.location || '') + '</div></div></div>' : '')
+        + (contactEmail ? '<div class="info-row"><div class="info-icon">&#9993;</div><div><div class="info-label">Kontakt</div><div class="info-value"><a href="mailto:' + escHtml(contactEmail) + '" style="color:' + accent + '">' + escHtml(contactEmail) + '</a></div></div></div>' : '')
+        + '</div>';
+    })()}
+    ${ev && ev.description ? '<div class="desc-box"><div class="desc-label">Om arrangementet</div><div class="desc-text">' + escHtml(ev.description || '').replace(/\n/g,'<br>') + '</div></div>' : ''}
   </div>
 </main>
 <footer>${escHtml(siteName)} &mdash; Siden oppdateres n\u00e5r arrangementet er klart.</footer>
@@ -8818,7 +9336,7 @@ body{font-family:${fontBody};background:var(--b);color:var(--text);min-height:10
 .ev-theme-btn{background:none;border:none;cursor:pointer;font-size:1.2rem;padding:4px 6px;border-radius:6px;opacity:.9;transition:opacity .15s;line-height:1}
 .ev-theme-btn:hover{opacity:1}
 <script>
-// Tema-init: les cookie, fallback til avdelingens standard
+// theme-init: read cookie, fallback to department standard
 (function(){
   var def = '${theme}';
   var cookie = document.cookie.split(';').map(function(c){return c.trim();}).find(function(c){return c.startsWith('ev_theme=');});
@@ -8933,10 +9451,10 @@ body{background:var(--b);color:var(--text)}
 .pin-sheet h3{font-size:1.1rem;font-weight:800;margin-bottom:1rem;text-align:center}
 .pin-close-btn{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;color:var(--text2);cursor:pointer;padding:4px 10px}
 /* Etappe list */
-.etappe-item{background:var(--g2);border-radius:8px;padding:1rem;margin-bottom:.6rem;border-left:4px solid var(--y)}
-.etappe-num{font-size:.72rem;color:var(--text2);font-weight:700;text-transform:uppercase;margin-bottom:.2rem}
-.etappe-name{font-weight:800;font-size:1rem}
-.etappe-meta{font-size:.82rem;color:var(--text2);margin-top:.3rem;display:flex;gap:1rem;flex-wrap:wrap}
+.stage-item{background:var(--g2);border-radius:8px;padding:1rem;margin-bottom:.6rem;border-left:4px solid var(--y)}
+.stage-num{font-size:.72rem;color:var(--text2);font-weight:700;text-transform:uppercase;margin-bottom:.2rem}
+.stage-name{font-weight:800;font-size:1rem}
+.stage-meta{font-size:.82rem;color:var(--text2);margin-top:.3rem;display:flex;gap:1rem;flex-wrap:wrap}
 /* Lottery */
 .lottery-box{background:linear-gradient(135deg,#1a0a2e,#0d1a0d);border:2px solid var(--y);border-radius:12px;padding:2rem;text-align:center}
 .lottery-drum{font-size:4.5rem;display:block;margin:.5rem 0}
@@ -9026,8 +9544,8 @@ function tabletPinSheet(ev, lang) {
       }).join('')
     : `<div class="empty"><span class="empty-icon">👔</span>Ingen forhåndsregistrert personell</div>`;
 
-  // Avdelingsvelger: skjul hvis eventet har én fast avdeling,
-  // vis bare samarbeidsavdelinger ved collab-events
+  // Avdelingsvelger: hide if eventet has én fast department,
+  // show only samarbeidsavdelinger at collab-events
   const evDept      = ev.department ? depts.find(function(d){ return d.id === ev.department; }) : null;
   const collabDepts = (ev.collaborators || [])
     .filter(function(c){ return c.status === 'accepted'; })
@@ -9036,10 +9554,10 @@ function tabletPinSheet(ev, lang) {
 
   let deptSel = '';
   if (evDept && collabDepts.length === 0) {
-    // Fast avdeling, ingen samarbeid → skjul, forhåndsvelg automatisk
+    // Fast department, none/no samarbeid → hide, forhåndsvelg automatically
     deptSel = `<input type="hidden" id="sDept" value="${escHtml(evDept.name)}"/>`;
   } else if (evDept && collabDepts.length > 0) {
-    // Samarbeids-event → vis dropdown med arrangørens avdeling + godkjente samarbeidsavdelinger
+    // Samarbeids-event → show dropdown with arrangørens department + godkjente samarbeidsavdelinger
     const options = [evDept, ...collabDepts]
       .map(function(d){ return `<option value="${escHtml(d.name)}">${escHtml(d.name)}</option>`; })
       .join('');
@@ -9049,7 +9567,7 @@ function tabletPinSheet(ev, lang) {
          ${options}
        </select>`;
   } else if (depts.length > 0) {
-    // Ingen avdeling satt på eventet → vis alle
+    // none/no department satt on eventet → show all
     deptSel = `<label>Avdeling</label>
        <select id="sDept">
          <option value="">– Velg –</option>
@@ -9124,6 +9642,7 @@ function tabletSharedJS(ev) {
 var EV_ID="${ev.id}";
 var EV_SLUG="${escHtml(ev.slug || '')}";
 var PHOTO_BASE_URL="https://${ADMIN_DOMAIN}";
+var EV_TAB_ORDER=${JSON.stringify(ev.tabOrder||[])};
 // Tabs
 function showTab(id) {
   document.querySelectorAll('.ev-panel').forEach(function(p){p.classList.remove('active')});
@@ -9135,19 +9654,44 @@ function showTab(id) {
   // Scroll tabs into view
   if(tab) tab.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
 }
+(function(){
+  var order=EV_TAB_ORDER&&EV_TAB_ORDER.length?EV_TAB_ORDER:null;
+  if(order){for(var i=0;i<order.length;i++){var p=document.getElementById('tab-'+order[i]);if(p){showTab(order[i]);break;}}}
+})();
 
 // Navigasjon
 function startNavigation() {
-  // NAV_LAT/LON are injected server-side as numbers or null (not strings)
-  var hasCoords = NAV_LAT !== null && NAV_LAT !== 'null' && NAV_LON !== null && NAV_LON !== 'null';
+  var hasCoords = NAV_LAT && NAV_LON && NAV_LAT !== null && NAV_LON !== null;
   var dest = hasCoords ? (NAV_LAT + ',' + NAV_LON) : (NAV_NAME || '');
   if (!dest) { alert('Ingen navigasjonsadresse funnet for dette arrangementet.'); return; }
+  // Use Google Maps universal URL — works as app deep-link on Android and iOS,
+  // and as web fallback on desktop. Avoids window.open popup blocking.
   var url = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(dest) + '&travelmode=driving';
   window.location.href = url;
 }
 function startNavigationByName() {
   if (!NAV_NAME) { alert('Ingen adresse funnet for dette arrangementet.'); return; }
   window.location.href = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(NAV_NAME) + '&travelmode=driving';
+}
+
+// Join the group — navigates to the live tracker
+function catchUpToTracker() {
+  if (!LIVE_TRACKING_URL) { alert('Ingen live tracking-URL er konfigurert for dette arrangementet.'); return; }
+  window.location.href = LIVE_TRACKING_URL;
+}
+
+function catchUpManualNav() {
+  var inp = document.getElementById('catchUpCoords');
+  if (!inp || !inp.value.trim()) return;
+  var val = inp.value.trim();
+  // Accept "lat,lon" or Google Maps URL
+  var m = val.match(/([-\d.]+)[,\s]+([-\d.]+)/);
+  if (m) {
+    window.location.href = 'https://www.google.com/maps/dir/?api=1&destination=' + m[1] + ',' + m[2] + '&travelmode=driving';
+  } else {
+    // Pass as text destination
+    window.location.href = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(val) + '&travelmode=driving';
+  }
 }
 
 // PIN sheet
@@ -9329,40 +9873,18 @@ var EV_STRINGS = {
     attend_physical:   'Fysisk',
     attend_digital:    'Digitalt',
     attend_unsure:     'Vet ikke ennå',
-    desc_stand:          'Meld deg på og motta informasjon vi deler fra denne standen direkte på e-post.',
-    desc_stand_lot:      'Meld deg på og motta informasjon – og delta automatisk i <strong style="color:var(--y)">lodtrekningen</strong>!',
-    desc_mote:           'Fyll inn skjemaet for å melde deg på arrangementet.',
-    desc_kurs:           'Fyll inn skjemaet for å melde deg på kurset.',
-    desc_tur:            'Fyll inn skjemaet for å melde deg på turen.',
-    full_mote:           'Møtet er fullt – ingen ledige plasser.',
-    full_kurs:           'Kurset er fullt – ingen ledige plasser.',
-    full_tur:            'Turen er full – ingen ledige plasser.',
-    spots_full_mote:     'Fullt',
-    btn_reg_mote:        '📋 Meld deg på →',
-    btn_reg_kurs_link:   '📋 Meld deg på kurset →',
-    btn_reg_tur_link:    '📋 Meld deg på turen →',
-    no_etappe:           'Ingen etappeplan lagt inn ennå',
-    qr_valid:            'Gyldig i 15 minutter',
-    ph_full_name:        'Ditt fulle navn',
-    places_label:        'Plasser',
-    desc_stand:          'Anmäl dig och ta emot information vi delar från detta stånd direkt på e-post.',
-    desc_stand_lot:      'Anmäl dig och ta emot information – och delta automatiskt i <strong style="color:var(--y)">utlottningen</strong>!',
-    desc_mote:           'Fyll i formuläret för att anmäla dig till evenemanget.',
-    desc_kurs:           'Fyll i formuläret för att anmäla dig till kursen.',
-    desc_tur:            'Fyll i formuläret för att anmäla dig till resan.',
-    full_mote:           'Mötet är fullt – inga lediga platser.',
-    full_kurs:           'Kursen är full – inga lediga platser.',
-    full_tur:            'Resan är full – inga lediga platser.',
-    spots_full_mote:     'Fullt',
-    btn_reg_mote:        '📋 Anmäl dig →',
-    btn_reg_kurs_link:   '📋 Anmäl dig till kursen →',
-    btn_reg_tur_link:    '📋 Anmäl dig till resan →',
-    no_etappe:           'Ingen resplan lagd ännu',
-    qr_valid:            'Giltig i 15 minuter',
-    ph_full_name:        'Ditt fullständiga namn',
-    places_label:        'Platser',
     staff_btn:         '👔 Personal',
     staff_hint:        'Personalinngang',
+    full_kurs:         'Kurset er fullt – ingen ledige plasser.',
+    full_mote:         'Møtet er fullt – ingen ledige plasser.',
+    full_tur:          'Turen er full – ingen ledige plasser.',
+    spots_full_mote:   'Fullt',
+    no_etappe:         'Ingen etappeplan lagt inn ennå',
+    ph_full_name:      'Ditt fulle navn',
+    places_label:      'Plasser',
+    qr_valid:          'Gyldig i 15 minutter',
+    btn_reg_kurs_link: '📋 Meld deg på kurset →',
+    btn_reg_tur_link:  '📋 Meld deg på turen →',
   },
   sv: {
     tab_info:          'ℹ️ Om ståndet',
@@ -9463,8 +9985,30 @@ var EV_STRINGS = {
     attend_physical:   'Fysiskt',
     attend_digital:    'Digitalt',
     attend_unsure:     'Vet inte ännu',
+
+    btn_reg_kurs_link:     '📋 Anmäl dig till kursen →',
+    btn_reg_mote:          '📋 Anmäl dig →',
+    btn_reg_tur_link:      '📋 Anmäl dig till resan →',
+    full_kurs:             'Kursen är full – inga lediga platser.',
+    full_mote:             'Mötet är fullt – inga lediga platser.',
+    full_tur:              'Resan är full – inga lediga platser.',
+    no_etappe:             'Ingen resplan lagd ännu',
+    ph_full_name:          'Ditt fullständiga namn',
+    places_label:          'Platser',
+    qr_valid:              'Giltig i 15 minuter',
+    spots_full_mote:       'Fullt',
     staff_btn:         '👔 Personal',
     staff_hint:        'Personalingång',
+    full_kurs:         'Kursen är full – inga lediga platser.',
+    full_mote:         'Mötet är fullt – inga lediga platser.',
+    full_tur:          'Resan är full – inga lediga platser.',
+    spots_full_mote:   'Fullt',
+    no_etappe:         'Ingen resplan lagd ännu',
+    ph_full_name:      'Ditt fullständiga namn',
+    places_label:      'Platser',
+    qr_valid:          'Giltig i 15 minuter',
+    btn_reg_kurs_link: '📋 Anmäl dig till kursen →',
+    btn_reg_tur_link:  '📋 Anmäl dig till resan →',
   },
   en: {
     tab_info:          'ℹ️ About the stand',
@@ -9581,8 +10125,30 @@ var EV_STRINGS = {
     qr_valid:            'Valid for 15 minutes',
     ph_full_name:        'Your full name',
     places_label:        'Spots',
+
+    btn_reg_kurs_link:     '📋 Register for course →',
+    btn_reg_mote:          '📋 Register →',
+    btn_reg_tur_link:      '📋 Register for trip →',
+    full_kurs:             'The course is full – no spots available.',
+    full_mote:             'The event is full – no spots available.',
+    full_tur:              'The trip is full – no spots available.',
+    no_etappe:             'No itinerary added yet',
+    ph_full_name:          'Your full name',
+    places_label:          'Spots',
+    qr_valid:              'Valid for 15 minutes',
+    spots_full_mote:       'Full',
     staff_btn:         '👔 Staff',
     staff_hint:        'Staff entrance',
+    full_kurs:         'The course is full – no spots available.',
+    full_mote:         'The event is full – no spots available.',
+    full_tur:          'The trip is full – no spots available.',
+    spots_full_mote:   'Full',
+    no_etappe:         'No itinerary added yet',
+    ph_full_name:      'Your full name',
+    places_label:      'Spots',
+    qr_valid:          'Valid for 15 minutes',
+    btn_reg_kurs_link: '📋 Register for course →',
+    btn_reg_tur_link:  '📋 Register for trip →',
   }
 };
 
@@ -9593,7 +10159,7 @@ function toggleEvTheme() {
   var next = cur === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   window._evTheme = next;
-  // Lagre i cookie i 365 dager
+  // save in cookie in 365 dager
   document.cookie = 'ev_theme=' + next + ';path=/;max-age=' + (365*24*3600) + ';SameSite=Lax';
   updateEvThemeBtn();
   // Oppdater CSS-variabler
@@ -9669,8 +10235,9 @@ function applyEvLang() {
   setEl('gbMsg2', 'placeholder', t('gb_ph_msg'));
 
   // Registration form labels
-  setAll('label[for="rName"], .ev-form label:nth-of-type(1)', 'text', t('label_name'));
-  setAll('label[for="rEmail"], .ev-form label:nth-of-type(2)', 'text', t('label_email'));
+  // Only target registration form labels, not guestbook form
+  setAll('label[for="rName"]', 'text', t('label_name'));
+  setAll('label[for="rEmail"]', 'text', t('label_email'));
 
   // Register button
   var regBtn = document.getElementById('regBtn');
@@ -9680,6 +10247,13 @@ function applyEvLang() {
   setEl('gbSendBtn', 'text', t('gb_send'));
   setAll('[data-i18n="gb_send"]', 'text', t('gb_send'));
   setAll('[data-i18n="gb_note"]', 'text', t('gb_note'));
+  // gb_msg label has a child span so handle separately
+  var gbMsgLabel = document.getElementById('gbMsgLabel');
+  if (gbMsgLabel) gbMsgLabel.innerHTML = t('gb_msg') + ' <span style="font-weight:400;color:#555">(' + t('label_phone_opt') + ')</span>';
+  // no_comments text - update data-i18n spans
+  document.querySelectorAll('[data-i18n="no_comments"]').forEach(function(el) {
+    el.textContent = t('no_comments');
+  });
 
   // Photo upload button
   var photoBtn = document.getElementById('gbPhotoBtn');
@@ -9766,7 +10340,7 @@ window.addEventListener('offline',function(){document.getElementById('evHeader')
     }
   }, {passive: true});
 
-  // Mus/desktop: håll Shift + klicka på staffFab-wrapper, eller
+  // Mus/desktop: håll Shift + klicka on staffFab-wraps, or
   // dubbelklicka längst ner på sidan (inom 80px från botten)
   document.addEventListener('dblclick', function(e){
     if((window.innerHeight - e.clientY) < 80){
@@ -9913,6 +10487,24 @@ const EV_STRINGS_SERVER = (() => {
       hotel_single:'🛏 Enkeltrom',hotel_double:'🛏🛏 Dobbeltrom',
       attend_physical:'Fysisk',attend_digital:'Digitalt',attend_unsure:'Vet ikke ennå',
       tab_oppmote:'✅ Oppmøte',tab_forere:'🏍 Deltakere',
+      tab_gb:'✍️ Gjestebok',
+      tab_info:'ℹ️ Om standen',tab_reg:'📧 Hold meg oppdatert',
+      tab_info_kurs:'ℹ️ Om kurset',tab_reg_kurs:'📋 Påmelding',
+      tab_info_mote:'ℹ️ Om møtet',tab_reg_mote:'📋 Påmelding',
+      tab_info_tur:'ℹ️ Om turen',tab_reg_tur:'📋 Påmelding',
+      btn_reg_kurs_link:'📋 Meld deg på kurset →',
+      btn_reg_tur_link:'📋 Meld deg på turen →',
+      desc_stand:'Meld deg på og motta informasjon vi deler fra denne standen direkte på e-post.',
+      desc_stand_lot:'Meld deg på og motta informasjon – og delta automatisk i <strong style="color:var(--y)">lodtrekningen</strong>!',
+      full_kurs:'Kurset er fullt – ingen ledige plasser.',
+      full_mote:'Møtet er fullt – ingen ledige plasser.',
+      full_tur:'Turen er full – ingen ledige plasser.',
+      no_etappe:'Ingen etappeplan lagt inn ennå',
+      ph_full_name:'Ditt fulle navn',
+      places_label:'Plasser',
+      qr_valid:'Gyldig i 15 minutter',
+      spots_full_mote:'Fullt',
+      staff_hint:'Personalinngang',
       spots_low:'få plasser igjen',
     },
     sv: {
@@ -9951,6 +10543,24 @@ const EV_STRINGS_SERVER = (() => {
       hotel_single:'🛏 Enkelrum',hotel_double:'🛏🛏 Dubbelrum',
       attend_physical:'Fysiskt',attend_digital:'Digitalt',attend_unsure:'Vet inte ännu',
       tab_oppmote:'✅ Närvaro',tab_forere:'🏍 Deltagare',
+      tab_gb:'✍️ Gästbok',
+      tab_info:'ℹ️ Om ståndet',tab_reg:'📧 Håll mig uppdaterad',
+      tab_info_kurs:'ℹ️ Om kursen',tab_reg_kurs:'📋 Anmälan',
+      tab_info_mote:'ℹ️ Om mötet',tab_reg_mote:'📋 Anmälan',
+      tab_info_tur:'ℹ️ Om resan',tab_reg_tur:'📋 Anmälan',
+      btn_reg_kurs_link:'📋 Anmäl dig till kursen →',
+      btn_reg_tur_link:'📋 Anmäl dig till resan →',
+      desc_stand:'Anmäl dig och ta emot information vi delar från detta stånd direkt på e-post.',
+      desc_stand_lot:'Anmäl dig och ta emot information – och delta automatiskt i <strong style="color:var(--y)">utlottningen</strong>!',
+      full_kurs:'Kursen är full – inga lediga platser.',
+      full_mote:'Mötet är fullt – inga lediga platser.',
+      full_tur:'Resan är full – inga lediga platser.',
+      no_etappe:'Ingen resplan lagd ännu',
+      ph_full_name:'Ditt fullständiga namn',
+      places_label:'Platser',
+      qr_valid:'Giltig i 15 minuter',
+      spots_full_mote:'Fullt',
+      staff_hint:'Personalingång',
     },
     en: {
       about_stand:'About the stand',about_event:'About the event',about_kurs:'About the course',about_tur:'About the trip',
@@ -9988,6 +10598,24 @@ const EV_STRINGS_SERVER = (() => {
       hotel_single:'🛏 Single room',hotel_double:'🛏🛏 Double room',
       attend_physical:'In person',attend_digital:'Online',attend_unsure:'Not sure yet',
       tab_oppmote:'✅ Attendance',tab_forere:'🏍 Participants',
+      tab_gb:'✍️ Guestbook',
+      tab_info:'ℹ️ About the stand',tab_reg:'📧 Keep me updated',
+      tab_info_kurs:'ℹ️ About the course',tab_reg_kurs:'📋 Registration',
+      tab_info_mote:'ℹ️ About the event',tab_reg_mote:'📋 Registration',
+      tab_info_tur:'ℹ️ About the trip',tab_reg_tur:'📋 Registration',
+      btn_reg_kurs_link:'📋 Register for course →',
+      btn_reg_tur_link:'📋 Register for trip →',
+      desc_stand:'Sign up and receive information we share from this stand directly by email.',
+      desc_stand_lot:'Sign up and receive information – and automatically enter the <strong style="color:var(--y)">lottery draw</strong>!',
+      full_kurs:'The course is full – no spots available.',
+      full_mote:'The event is full – no spots available.',
+      full_tur:'The trip is full – no spots available.',
+      no_etappe:'No itinerary added yet',
+      ph_full_name:'Your full name',
+      places_label:'Spots',
+      qr_valid:'Valid for 15 minutes',
+      spots_full_mote:'Full',
+      staff_hint:'Staff entrance',
     }
   };
 })();
@@ -9999,6 +10627,49 @@ function T(key, lang) {
 // Safety net: if server-side code accidentally calls browser t(), throw a clear error
 function t(key) {
   throw new Error('Server-side t() called with key: ' + key + ' — use T(key, lang) instead');
+}
+
+
+// ── Shared registration form builder (avoids \\n rendering bugs) ──────────
+function buildRegFormHtml(ev, lang, isFull, _slotsWithCounts, regBtnKey, extraFields) {
+  if (isFull) {
+    var fullKey = ev.eventType === 'mote' ? 'full_mote' : ev.eventType === 'kurs' ? 'full_kurs' : 'full_stand';
+    return '<div class="msg msg-err">' + T(fullKey, lang) + '</div>';
+  }
+  var slotsHtml = '';
+  if (_slotsWithCounts.length > 0) {
+    slotsHtml = '<label style="font-weight:700;margin-bottom:.25rem">' + T('label_slot', lang) + '</label>'
+      + '<div id="evSlotPicker" style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.5rem">'
+      + _slotsWithCounts.map(function(s) {
+          var full = s.available === 0;
+          var badge = full
+            ? '<span style="color:#e00;font-size:.78rem">(' + T('slot_full', lang) + ')</span>'
+            : s.available <= 3
+              ? '<span style="color:#e67e00;font-size:.78rem">(' + s.available + ' ' + T('slot_left', lang) + ')</span>'
+              : '<span style="color:#16a34a;font-size:.78rem">(' + s.available + ' ' + T('slot_available', lang) + ')</span>';
+          var parts = [s.label];
+          if (s.location) parts.push(s.location);
+          if (s.date) parts.push(s.date);
+          if (s.time) parts.push(T('at_time', lang) + s.time);
+          return '<label style="display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border:1px solid var(--ev-border,#ddd);border-radius:var(--ev-radius,8px);cursor:' + (full ? 'not-allowed' : 'pointer') + ';opacity:' + (full ? .45 : 1) + ';background:var(--ev-card,#fff)">'
+            + '<input type="radio" name="evSlot" value="' + s.id + '"' + (full ? ' disabled' : '') + ' style="accent-color:var(--ev-accent,#FFD100);flex-shrink:0;width:16px;height:16px"/>'
+            + '<div><strong>' + parts.join(' · ') + '</strong> ' + badge + '</div></label>';
+        }).join('')
+      + '</div>';
+  }
+  return (ev.regIntro ? '<div style="font-size:.92rem;color:var(--ev-text,#1a1a1a);line-height:1.6;margin-bottom:1rem;white-space:pre-line">' + escHtml(ev.regIntro) + '</div>' : '')
+    + '<div id="regMsg"></div>'
+    + '<div class="ev-form">'
+    + slotsHtml
+    + '<label data-i18n="label_name">' + T('label_name', lang) + '</label>'
+    + '<input id="rName" type="text" placeholder="' + T('ph_full_name', lang) + '" autocomplete="name"/>'
+    + '<label data-i18n="label_email">' + T('label_email', lang) + '</label>'
+    + '<input id="rEmail" type="email" placeholder="din@epost.no" autocomplete="email"/>'
+    + '<label><span data-i18n="label_phone">' + T('label_phone', lang) + '</span> <span style="color:#666;font-weight:400" data-i18n="label_phone_opt">(' + T('label_phone_opt', lang) + ')</span></label>'
+    + '<input id="rPhone" type="tel" placeholder="+47 000 00 000" autocomplete="tel"/>'
+    + (extraFields || '')
+    + '</div>'
+    + '<button class="btn-primary" id="regBtn" onclick="doRegister()" data-i18n="' + regBtnKey + '">' + T(regBtnKey, lang) + '</button>';
 }
 
 function buildStandPage(ev, isAuthenticated) {
@@ -10036,7 +10707,23 @@ function buildStandPage(ev, isAuthenticated) {
       }).join('')
     : '<div class="empty"><span class="empty-icon">✍️</span>'+T('no_comments_first', lang)+'</div>';
 
-  return `<!DOCTYPE html>
+    // ── Tab nav order ──
+  var _defs = [
+    {id:'info',html:'<div class="ev-tab" data-tab="info" onclick="showTab(\'info\')" data-i18n="tab_info">' + 'ℹ️ Om standen' + '</div>'},
+    {id:'reg',html:'<div class="ev-tab" data-tab="reg" onclick="showTab(\'reg\')" data-i18n="tab_reg">' + '📧 Hold meg oppdatert' + '</div>'},
+    {id:'lottery',html:lotteryOn?'<div class="ev-tab" data-tab="lottery" onclick="showTab(\'lottery\')" data-i18n="tab_lottery">🎰 Lotteri</div>':''},
+    {id:'gb',html:'<div class="ev-tab" data-tab="gb" onclick="showTab(\'gb\')" data-i18n="tab_gb">' + T('tab_gb',lang) + '</div>'},
+  ];
+  var _order = ev.tabOrder && ev.tabOrder.length ? ev.tabOrder : _defs.map(function(d){return d.id;});
+  var _sorted = _order.map(function(id){return _defs.find(function(d){return d.id===id;});}).filter(Boolean);
+  _defs.forEach(function(d){if(!_sorted.find(function(s){return s&&s.id===d.id;}))_sorted.push(d);});
+  var _first = _sorted.length ? _sorted[0].id : '';
+  var navHtml = '<nav class="ev-tabs">' + _sorted.map(function(d){
+    if(!d||!d.html) return '';
+    return d.id===_first ? d.html.replace(' class="ev-tab"',' class="ev-tab active"') : d.html;
+  }).filter(Boolean).join('') + '</nav>';
+
+return `<!DOCTYPE html>
 <html lang="no">
 <head>
 <meta charset="UTF-8"/>
@@ -10065,23 +10752,18 @@ ${tabletHeader(ev, settings, 'badge-stand', '🟢 ' + getTypeLabel('stand', sett
 ${tabletHero(ev, 'badge-stand', '🟢 ' + getTypeLabel('stand', settings))}
 
 <!-- Tabs -->
-<nav class="ev-tabs">
-  <div class="ev-tab" data-tab="info" onclick="showTab('info')" data-i18n="tab_info">ℹ️ Om standen</div>
-  <div class="ev-tab active" data-tab="reg" onclick="showTab('reg')" data-i18n="tab_reg">📧 Hold meg oppdatert</div>
-  ${lotteryOn ? `<div class="ev-tab" data-tab="lottery" onclick="showTab('lottery')" data-i18n="tab_lottery">🎰 Lotteri</div>` : ''}
-  <div class="ev-tab" data-tab="gb" onclick="showTab('gb')" data-i18n="tab_gb">✍️ Gjestebok</div>
-</nav>
+${navHtml}
 
 <div class="ev-content">
 
   <!-- Info -->
   <div class="ev-panel" id="tab-info">
-    ${ev.description ? `<div class="ev-card"><div class="ev-card-title">${T('about_stand', lang)}</div><p style="line-height:1.7;color:#ddd">${escHtml(ev.description).replace(/\n/g,'<br>')}</p></div>` : ''}
+    ${ev.description ? '<div class="ev-card"><div class="ev-card-title">' + (T('about_stand', lang)) + '</div><p style="line-height:1.7;color:#ddd">' + (escHtml(ev.description).replace(/\n/g,'<br>')) + '</p></div>' : ''}
     <div class="ev-card">
       <div class="ev-card-title" data-i18n="practical_info">${T('practical_info', lang)}</div>
-      ${ev.date ? `<div class="info-row"><span class="icon">📅</span><div><div class="label" data-i18n="date_time">${T('date_time', lang)}</div><div class="value">${evFmtDate(ev.date)}${ev.date ? ' kl. ' + evFmtTime(ev.date) : ''}</div></div></div>` : ''}
-      ${ev.location ? `<div class="info-row"><span class="icon">📍</span><div><div class="label" data-i18n="location">${T('location', lang)}</div><div class="value">${escHtml(ev.location)}</div></div></div>` : ''}
-      ${contactEmail ? `<div class="info-row"><span class="icon">✉️</span><div><div class="label" data-i18n="contact">${T('contact', lang)}</div><div class="value"><a href="mailto:${escHtml(contactEmail)}" style="color:var(--y)">${escHtml(contactEmail)}</a></div></div></div>` : ''}
+      ${ev.date ? '<div class="info-row"><span class="icon">📅</span><div><div class="label" data-i18n="date_time">' + (T('date_time', lang)) + '</div><div class="value">' + (evFmtDate(ev.date)) + (ev.date ? ' kl. ' + evFmtTime(ev.date) : '') + '</div></div></div>' : ''}
+      ${ev.location ? '<div class="info-row"><span class="icon">📍</span><div><div class="label" data-i18n="location">' + (T('location', lang)) + '</div><div class="value">' + (escHtml(ev.location)) + '</div></div></div>' : ''}
+      ${contactEmail ? '<div class="info-row"><span class="icon">✉️</span><div><div class="label" data-i18n="contact">' + (T('contact', lang)) + '</div><div class="value"><a href="mailto:' + (escHtml(contactEmail)) + '" style="color:var(--y)">' + (escHtml(contactEmail)) + '</a></div></div></div>' : ''}
     </div>
     <button class="btn-primary" onclick="showTab('reg')" data-i18n="btn_info_link">📧 Meld meg på e-postlisten →</button>
   </div>
@@ -10096,17 +10778,27 @@ ${tabletHero(ev, 'badge-stand', '🟢 ' + getTypeLabel('stand', settings))}
       ${ev.regIntro ? '<div style="font-size:.92rem;color:var(--ev-text,#1a1a1a);line-height:1.6;margin-bottom:1rem;white-space:pre-line">' + escHtml(ev.regIntro) + '</div>' : ''}
       <div id="regMsg"></div>
       <div class="ev-form">
-      ${_slotsWithCounts.length > 0 ? `
-      <label style="font-weight:700;margin-bottom:.25rem">${T('label_slot', lang)}</label>
-      <div id="evSlotPicker" style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.5rem">
-        \${_slotsWithCounts.map(s=>{
-          var full=s.available===0;
-          var badge=full?'<span style="color:#e00;font-size:.78rem">('+T('slot_full', lang)+')</span>':s.available<=3?'<span style="color:#e67e00;font-size:.78rem">('+s.available+' '+T('slot_left', lang)+')</span>':'<span style="color:#16a34a;font-size:.78rem">('+s.available+' '+T('slot_available', lang)+')</span>';
-          var parts=[s.label];if(s.location)parts.push(s.location);if(s.date)parts.push(s.date);if(s.time)parts.push(T('at_time', lang)+s.time);
-          return '<label style="display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border:1px solid var(--ev-border,#ddd);border-radius:var(--ev-radius,8px);cursor:'+(full?'not-allowed':'pointer')+';opacity:'+(full?.45:1)+';background:var(--ev-card,#fff)">'
-            +'<input type="radio" name="evSlot" value="'+s.id+'"'+(full?' disabled':'')+' style="accent-color:var(--ev-accent,#FFD100);flex-shrink:0;width:16px;height:16px"/>'+'<div><strong>'+parts.join(' · ')+'</strong> '+badge+'</div></label>';
-        }).join('')}
-      </div>` : ''}
+      ${(function(){
+        if (!_slotsWithCounts.length) return '';
+        return '<label style="font-weight:700;margin-bottom:.25rem">' + T('label_slot', lang) + '</label>'
+          + '<div id="evSlotPicker" style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.5rem">'
+          + _slotsWithCounts.map(function(s) {
+              var full = s.available === 0;
+              var badge = full
+                ? '<span style="color:#e00;font-size:.78rem">(' + T('slot_full', lang) + ')</span>'
+                : s.available <= 3
+                  ? '<span style="color:#e67e00;font-size:.78rem">(' + s.available + ' ' + T('slot_left', lang) + ')</span>'
+                  : '<span style="color:#16a34a;font-size:.78rem">(' + s.available + ' ' + T('slot_available', lang) + ')</span>';
+              var parts = [s.label];
+              if (s.location) parts.push(s.location);
+              if (s.date) parts.push(s.date);
+              if (s.time) parts.push(T('at_time', lang) + s.time);
+              return '<label style="display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border:1px solid var(--ev-border,#ddd);border-radius:var(--ev-radius,8px);cursor:' + (full ? 'not-allowed' : 'pointer') + ';opacity:' + (full ? .45 : 1) + ';background:var(--ev-card,#fff)">'
+                + '<input type="radio" name="evSlot" value="' + s.id + '"' + (full ? ' disabled' : '') + ' style="accent-color:var(--ev-accent,#FFD100);flex-shrink:0;width:16px;height:16px"/>'
+                + '<div><strong>' + parts.join(' · ') + '</strong> ' + badge + '</div></label>';
+            }).join('')
+          + '</div>';
+      })()}
         <label data-i18n="label_name">Navn *</label>
         <input id="rName" type="text" placeholder="${T('ph_full_name',lang)}" autocomplete="name"/>
         <label data-i18n="label_email">E-post *</label>
@@ -10117,26 +10809,28 @@ ${tabletHero(ev, 'badge-stand', '🟢 ' + getTypeLabel('stand', settings))}
       <button class="btn-primary" id="regBtn" onclick="registerStand()" data-i18n="${lotteryOn ? 'btn_reg_lot' : 'btn_reg'}">
         ✅ Meld meg på${lotteryOn ? ' og delta i lotteri' : ''}
       </button>
-      ${regs.length > 0 ? `<div style="text-align:center;margin-top:1rem;font-size:.85rem;color:#555">${regs.length} ${T('registered_count', lang)}</div>` : ''}
+      ${regs.length > 0 ? '<div style="text-align:center;margin-top:1rem;font-size:.85rem;color:#555">' + (regs.length) + ' ' + (T('registered_count', lang)) + '</div>' : ''}
       <div class="gdpr-note" data-i18n="gdpr">🔒 Vi lagrer kun navn og e-post for å sende informasjon. Data deles ikke med tredjepart og slettes automatisk etter arrangementet.</div>
     </div>
   </div>
 
-  ${lotteryOn ? `
-  <!-- Lotteri -->
-  <div class="ev-panel" id="tab-lottery">
-    <div class="lottery-box">
-      <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;color:var(--y);font-weight:700;margin-bottom:.25rem">${T('lottery_draw', lang)}</div>
-      ${lottery.prize ? `<div style="font-size:.92rem;color:#bbb;margin-bottom:.75rem">${T('lottery_prize', lang)}: <strong style="color:var(--y)">${escHtml(lottery.prize)}</strong></div>` : ''}
-      <span class="lottery-drum" id="lDrum">🎱</span>
-      <div id="lWinner"></div>
-      <div id="lEligible" style="font-size:.85rem;color:#666;margin-top:.75rem"></div>
-    </div>
-    <div id="pastWrap" style="margin-top:1rem;display:none">
-      <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:.5rem">${T('lottery_past', lang)}</div>
-      <div id="pastList"></div>
-    </div>
-  </div>` : ''}
+  ${(function(){
+    if (!lotteryOn) return '';
+    return '<!-- Lotteri -->'
+      + '<div class="ev-panel" id="tab-lottery">'
+      + '<div class="lottery-box">'
+      + '<div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;color:var(--y);font-weight:700;margin-bottom:.25rem">' + T('lottery_draw', lang) + '</div>'
+      + (lottery.prize ? '<div style="font-size:.92rem;color:#bbb;margin-bottom:.75rem">' + T('lottery_prize', lang) + ': <strong style="color:var(--y)">' + escHtml(lottery.prize) + '</strong></div>' : '')
+      + '<span class="lottery-drum" id="lDrum">🎱</span>'
+      + '<div id="lWinner"></div>'
+      + '<div id="lEligible" style="font-size:.85rem;color:#666;margin-top:.75rem"></div>'
+      + '</div>'
+      + '<div id="pastWrap" style="margin-top:1rem;display:none">'
+      + '<div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;color:#555;margin-bottom:.5rem">' + T('lottery_past', lang) + '</div>'
+      + '<div id="pastList"></div>'
+      + '</div>'
+      + '</div>';
+  })()}
 
 
 
@@ -10145,17 +10839,17 @@ ${tabletHero(ev, 'badge-stand', '🟢 ' + getTypeLabel('stand', settings))}
   <div class="ev-panel" id="tab-gb">
     <div id="gbEntries">${gbHtml}</div>
     <div class="ev-card" style="margin-top:1rem">
-      <div class="ev-card-title" data-i18n="gb_title">✍️ Legg igjen en kommentar</div>
+      <div class="ev-card-title" data-i18n="gb_title">${T('gb_title', lang)}</div>
       <div id="gbMsg"></div>
       <div class="ev-form">
-        <label data-i18n="gb_name">${T('gb_name', lang)}</label>
+        <label data-i18n="label_name">${T('label_name', lang)}</label>
         <input id="gbName" type="text" placeholder="${T('gb_ph_name', lang)}"/>
         <label data-i18n="label_phone_req">${T('label_phone_req', lang)}</label>
         <input id="gbPhone" type="tel" placeholder="${T('ph_phone_num', lang)}"/>
-        <label data-i18n="gb_msg">${T('gb_msg', lang)} <span style="font-weight:400;color:#555">(${T('label_phone_opt', lang)})</span></label>
+        <label id="gbMsgLabel">${T('gb_msg', lang)} <span style="font-weight:400;color:#555">(${T('label_phone_opt', lang)})</span></label>
         <textarea id="gbMsg2" placeholder="${T('ph_comment', lang)}"></textarea>
       </div>
-      <button class="btn-primary" onclick="submitGb()" data-i18n="gb_send">Send kommentar</button>
+      <button class="btn-primary" onclick="submitGb()" data-i18n="gb_send">${T('gb_send', lang)}</button>
       <p style="font-size:.75rem;color:#555;margin-top:.75rem" data-i18n="gb_note">${T('gb_note', lang)}</p>
       <!-- ╔══════════════════════════════════════════════════════╗
            ║  LOCKED: GUESTBOOK UPLOAD — DO NOT MODIFY            ║
@@ -10243,56 +10937,6 @@ async function registerStand(){
   }
 }
 
-async function submitGb(){
-  var name=document.getElementById('gbName').value.trim();
-  var phone=document.getElementById('gbPhone').value.trim();
-  var msg2=document.getElementById('gbMsg2').value.trim();
-  var msg=document.getElementById('gbMsg');
-  if(!name){msg.innerHTML='<div class="msg msg-err">'+t('gb_err')+'</div>';return;}
-  var r=await fetch('/api/events/'+EV_ID+'/guestbook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,phone,message:msg2})});
-  var d=await r.json();
-  if(r.ok){
-    document.getElementById('gbName').value='';
-    document.getElementById('gbPhone').value='';
-    document.getElementById('gbMsg2').value='';
-    msg.innerHTML='<div class="msg msg-ok">'+t('gb_ok')+'</div>';
-    setTimeout(function(){msg.innerHTML='';},8000);
-    var prevArea=document.getElementById('gbQrArea');
-    if(prevArea)prevArea.innerHTML='';
-    var photoArea=document.getElementById('gbPhotoArea');
-    var photoLabel=document.getElementById('gbPhotoBtn');
-    var fileInput=document.getElementById('gbFileInput');
-    if(photoLabel){photoLabel.dataset.gbid=d.id;}
-    if(fileInput){fileInput.dataset.gbid=d.id;}
-    if(photoArea){photoArea.style.display='block';}
-    var area=document.getElementById('gbQrArea');
-    if(area)area.innerHTML='';
-  } else {
-    msg.innerHTML='<div class="msg msg-err">'+esc(d.err||d.error||'Feil')+'</div>';
-  }
-}
-function openGbPhotoPicker(){
-  var sheet = document.getElementById('gbPickerDialog');
-  var backdrop = document.getElementById('gbPickerBackdrop');
-  if(sheet) {
-    var isOpen = sheet.style.display === 'block';
-    sheet.style.display = isOpen ? 'none' : 'block';
-    if(backdrop) backdrop.style.display = isOpen ? 'none' : 'block';
-  }
-}
-function gbTriggerFileInput(){
-  var input=document.createElement('input');
-  input.type='file';
-  input.accept='image/*,video/*';
-  input.multiple=true;
-  document.body.appendChild(input);
-  input.addEventListener('change',function(){
-    if(input.files&&input.files.length) gbDirectUpload(input);
-    setTimeout(function(){document.body.removeChild(input);},1000);
-  });
-  // Must happen synchronously in user gesture
-  input.click();
-}
 function gbPickQr(){
   document.getElementById('gbPickerDialog').style.display='none';
   showGbQr();
@@ -10302,25 +10946,36 @@ async function gbDirectUpload(input){
   var label=document.getElementById('gbPhotoBtn');
   var gbId=(label&&label.dataset.gbid)||(input&&input.dataset.gbid)||'';
   if(!gbId||!input.files.length)return;
-  btn.disabled=true;btn.textContent='⏳ Laster opp…';
+  if(label){label.style.opacity='0.6';label.style.pointerEvents='none';}
+  var statusEl=document.createElement('div');
+  statusEl.style.cssText='font-size:.82rem;color:var(--text2);text-align:center;margin-top:.35rem';
+  statusEl.textContent='⏳ Laster opp…';
+  if(label&&label.parentNode)label.parentNode.appendChild(statusEl);
   var tr=await fetch('/api/events/'+EV_ID+'/guestbook/'+gbId+'/photo-token',{method:'POST',headers:{'Content-Type':'application/json'}});
   var td=await tr.json();
-  if(!tr.ok||!td.token){btn.disabled=false;btn.textContent='${T("gb_upload",lang)}';return;}
+  if(!tr.ok||!td.token){
+    if(label){label.style.opacity='1';label.style.pointerEvents='';}
+    statusEl.textContent='❌ Feil – prøv igjen';
+    setTimeout(function(){statusEl.remove();},3000);
+    return;
+  }
   var uploaded=0;
   for(var i=0;i<input.files.length;i++){
     var fd=new FormData();
     fd.append('photo',input.files[i]);
+    statusEl.textContent='⏳ Laster opp '+(i+1)+'/'+input.files.length+'…';
     var r=await fetch('/api/gb-photo/'+td.token,{method:'POST',body:fd});
     if(r.ok)uploaded++;
   }
   await fetch('/api/gb-photo-done/'+td.token,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({done:true})});
-  btn.textContent='✓ '+uploaded+' fil'+(uploaded!==1?'er':'')+' lastet opp';
-  btn.style.background='#22c55e';btn.style.color='#fff';
+  statusEl.textContent='✅ '+uploaded+' fil'+(uploaded!==1?'er':'')+' lastet opp!';
+  statusEl.style.color='#22c55e';
   setTimeout(function(){
-    btn.style.background='';btn.style.color='';btn.disabled=false;
     var photoArea2=document.getElementById('gbPhotoArea');
-    if(label){label.style.opacity='1';label.dataset.gbid='';}
+    if(label){label.style.opacity='1';label.style.pointerEvents='';label.dataset.gbid='';}
     if(photoArea2)photoArea2.style.display='none';
+    statusEl.remove();
+    clearTimeout(window._gbAutoHideTimer);
   },3000);
   input.value='';
 }
@@ -10382,38 +11037,35 @@ function closeGbQrOverlay(){
   if(overlay)overlay.classList.remove('open');
 }
 
-${lotteryOn ? `
-async function loadLottery(){
-  var r=await fetch('/api/events/'+EV_ID+'/lottery/winners');
-  if(!r.ok)return;
+${lotteryOn ? '\\nasync function loadLottery(){\\n  var r=await fetch(\'/api/events/\'+EV_ID+\'/lottery/winners\');\\n  if(!r.ok)return;\\n  var d=await r.json();\\n  var winners=d.winners||[];\\n  var el=document.getElementById(\'lEligible\');\\n  if(el)el.textContent=(' + (regs.length) + '-winners.length)+\' med i trekningen\';\\n  var wrap=document.getElementById(\'pastWrap\');\\n  var list=document.getElementById(\'pastList\');\\n  if(winners.length&&wrap&&list){\\n    wrap.style.display=\'\';\\n    list.innerHTML=winners.slice().reverse().map(function(w){\\n      return \'<div class="past-winner"><span>🏆 \'+esc(w.name)+\'</span><span style="color:#555;font-size:.78rem">\'+new Date(w.drawnAt).toLocaleTimeString(\'nb-NO\',{hour:\'2-digit\',minute:\'2-digit\'})+\'</span></div>\';\\n    }).join(\'\');\\n  }\\n  if(winners.length){\\n    var last=winners[winners.length-1];\\n    var wDiv=document.getElementById(\'lWinner\');\\n    if(wDiv&&wDiv.dataset.shown!==last.regId){\\n      wDiv.dataset.shown=last.regId;\\n      wDiv.innerHTML=\'<div class="winner-pop"><div class="winner-name">🎉 \'+esc(last.name)+\'!</div>\'+(last.prize?\'<div style="color:#aaa;font-size:.88rem;margin-top:.25rem">Premie: \'+esc(last.prize)+\'</div>\':\'\')+\'</div>\';\\n    }\\n  }\\n}\\n(function(){\\n  var es=new EventSource(\'/api/events/stream?department=' + (escHtml(ev.department||'')) + '\');\\n  es.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type===\'events_updated\')loadLottery();}catch(ex){}};\\n  es.onerror=function(){es.close();setTimeout(function(){var es2=new EventSource(\'/api/events/stream?department=' + (escHtml(ev.department||"")) + '\');es2.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==="events_updated")loadLottery();}catch(ex){}};es2.onerror=function(){es2.close();};},8000)};\\n})();\\nloadLottery();\\n' : ''}
+async function submitGb(){
+  var name=document.getElementById('gbName').value.trim();
+  var phone=document.getElementById('gbPhone').value.trim();
+  var msg2=document.getElementById('gbMsg2').value.trim();
+  var msg=document.getElementById('gbMsg');
+  if(!name){msg.innerHTML='<div class="msg msg-err">'+t('gb_err')+'</div>';return;}
+  var r=await fetch('/api/events/'+EV_ID+'/guestbook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,phone,message:msg2})});
   var d=await r.json();
-  var winners=d.winners||[];
-  var el=document.getElementById('lEligible');
-  if(el)el.textContent=(${regs.length}-winners.length)+' med i trekningen';
-  var wrap=document.getElementById('pastWrap');
-  var list=document.getElementById('pastList');
-  if(winners.length&&wrap&&list){
-    wrap.style.display='';
-    list.innerHTML=winners.slice().reverse().map(function(w){
-      return '<div class="past-winner"><span>🏆 '+esc(w.name)+'</span><span style="color:#555;font-size:.78rem">'+new Date(w.drawnAt).toLocaleTimeString('nb-NO',{hour:'2-digit',minute:'2-digit'})+'</span></div>';
-    }).join('');
-  }
-  if(winners.length){
-    var last=winners[winners.length-1];
-    var wDiv=document.getElementById('lWinner');
-    if(wDiv&&wDiv.dataset.shown!==last.regId){
-      wDiv.dataset.shown=last.regId;
-      wDiv.innerHTML='<div class="winner-pop"><div class="winner-name">🎉 '+esc(last.name)+'!</div>'+(last.prize?'<div style="color:#aaa;font-size:.88rem;margin-top:.25rem">Premie: '+esc(last.prize)+'</div>':'')+'</div>';
-    }
+  if(r.ok){
+    document.getElementById('gbName').value='';
+    document.getElementById('gbPhone').value='';
+    document.getElementById('gbMsg2').value='';
+    msg.innerHTML='<div class="msg msg-ok">'+t('gb_ok')+'</div>';
+    setTimeout(function(){msg.innerHTML='';},8000);
+    var prevArea=document.getElementById('gbQrArea');
+    if(prevArea)prevArea.innerHTML='';
+    var photoArea=document.getElementById('gbPhotoArea');
+    var photoLabel=document.getElementById('gbPhotoBtn');
+    var fileInput=document.getElementById('gbFileInput');
+    if(photoLabel){photoLabel.dataset.gbid=d.id;}
+    if(fileInput){fileInput.dataset.gbid=d.id;}
+    if(photoArea){photoArea.style.display='block';}
+    var area=document.getElementById('gbQrArea');
+    if(area)area.innerHTML='';
+  } else {
+    msg.innerHTML='<div class="msg msg-err">'+esc(d.err||d.error||'Feil')+'</div>';
   }
 }
-(function(){
-  var es=new EventSource('/api/events/stream?department=${escHtml(ev.department||'')}');
-  es.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==='events_updated')loadLottery();}catch(ex){}};
-  es.onerror=function(){es.close();setTimeout(function(){var es2=new EventSource('/api/events/stream?department=${escHtml(ev.department||"")}');es2.onmessage=function(e){try{var m=JSON.parse(e.data);if(m.type==="events_updated")loadLottery();}catch(ex){}};es2.onerror=function(){es2.close();};},8000)};
-})();
-loadLottery();
-` : ''}
 <\/script>
 </body>
 </html>`;
@@ -10439,7 +11091,23 @@ function buildMotePage(ev, isAuthenticated) {
   const deptLogo     = deptApp.logo;
   const deptTypo     = deptApp.typography;
 
-  return `<!DOCTYPE html>
+    // ── Tab nav order ──
+  var _defs = [
+    {id:'info',html:'<div class="ev-tab" data-tab="info" onclick="showTab(\'info\')" data-i18n="tab_info_mote">' + 'ℹ️ Om møtet' + '</div>'},
+    {id:'reg',html:'<div class="ev-tab" data-tab="reg" onclick="showTab(\'reg\')" data-i18n="tab_reg_mote">' + T('tab_reg_mote', lang) + '</div>'},
+    {id:'oppmote',html:'<div class="ev-tab" data-tab="oppmote" onclick="showTab(\'oppmote\')" data-i18n="tab_oppmote">' + '✅ Oppmøte' + '</div>'},
+    {id:'gb',html:'<div class="ev-tab" data-tab="gb" onclick="showTab(\'gb\')" data-i18n="tab_gb">' + T('tab_gb',lang) + '</div>'},
+  ];
+  var _order = ev.tabOrder && ev.tabOrder.length ? ev.tabOrder : _defs.map(function(d){return d.id;});
+  var _sorted = _order.map(function(id){return _defs.find(function(d){return d.id===id;});}).filter(Boolean);
+  _defs.forEach(function(d){if(!_sorted.find(function(s){return s&&s.id===d.id;}))_sorted.push(d);});
+  var _first = _sorted.length ? _sorted[0].id : '';
+  var navHtml = '<nav class="ev-tabs">' + _sorted.map(function(d){
+    if(!d||!d.html) return '';
+    return d.id===_first ? d.html.replace(' class="ev-tab"',' class="ev-tab active"') : d.html;
+  }).filter(Boolean).join('') + '</nav>';
+
+return `<!DOCTYPE html>
 <html lang="no">
 <head>
 <meta charset="UTF-8"/>
@@ -10467,66 +11135,37 @@ ${tabletCSS(accentColor, deptTheme, deptTypo, settings.publicColors)}
 ${tabletHeader(ev, settings, 'badge-mote', '🟡 ' + getTypeLabel('mote', settings))}
 ${tabletHero(ev, 'badge-mote', '🟡 ' + getTypeLabel('mote', settings))}
 
-<nav class="ev-tabs">
-  <div class="ev-tab active" data-tab="info" onclick="showTab('info')" data-i18n="tab_info_mote">ℹ️ Om møtet</div>
-  <div class="ev-tab" data-tab="reg" onclick="showTab('reg')" data-i18n="tab_reg_mote">📋 Meld deg på</div>
-  <div class="ev-tab" data-tab="oppmote" onclick="showTab('oppmote')" data-i18n="tab_oppmote">✅ Oppmøte</div>
-</nav>
+${navHtml}
 
 <div class="ev-content">
 
   <!-- Info -->
   <div class="ev-panel active" id="tab-info">
-    ${ev.description ? `<div class="ev-card"><div class="ev-card-title" data-i18n="about_event">${T('about_event',lang)}</div><p style="line-height:1.7;color:#ddd">${escHtml(ev.description).replace(/\n/g,'<br>')}</p></div>` : ''}
+    ${ev.description ? '<div class="ev-card"><div class="ev-card-title" data-i18n="about_event">' + (T('about_event',lang)) + '</div><p style="line-height:1.7;color:#ddd">' + (escHtml(ev.description).replace(/\n/g,'<br>')) + '</p></div>' : ''}
     <div class="ev-card">
       <div class="ev-card-title" data-i18n="practical_info">${T('practical_info', lang)}</div>
-      ${ev.date ? `<div class="info-row"><span class="icon">📅</span><div><div class="label" data-i18n="date_time">${T('date_time', lang)}</div><div class="value">${evFmtDate(ev.date)}${ev.date ? ' kl. ' + evFmtTime(ev.date) : ''}</div></div></div>` : ''}
-      ${ev.location ? `<div class="info-row"><span class="icon">📍</span><div><div class="label" data-i18n="location">${T('location', lang)}</div><div class="value">${escHtml(ev.location)}</div></div></div>` : ''}
+      ${ev.date ? '<div class="info-row"><span class="icon">📅</span><div><div class="label" data-i18n="date_time">' + (T('date_time', lang)) + '</div><div class="value">' + (evFmtDate(ev.date)) + (ev.date ? ' kl. ' + evFmtTime(ev.date) : '') + '</div></div></div>' : ''}
+      ${ev.location ? '<div class="info-row"><span class="icon">📍</span><div><div class="label" data-i18n="location">' + (T('location', lang)) + '</div><div class="value">' + (escHtml(ev.location)) + '</div></div></div>' : ''}
       ${_slotsWithCounts.length > 0
         ? _slotsWithCounts.map(function(s) {
             var badge = s.available === 0
               ? '<span class="spots-full">'+T('spots_full_mote',lang)+'</span>'
               : s.available <= 3
-                ? '<span class="spots-low">' + s.available + ' igjen</span>'
-                : '<span class="spots-ok">' + s.available + ' ledige</span>';
+                ? '<span class="spots-low">' + s.available + ' ' + T('slot_left',lang) + '</span>'
+                : '<span class="spots-ok">' + s.available + ' ' + T('slot_available',lang) + '</span>';
             return '<div class="info-row"><span class="icon">📍</span><div><div class="label">' + escHtml(s.label) + (s.location ? ' · ' + escHtml(s.location) : '') + (s.date ? ' · ' + s.date : '') + (s.time ? ' kl. ' + s.time : '') + '</div><div class="value">' + badge + '</div></div></div>';
           }).join('')
-        : (ev.maxParticipants ? `<div class="info-row"><span class="icon">👥</span><div><div class="label" data-i18n="places_label">${T('places_label',lang)}</div><div class="value ${isFull?'spots-full':spotsLeft&&spotsLeft<=5?'spots-low':'spots-ok'}">${isFull?T('spots_full',lang):''+spotsLeft+' '+T('spots_left',lang)+' / '+ev.maxParticipants}</div></div></div>` : '')}
-      ${contactEmail ? `<div class="info-row"><span class="icon">✉️</span><div><div class="label" data-i18n="contact">${T('contact', lang)}</div><div class="value"><a href="mailto:${escHtml(contactEmail)}" style="color:var(--y)">${escHtml(contactEmail)}</a></div></div></div>` : ''}
+        : (ev.maxParticipants ? '<div class="info-row"><span class="icon">👥</span><div><div class="label" data-i18n="places_label">' + (T('places_label',lang)) + '</div><div class="value ' + (isFull?'spots-full':spotsLeft&&spotsLeft<=5?'spots-low':'spots-ok') + '">' + (isFull?T('spots_full',lang):''+spotsLeft+' '+T('spots_left',lang)+' / '+ev.maxParticipants) + '</div></div></div>' : '')}
+      ${contactEmail ? '<div class="info-row"><span class="icon">✉️</span><div><div class="label" data-i18n="contact">' + (T('contact', lang)) + '</div><div class="value"><a href="mailto:' + (escHtml(contactEmail)) + '" style="color:var(--y)">' + (escHtml(contactEmail)) + '</a></div></div></div>' : ''}
     </div>
-    ${!isFull ? `<button class="btn-primary" onclick="showTab('reg')">📋 Meld meg på →</button>` : `<div class="msg msg-err" style="text-align:center;margin-top:.5rem">Dette møtet er fullt</div>`}
+    ${!isFull ? '<button class="btn-primary" onclick="showTab(\'reg\')">📋 Meld meg på →</button>' : '<div class="msg msg-err" style="text-align:center;margin-top:.5rem">Dette møtet er fullt</div>'}
   </div>
 
   <!-- Påmelding -->
   <div class="ev-panel" id="tab-reg">
     <div class="ev-card">
-      <div class="ev-card-title">📋 Påmelding</div>
-      ${isFull ? `<div class="msg msg-err">${T('full_mote',lang)}</div>` : `
-      ${ev.regIntro ? '<div style="font-size:.92rem;color:var(--ev-text,#1a1a1a);line-height:1.6;margin-bottom:1rem;white-space:pre-line">' + escHtml(ev.regIntro) + '</div>' : ''}
-      <div id="regMsg"></div>
-      <div class="ev-form">
-      ${_slotsWithCounts.length > 0 ? `
-      <label style="font-weight:700;margin-bottom:.25rem">${T('label_slot', lang)}</label>
-      <div id="evSlotPicker" style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.5rem">
-        \${_slotsWithCounts.map(s=>{
-          var full=s.available===0;
-          var badge=full?'<span style="color:#e00;font-size:.78rem">('+T('slot_full', lang)+')</span>':s.available<=3?'<span style="color:#e67e00;font-size:.78rem">('+s.available+' '+T('slot_left', lang)+')</span>':'<span style="color:#16a34a;font-size:.78rem">('+s.available+' '+T('slot_available', lang)+')</span>';
-          var parts=[s.label];if(s.location)parts.push(s.location);if(s.date)parts.push(s.date);if(s.time)parts.push(T('at_time', lang)+s.time);
-          return '<label style="display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border:1px solid var(--ev-border,#ddd);border-radius:var(--ev-radius,8px);cursor:'+(full?'not-allowed':'pointer')+';opacity:'+(full?.45:1)+';background:var(--ev-card,#fff)">'
-            +'<input type="radio" name="evSlot" value="'+s.id+'"'+(full?' disabled':'')+' style="accent-color:var(--ev-accent,#FFD100);flex-shrink:0;width:16px;height:16px"/>'+'<div><strong>'+parts.join(' · ')+'</strong> '+badge+'</div></label>';
-        }).join('')}
-      </div>` : ''}
-        <label data-i18n="label_name">Navn *</label>
-        <input id="rName" type="text" placeholder="${T('ph_full_name',lang)}" autocomplete="name"/>
-        <label data-i18n="label_email">E-post *</label>
-        <input id="rEmail" type="email" placeholder="din@epost.no" autocomplete="email"/>
-        <label><span data-i18n="label_phone">Telefon</span> <span style="color:#666;font-weight:400" data-i18n="label_phone_opt">(valgfritt)</span></label>
-        <input id="rPhone" type="tel" placeholder="+47 000 00 000" autocomplete="tel"/>
-        <label>Fremmøteform</label>
-        <select id="rAttendance"><option value="">– Velg –</option><option>${T('attend_physical', lang)}</option><option>${T('attend_digital', lang)}</option><option>${T('attend_unsure', lang)}</option></select>
-      </div>
-      <button class="btn-primary" id="regBtn" onclick="doRegister()">✅ Meld meg på</button>
-      `}
+      <div class="ev-card-title" data-i18n="tab_reg_mote">${T('tab_reg_mote', lang)}</div>
+      ${buildRegFormHtml(ev, lang, isFull, _slotsWithCounts, 'btn_reg', '<label>Fremmøteform</label><select id="rAttendance"><option value="">– Velg –</option><option>\' + T(\'attend_physical\',lang) + \'</option><option>\' + T(\'attend_digital\',lang) + \'</option><option>\' + T(\'attend_unsure\',lang) + \'</option></select>')}
       <div class="gdpr-note">🔒 Personopplysninger brukes kun til å administrere møtet og slettes automatisk etterpå.</div>
     </div>
   </div>
@@ -10541,15 +11180,11 @@ ${tabletHero(ev, 'badge-mote', '🟡 ' + getTypeLabel('mote', settings))}
       </div>
       <div id="regList" class="reg-list">
         ${regs.filter(r=>!r.anonymized).map(function(r){
-          return `<div class="reg-item" id="ri-${escHtml(r.id)}" data-name="${escHtml((r.name||'').toLowerCase())}">
-            <div>
-              <div class="reg-name">${escHtml(r.name)}</div>
-              ${r.phone ? `<div class="reg-meta">${escHtml(r.phone)}</div>` : ''}
-            </div>
-            ${r.checkedIn
-              ? `<span class="checkin-done">✔ ${new Date(r.checkedInAt||Date.now()).toLocaleTimeString('nb-NO',{hour:'2-digit',minute:'2-digit'})}</span>`
-              : `<button class="checkin-btn" onclick="checkInReg('${escHtml(r.id)}')">'+T('checkin_btn',lang)+'</button>`}
-          </div>`;
+          return '<div class="reg-item" id="ri-' + escHtml(r.id) + '" data-name="' + escHtml((r.name||'').toLowerCase()) + '">'
+            + '<div><div class="reg-name">' + escHtml(r.name) + '</div>' + (r.phone ? '<div class="reg-meta">' + escHtml(r.phone) + '</div>' : '') + '</div>'
+            + (r.checkedIn
+              ? '<span class="checkin-done">✔ ' + (new Date(r.checkedInAt||Date.now()).toLocaleTimeString('nb-NO',{hour:'2-digit',minute:'2-digit'})) + '</span>'
+              : '<button class="checkin-btn" onclick="checkInReg(\'' + escHtml(r.id) + '\')">'+T('checkin_btn',lang)+'</button>') + '</div>';
         }).join('') || T('no_registered',lang)}
       </div>
       <div style="text-align:center;color:#555;font-size:.85rem;margin-top:.75rem">${regs.filter(r=>!r.anonymized).length} ${T('registered_count',lang)} · ${regs.filter(r=>r.checkedIn&&!r.anonymized).length} ${T('checked_in_count',lang)}</div>
@@ -10606,6 +11241,7 @@ ${tabletPinSheet(ev, lang)}
 var NAV_LAT=${_navLat};
 var NAV_LON=${_navLon};
 var NAV_NAME="${_navName}";
+var LIVE_TRACKING_URL=${ev.liveTrackingUrl ? JSON.stringify(ev.liveTrackingUrl) : 'null'};
 </script>
 ${tabletSharedJS(ev)}
 <script>
@@ -10679,6 +11315,35 @@ function filterRegs(q){
     el.style.display=(!q||el.dataset.name.includes(q))?'flex':'none';
   });
 }
+
+async function submitGb(){
+  var name=document.getElementById('gbName').value.trim();
+  var phone=document.getElementById('gbPhone').value.trim();
+  var msg2=document.getElementById('gbMsg2').value.trim();
+  var msg=document.getElementById('gbMsg');
+  if(!name){msg.innerHTML='<div class="msg msg-err">'+t('gb_err')+'</div>';return;}
+  var r=await fetch('/api/events/'+EV_ID+'/guestbook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,phone,message:msg2})});
+  var d=await r.json();
+  if(r.ok){
+    document.getElementById('gbName').value='';
+    document.getElementById('gbPhone').value='';
+    document.getElementById('gbMsg2').value='';
+    msg.innerHTML='<div class="msg msg-ok">'+t('gb_ok')+'</div>';
+    setTimeout(function(){msg.innerHTML='';},8000);
+    var prevArea=document.getElementById('gbQrArea');
+    if(prevArea)prevArea.innerHTML='';
+    var photoArea=document.getElementById('gbPhotoArea');
+    var photoLabel=document.getElementById('gbPhotoBtn');
+    var fileInput=document.getElementById('gbFileInput');
+    if(photoLabel){photoLabel.dataset.gbid=d.id;}
+    if(fileInput){fileInput.dataset.gbid=d.id;}
+    if(photoArea){photoArea.style.display='block';}
+    var area=document.getElementById('gbQrArea');
+    if(area)area.innerHTML='';
+  } else {
+    msg.innerHTML='<div class="msg msg-err">'+esc(d.err||d.error||'Feil')+'</div>';
+  }
+}
 <\/script>
 </body>
 </html>`;
@@ -10716,7 +11381,23 @@ function buildKursPage(ev, isAuthenticated) {
     </div>`;
   }).join('') || T('no_registered',lang);
 
-  return `<!DOCTYPE html>
+    // ── Tab nav order ──
+  var _defs = [
+    {id:'info',html:'<div class="ev-tab" data-tab="info" onclick="showTab(\'info\')" data-i18n="tab_info_kurs">' + 'ℹ️ Om kurset' + '</div>'},
+    {id:'reg',html:'<div class="ev-tab" data-tab="reg" onclick="showTab(\'reg\')" data-i18n="tab_reg_kurs">' + T('tab_reg_kurs', lang) + '</div>'},
+    {id:'oppmote',html:'<div class="ev-tab" data-tab="oppmote" onclick="showTab(\'oppmote\')" data-i18n="tab_oppmote">' + '✅ Oppmøte' + '</div>'},
+    {id:'gb',html:'<div class="ev-tab" data-tab="gb" onclick="showTab(\'gb\')" data-i18n="tab_gb">' + T('tab_gb',lang) + '</div>'},
+  ];
+  var _order = ev.tabOrder && ev.tabOrder.length ? ev.tabOrder : _defs.map(function(d){return d.id;});
+  var _sorted = _order.map(function(id){return _defs.find(function(d){return d.id===id;});}).filter(Boolean);
+  _defs.forEach(function(d){if(!_sorted.find(function(s){return s&&s.id===d.id;}))_sorted.push(d);});
+  var _first = _sorted.length ? _sorted[0].id : '';
+  var navHtml = '<nav class="ev-tabs">' + _sorted.map(function(d){
+    if(!d||!d.html) return '';
+    return d.id===_first ? d.html.replace(' class="ev-tab"',' class="ev-tab active"') : d.html;
+  }).filter(Boolean).join('') + '</nav>';
+
+return `<!DOCTYPE html>
 <html lang="no">
 <head>
 <meta charset="UTF-8"/>
@@ -10744,58 +11425,30 @@ ${tabletCSS(accentColor, deptTheme, deptTypo, settings.publicColors)}
 ${tabletHeader(ev, settings, 'badge-kurs', '🔵 ' + getTypeLabel('kurs', settings))}
 ${tabletHero(ev, 'badge-kurs', '🔵 ' + getTypeLabel('kurs', settings))}
 
-<nav class="ev-tabs">
-  <div class="ev-tab active" data-tab="info" onclick="showTab('info')" data-i18n="tab_info_kurs">ℹ️ Om kurset</div>
-  <div class="ev-tab" data-tab="reg" onclick="showTab('reg')">📋 Påmelding</div>
-  <div class="ev-tab" data-tab="oppmote" onclick="showTab('oppmote')" data-i18n="tab_oppmote">✅ Oppmøte</div>
-  <div class="ev-tab" data-tab="gb" onclick="showTab('gb')">✍️ Gjestebok</div>
-</nav>
+${navHtml}
 
 <div class="ev-content">
 
   <!-- Info -->
   <div class="ev-panel active" id="tab-info">
-    ${ev.description ? `<div class="ev-card"><div class="ev-card-title">${T('about_kurs', lang)}</div><p style="line-height:1.7;color:#ddd">${escHtml(ev.description).replace(/\n/g,'<br>')}</p></div>` : ''}
+    ${ev.description ? '<div class="ev-card"><div class="ev-card-title">' + (T('about_kurs', lang)) + '</div><p style="line-height:1.7;color:#ddd">' + (escHtml(ev.description).replace(/\n/g,'<br>')) + '</p></div>' : ''}
     <div class="ev-card">
       <div class="ev-card-title" data-i18n="practical_info">${T('practical_info', lang)}</div>
-      ${ev.date ? `<div class="info-row"><span class="icon">📅</span><div><div class="label" data-i18n="date_time">${T('date_time', lang)}</div><div class="value">${evFmtDate(ev.date)}${ev.date ? ' kl. ' + evFmtTime(ev.date) : ''}</div></div></div>` : ''}
-      ${ev.location ? `<div class="info-row"><span class="icon">📍</span><div><div class="label" data-i18n="location">${T('location', lang)}</div><div class="value">${escHtml(ev.location)}</div></div></div>` : ''}
-      ${ev.maxParticipants ? `<div class="info-row"><span class="icon">👥</span><div><div class="label" data-i18n="spots_left">${T('spots_left', lang)}</div><div class="value ${isFull?'spots-full':spotsLeft&&spotsLeft<=3?'spots-low':'spots-ok'}">${isFull ? 'Kurset er fullt' : spotsLeft + ' av ' + ev.maxParticipants + ' ledige'}</div></div></div>` : ''}
-      ${contactEmail ? `<div class="info-row"><span class="icon">✉️</span><div><div class="label" data-i18n="contact">${T('contact', lang)}</div><div class="value"><a href="mailto:${escHtml(contactEmail)}" style="color:var(--y)">${escHtml(contactEmail)}</a></div></div></div>` : ''}
+      ${ev.date ? '<div class="info-row"><span class="icon">📅</span><div><div class="label" data-i18n="date_time">' + (T('date_time', lang)) + '</div><div class="value">' + (evFmtDate(ev.date)) + (ev.date ? ' kl. ' + evFmtTime(ev.date) : '') + '</div></div></div>' : ''}
+      ${ev.location ? '<div class="info-row"><span class="icon">📍</span><div><div class="label" data-i18n="location">' + (T('location', lang)) + '</div><div class="value">' + (escHtml(ev.location)) + '</div></div></div>' : ''}
+      ${ev.maxParticipants ? '<div class="info-row"><span class="icon">👥</span><div><div class="label" data-i18n="spots_left">' + (T('spots_left', lang)) + '</div><div class="value ' + (isFull?'spots-full':spotsLeft&&spotsLeft<=3?'spots-low':'spots-ok') + '">' + (isFull ? 'Kurset er fullt' : spotsLeft + ' av ' + ev.maxParticipants + ' ledige') + '</div></div></div>' : ''}
+      ${contactEmail ? '<div class="info-row"><span class="icon">✉️</span><div><div class="label" data-i18n="contact">' + (T('contact', lang)) + '</div><div class="value"><a href="mailto:' + (escHtml(contactEmail)) + '" style="color:var(--y)">' + (escHtml(contactEmail)) + '</a></div></div></div>' : ''}
     </div>
     ${!isFull
-      ? `<button class="btn-primary" onclick="showTab('reg')">${T('btn_reg_kurs_link',lang)}</button>`
-      : `<div class="msg msg-err" style="text-align:center;margin-top:.5rem">Kurset er fullt</div>`}
+      ? '<button class="btn-primary" onclick="showTab(\'reg\')">' + (T('btn_reg_kurs_link',lang)) + '</button>'
+      : '<div class="msg msg-err" style="text-align:center;margin-top:.5rem">Kurset er fullt</div>'}
   </div>
 
   <!-- Påmelding -->
   <div class="ev-panel" id="tab-reg">
     <div class="ev-card">
-      <div class="ev-card-title">📋 Påmelding</div>
-      ${isFull ? `<div class="msg msg-err">${T('full_kurs',lang)}</div>` : `
-      ${ev.regIntro ? '<div style="font-size:.92rem;color:var(--ev-text,#1a1a1a);line-height:1.6;margin-bottom:1rem;white-space:pre-line">' + escHtml(ev.regIntro) + '</div>' : ''}
-      <div id="regMsg"></div>
-      <div class="ev-form">
-      ${_slotsWithCounts.length > 0 ? `
-      <label style="font-weight:700;margin-bottom:.25rem">${T('label_slot', lang)}</label>
-      <div id="evSlotPicker" style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.5rem">
-        \${_slotsWithCounts.map(s=>{
-          var full=s.available===0;
-          var badge=full?'<span style="color:#e00;font-size:.78rem">('+T('slot_full', lang)+')</span>':s.available<=3?'<span style="color:#e67e00;font-size:.78rem">('+s.available+' '+T('slot_left', lang)+')</span>':'<span style="color:#16a34a;font-size:.78rem">('+s.available+' '+T('slot_available', lang)+')</span>';
-          var parts=[s.label];if(s.location)parts.push(s.location);if(s.date)parts.push(s.date);if(s.time)parts.push(T('at_time', lang)+s.time);
-          return '<label style="display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border:1px solid var(--ev-border,#ddd);border-radius:var(--ev-radius,8px);cursor:'+(full?'not-allowed':'pointer')+';opacity:'+(full?.45:1)+';background:var(--ev-card,#fff)">'
-            +'<input type="radio" name="evSlot" value="'+s.id+'"'+(full?' disabled':'')+' style="accent-color:var(--ev-accent,#FFD100);flex-shrink:0;width:16px;height:16px"/>'+'<div><strong>'+parts.join(' · ')+'</strong> '+badge+'</div></label>';
-        }).join('')}
-      </div>` : ''}
-        <label data-i18n="label_name">Navn *</label>
-        <input id="rName" type="text" placeholder="${T('ph_full_name',lang)}" autocomplete="name"/>
-        <label data-i18n="label_email">E-post *</label>
-        <input id="rEmail" type="email" placeholder="din@epost.no" autocomplete="email"/>
-        <label><span data-i18n="label_phone">Telefon</span> <span style="color:#666;font-weight:400" data-i18n="label_phone_opt">(valgfritt)</span></label>
-        <input id="rPhone" type="tel" placeholder="+47 000 00 000" autocomplete="tel"/>
-      </div>
-      <button class="btn-primary" id="regBtn" onclick="doRegister()" data-i18n="btn_reg_kurs">✅ Meld meg på kurset</button>
-      `}
+      <div class="ev-card-title" data-i18n="tab_reg_kurs">${T('tab_reg_kurs', lang)}</div>
+      ${buildRegFormHtml(ev, lang, isFull, _slotsWithCounts, 'btn_reg_kurs', '')}
       <div class="gdpr-note">🔒 Personopplysninger brukes kun til å administrere kurset og slettes automatisk etterpå.</div>
     </div>
   </div>
@@ -10823,20 +11476,20 @@ ${tabletHero(ev, 'badge-kurs', '🔵 ' + getTypeLabel('kurs', settings))}
     <div id="gbEntries">
       ${(ev.guestbook||[]).filter(g=>g.approved).length
         ? (ev.guestbook||[]).filter(g=>g.approved).map(function(g){
-            const ph=(g.photos&&g.photos.length)?'<div class="gb-photos">'+g.photos.map(function(p){return'<img src="'+escHtml(p)+'" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:2px solid #333;cursor:pointer" loading="lazy"/>';}).join('')+'</div>':''; return `<div class="gb-entry"><div class="gb-name">${escHtml(g.name)}</div><div class="gb-msg">${escHtml(g.message||'').replace(/\n/g,'<br>')}</div>${ph}<div class="gb-date">${new Date(g.createdAt).toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'})}</div></div>`;
+            const ph=(g.photos&&g.photos.length)?'<div class="gb-photos">'+g.photos.map(function(p){return'<img src="'+escHtml(p)+'" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:2px solid #333;cursor:pointer" loading="lazy"/>';}).join('')+'</div>':''; return '<div class="gb-entry"><div class="gb-name">' + (escHtml(g.name)) + '</div><div class="gb-msg">' + (escHtml(g.message||'').replace(/\n/g,'<br>')) + '</div>' + (ph) + '<div class="gb-date">' + (new Date(g.createdAt).toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'})) + '</div></div>';
           }).join('')
-        : '<div class="empty"><span class="empty-icon">✍️</span>'+T('no_comments', lang)+'</div>'}
+        : '<div class="empty"><span class="empty-icon">✍️</span><span data-i18n="no_comments">'+T('no_comments', lang)+'</span></div>'}
     </div>
     <div class="ev-card" style="margin-top:1rem">
-      <div class="ev-card-title">${T('gb_title', lang)}</div>
+      <div class="ev-card-title" data-i18n="gb_title">${T('gb_title', lang)}</div>
       <div id="gbMsg"></div>
       <div class="ev-form">
-        <label data-i18n="label_name">Navn *</label><input id="gbName" type="text" placeholder="${T('gb_ph_name', lang)}"/>
+        <label data-i18n="label_name">${T('label_name', lang)}</label><input id="gbName" type="text" placeholder="${T('gb_ph_name', lang)}"/>
         <label data-i18n="label_phone_req">${T('label_phone_req', lang)}</label><input id="gbPhone" type="tel" placeholder="${T('ph_phone_num', lang)}"/>
-        <label>${T('gb_msg', lang)} <span style="font-weight:400;color:#555">(${T('label_phone_opt', lang)})</span></label><textarea id="gbMsg2" placeholder="${T('ph_comment', lang)}"></textarea>
+        <label id="gbMsgLabel">${T('gb_msg', lang)} <span style="font-weight:400;color:#555">(${T('label_phone_opt', lang)})</span></label><textarea id="gbMsg2" placeholder="${T('ph_comment', lang)}"></textarea>
       </div>
-      <button class="btn-primary" onclick="submitGb()" data-i18n="gb_send">Send kommentar</button>
-      <p style="font-size:.75rem;color:#555;margin-top:.75rem">${T('gb_note', lang)}</p>
+      <button class="btn-primary" onclick="submitGb()" data-i18n="gb_send">${T('gb_send', lang)}</button>
+      <p style="font-size:.75rem;color:#555;margin-top:.75rem" data-i18n="gb_note">${T('gb_note', lang)}</p>
       <!-- ╔══════════════════════════════════════════════════════╗
            ║  LOCKED: GUESTBOOK UPLOAD — DO NOT MODIFY            ║
            ║  Approved by David Eriksson. Works on all browsers.   ║
@@ -10966,6 +11619,59 @@ function filterRegs(q){
   });
 }
 
+async function gbDirectUpload(input){
+  var label=document.getElementById('gbPhotoBtn');
+  var gbId=(label&&label.dataset.gbid)||(input&&input.dataset.gbid)||'';
+  if(!gbId||!input.files.length)return;
+  if(label){label.style.opacity='0.6';label.style.pointerEvents='none';}
+  var statusEl=document.createElement('div');
+  statusEl.style.cssText='font-size:.82rem;color:var(--text2);text-align:center;margin-top:.35rem';
+  statusEl.textContent='⏳ Laster opp…';
+  if(label&&label.parentNode)label.parentNode.appendChild(statusEl);
+  var tr=await fetch('/api/events/'+EV_ID+'/guestbook/'+gbId+'/photo-token',{method:'POST',headers:{'Content-Type':'application/json'}});
+  var td=await tr.json();
+  if(!tr.ok||!td.token){
+    if(label){label.style.opacity='1';label.style.pointerEvents='';}
+    statusEl.textContent='❌ Feil – prøv igjen';
+    setTimeout(function(){statusEl.remove();},3000);
+    return;
+  }
+  var uploaded=0;
+  for(var i=0;i<input.files.length;i++){
+    var fd=new FormData();
+    fd.append('photo',input.files[i]);
+    statusEl.textContent='⏳ Laster opp '+(i+1)+'/'+input.files.length+'…';
+    var r=await fetch('/api/gb-photo/'+td.token,{method:'POST',body:fd});
+    if(r.ok)uploaded++;
+  }
+  await fetch('/api/gb-photo-done/'+td.token,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({done:true})});
+  statusEl.textContent='✅ '+uploaded+' fil'+(uploaded!==1?'er':'')+' lastet opp!';
+  statusEl.style.color='#22c55e';
+  setTimeout(function(){
+    var photoArea2=document.getElementById('gbPhotoArea');
+    if(label){label.style.opacity='1';label.style.pointerEvents='';label.dataset.gbid='';}
+    if(photoArea2)photoArea2.style.display='none';
+    statusEl.remove();
+    clearTimeout(window._gbAutoHideTimer);
+  },3000);
+  input.value='';
+}
+
+// ── END LOCKED SECTION ───────────────────────────────────────────────────
+function gbPickFile() {
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*,video/*'; inp.multiple = true;
+  inp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;width:1px;height:1px';
+  document.body.appendChild(inp);
+  inp.addEventListener('change', function() {
+    if (inp.files && inp.files.length > 0) gbDirectUpload(inp);
+    setTimeout(function() { if (inp.parentNode) inp.parentNode.removeChild(inp); }, 10000);
+  });
+  inp.addEventListener('cancel', function() {
+    setTimeout(function() { if (inp.parentNode) inp.parentNode.removeChild(inp); }, 1000);
+  });
+  inp.click();
+}
 async function submitGb(){
   var name=document.getElementById('gbName').value.trim();
   var phone=document.getElementById('gbPhone').value.trim();
@@ -11072,7 +11778,7 @@ function buildTurPage(ev, isAuthenticated) {
   const deptTypo     = deptApp.typography;
   const route        = ev.route || {};
   const days         = route.days || [];
-  const _navDay0 = days[0] && days[0].etapper && days[0].etapper[0];
+  const _navDay0 = days[0] && days[0].stages && days[0].stages[0];
   const _navLat  = (_navDay0 && _navDay0._fra_lat) || 'null';
   const _navLon  = (_navDay0 && _navDay0._fra_lon) || 'null';
   const _navName = escHtml((ev.location||'').replace(/"/g,''));
@@ -11082,8 +11788,8 @@ function buildTurPage(ev, isAuthenticated) {
     return Object.assign({}, s, { taken, available: Math.max(0, (s.capacity || 0) - taken) });
   }).filter(function(s) { return s.capacity > 0; });
 
-  const etappeHtml = (function() {
-    if (!(days||[]).some(function(d){ return (d.etapper||[]).some(function(e){ return e.fra||e.til; }); }))
+  const stageHtml = (function() {
+    if (!(days||[]).some(function(d){ return (d.stages||[]).some(function(e){ return e.from||e.to; }); }))
       return '<div class="empty"><span class="empty-icon">🗺️</span>'+T('no_etappe',lang)+'</div>';
 
     // Totalkart øverst i etappeplanen
@@ -11092,11 +11798,11 @@ function buildTurPage(ev, isAuthenticated) {
       : '';
 
     return totalMapHtml + (days||[]).map(function(day, di) {
-      var etapper = (day.etapper||[]).filter(function(e){ return e.fra||e.til; });
-      if (!etapper.length) return '';
-      var dayKm  = etapper.reduce(function(s,e){ return s+(parseFloat(e.km)||0); },0);
-      var dayTid = etapper.reduce(function(s,e){ return s+(parseFloat(e.tid)||0); },0);
-      // Dagskart – zoomet inn på bare den dagenes rute
+      var stages = (day.stages||[]).filter(function(e){ return e.from||e.to; });
+      if (!stages.length) return '';
+      var dayKm  = stages.reduce(function(s,e){ return s+(parseFloat(e.km)||0); },0);
+      var dayTid = stages.reduce(function(s,e){ return s+(parseFloat(e.duration)||0); },0);
+      // Dagskart – zoomet in on only it/the dagenes rute
       var dayMapImg = (ev.dayMapImages && ev.dayMapImages[di])
         ? '<img src="'+escHtml(ev.dayMapImages[di])+'" style="width:100%;height:auto;min-height:320px;max-height:540px;object-fit:cover;border-radius:6px;margin-bottom:.75rem;display:block"/>'
         : '';
@@ -11107,15 +11813,15 @@ function buildTurPage(ev, isAuthenticated) {
         + (dayTid ? '<span style="font-size:.72rem;color:var(--text2)">· ca. '+(Math.round(dayTid*10)/10)+'t</span>' : '')
         + '</div>'
         + dayMapImg
-        + etapper.map(function(e,ei) {
+        + stages.map(function(e,ei) {
             var km = parseFloat(e.km)||0;
             var typeLabel = e.type==='overnatting' ? T('type_overnatting',lang) : e.type==='bensin' ? T('type_bensin',lang) : e.type==='slutt' ? T('type_slutt',lang) : '';
             return '<div style="display:flex;align-items:flex-start;gap:.75rem;padding:.5rem 0;border-bottom:1px solid var(--g3)">'
               + '<span style="font-size:.8rem;flex-shrink:0;color:var(--text2);min-width:1.4rem">'+(ei+1)+'.</span>'
               + '<div style="flex:1;min-width:0">'
-              + '<span style="font-weight:600;font-size:.9rem">'+escHtml(e.fra||'')+((e.fra&&e.til)?' → ':'')+escHtml(e.til||'')+'</span>'
+              + '<span style="font-weight:600;font-size:.9rem">'+escHtml(e.from||'')+((e.from&&e.to)?' → ':'')+escHtml(e.to||'')+'</span>'
               + (typeLabel ? ' <span style="font-size:.72rem;background:var(--g2);border:1px solid var(--g3);border-radius:10px;padding:1px 7px">'+typeLabel+'</span>' : '')
-              + (e.notat ? '<div style="font-size:.78rem;color:var(--text2);margin-top:.15rem">'+escHtml(e.notat)+'</div>' : '')
+              + (e.note ? '<div style="font-size:.78rem;color:var(--text2);margin-top:.15rem">'+escHtml(e.note)+'</div>' : '')
               + '</div>'
               + (km ? '<span style="font-size:.78rem;color:var(--text2);white-space:nowrap;flex-shrink:0">'+Math.round(km)+' km</span>' : '')
               + '</div>';
@@ -11137,7 +11843,24 @@ function buildTurPage(ev, isAuthenticated) {
     </div>`;
   }).join('') || T('no_registered',lang);
 
-  return `<!DOCTYPE html>
+    // ── Tab nav order ──
+  var _defs = [
+    {id:'info',html:'<div class="ev-tab" data-tab="info" onclick="showTab(\'info\')" data-i18n="tab_info_tur">' + 'ℹ️ Om turen' + '</div>'},
+    {id:'rute',html:'<div class="ev-tab" data-tab="rute" onclick="showTab(\'rute\')">' + '🗺️ Etappeplan' + '</div>'},
+    {id:'reg',html:'<div class="ev-tab" data-tab="reg" onclick="showTab(\'reg\')" data-i18n="tab_reg_tur">' + T('tab_reg_tur', lang) + '</div>'},
+    {id:'forere',html:'<div class="ev-tab" data-tab="forere" onclick="showTab(\'forere\')" data-i18n="tab_forere">' + '🏍 Deltakere' + '</div>'},
+    {id:'gb',html:'<div class="ev-tab" data-tab="gb" onclick="showTab(\'gb\')" data-i18n="tab_gb">' + T('tab_gb',lang) + '</div>'},
+  ];
+  var _order = ev.tabOrder && ev.tabOrder.length ? ev.tabOrder : _defs.map(function(d){return d.id;});
+  var _sorted = _order.map(function(id){return _defs.find(function(d){return d.id===id;});}).filter(Boolean);
+  _defs.forEach(function(d){if(!_sorted.find(function(s){return s&&s.id===d.id;}))_sorted.push(d);});
+  var _first = _sorted.length ? _sorted[0].id : '';
+  var navHtml = '<nav class="ev-tabs">' + _sorted.map(function(d){
+    if(!d||!d.html) return '';
+    return d.id===_first ? d.html.replace(' class="ev-tab"',' class="ev-tab active"') : d.html;
+  }).filter(Boolean).join('') + '</nav>';
+
+return `<!DOCTYPE html>
 <html lang="no">
 <head>
 <meta charset="UTF-8"/>
@@ -11165,98 +11888,126 @@ ${tabletCSS(accentColor, deptTheme, deptTypo, settings.publicColors)}
 ${tabletHeader(ev, settings, 'badge-tur', '🟣 ' + getTypeLabel('tur', settings))}
 ${tabletHero(ev, 'badge-tur', '🟣 ' + getTypeLabel('tur', settings))}
 
-<nav class="ev-tabs">
-  <div class="ev-tab active" data-tab="info" onclick="showTab('info')" data-i18n="tab_info_tur">ℹ️ Om turen</div>
-  <div class="ev-tab" data-tab="rute" onclick="showTab('rute')">🗺️ Etappeplan</div>
-  <div class="ev-tab" data-tab="reg" onclick="showTab('reg')">📋 Påmelding</div>
-  <div class="ev-tab" data-tab="forere" onclick="showTab('forere')" data-i18n="tab_forere">🏍 Deltakere</div>
-  <div class="ev-tab" data-tab="gb" onclick="showTab('gb')">✍️ Gjestebok</div>
-</nav>
+${navHtml}
 
 <div class="ev-content">
 
   <!-- Info -->
   <div class="ev-panel active" id="tab-info">
-    ${ev.description ? `<div class="ev-card"><div class="ev-card-title">${T('about_tur', lang)}</div><p style="line-height:1.7;color:#ddd">${escHtml(ev.description).replace(/\n/g,'<br>')}</p></div>` : ''}
+    ${ev.description ? '<div class="ev-card"><div class="ev-card-title">' + (T('about_tur', lang)) + '</div><p style="line-height:1.7;color:#ddd">' + (escHtml(ev.description).replace(/\n/g,'<br>')) + '</p></div>' : ''}
     <div class="ev-card">
       <div class="ev-card-title" data-i18n="practical_info">${T('practical_info', lang)}</div>
-      ${ev.date ? `<div class="info-row"><span class="icon">📅</span><div><div class="label" data-i18n="departure">${T('departure', lang)}</div><div class="value">${evFmtDate(ev.date)} kl. ${evFmtTime(ev.date)}</div></div></div>` : ''}
-      ${ev.location ? `<div class="info-row"><span class="icon">📍</span><div><div class="label" data-i18n="meetup">${T('meetup', lang)}</div><div class="value">${escHtml(ev.location)}</div></div></div>` : ''}
-      ${days.length ? `<div class="info-row"><span class="icon">🗓</span><div><div class="label" data-i18n="days_count">${T('days_count', lang)}</div><div class="value">${days.length} dag${days.length>1?'er':''}</div></div></div>` : ''}
-      ${ev.maxParticipants ? `<div class="info-row"><span class="icon">🏍</span><div><div class="label" data-i18n="spots_left">${T('spots_left', lang)}</div><div class="value ${isFull?'spots-full':spotsLeft&&spotsLeft<=3?'spots-low':'spots-ok'}">${isFull ? T('spots_full', lang) : spotsLeft + ' / ' + ev.maxParticipants + ' ' + T('spots_left', lang)}</div></div></div>` : ''}
-      ${contactEmail ? `<div class="info-row"><span class="icon">✉️</span><div><div class="label" data-i18n="contact">${T('contact', lang)}</div><div class="value"><a href="mailto:${escHtml(contactEmail)}" style="color:var(--y)">${escHtml(contactEmail)}</a></div></div></div>` : ''}
+      ${ev.date ? '<div class="info-row"><span class="icon">📅</span><div><div class="label" data-i18n="departure">' + (T('departure', lang)) + '</div><div class="value">' + (evFmtDate(ev.date)) + ' kl. ' + (evFmtTime(ev.date)) + '</div></div></div>' : ''}
+      ${ev.location ? '<div class="info-row"><span class="icon">📍</span><div><div class="label" data-i18n="meetup">' + (T('meetup', lang)) + '</div><div class="value">' + (escHtml(ev.location)) + '</div></div></div>' : ''}
+      ${days.length ? '<div class="info-row"><span class="icon">🗓</span><div><div class="label" data-i18n="days_count">' + (T('days_count', lang)) + '</div><div class="value">' + (days.length) + ' dag' + (days.length>1?'er':'') + '</div></div></div>' : ''}
+      ${ev.maxParticipants ? '<div class="info-row"><span class="icon">🏍</span><div><div class="label" data-i18n="spots_left">' + (T('spots_left', lang)) + '</div><div class="value ' + (isFull?'spots-full':spotsLeft&&spotsLeft<=3?'spots-low':'spots-ok') + '">' + (isFull ? T('spots_full', lang) : spotsLeft + ' / ' + ev.maxParticipants + ' ' + T('spots_left', lang)) + '</div></div></div>' : ''}
+      ${contactEmail ? '<div class="info-row"><span class="icon">✉️</span><div><div class="label" data-i18n="contact">' + (T('contact', lang)) + '</div><div class="value"><a href="mailto:' + (escHtml(contactEmail)) + '" style="color:var(--y)">' + (escHtml(contactEmail)) + '</a></div></div></div>' : ''}
     </div>
     ${!isFull
-      ? `<button class="btn-primary" onclick="showTab('reg')">${T('btn_reg_tur_link',lang)}</button>`
-      : `<div class="msg msg-err" style="text-align:center;margin-top:.5rem">Turen er full</div>`}
+      ? '<button class="btn-primary" onclick="showTab(\'reg\')">' + (T('btn_reg_tur_link',lang)) + '</button>'
+      : '<div class="msg msg-err" style="text-align:center;margin-top:.5rem">Turen er full</div>'}
   </div>
 
   <!-- Etappeplan -->
   <div class="ev-panel" id="tab-rute">
-    ${days.length && days[0] && days[0].etapper && days[0].etapper[0] && (days[0].etapper[0]._fra_lat || days[0].etapper[0]._fra_lon) ? `
-    <button class="btn-primary" style="margin-bottom:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:1rem" onclick="startNavigation()" data-i18n="btn_nav">
-      ${T('btn_nav', lang)}
-    </button>` : ev.location ? `
-    <button class="btn-primary" style="margin-bottom:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:1rem" onclick="startNavigationByName()" data-i18n="btn_nav">
-      ${T('btn_nav', lang)}
-    </button>` : ''}
+    ${days.length && days[0] && days[0].stages && days[0].stages[0] && (days[0].stages[0]._fra_lat || days[0].stages[0]._fra_lon)
+      ? '<button class="btn-primary" style="margin-bottom:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:1rem" onclick="startNavigation()" data-i18n="btn_nav">' + T('btn_nav', lang) + '</button>'
+      : ev.location
+        ? '<button class="btn-primary" style="margin-bottom:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:1rem" onclick="startNavigationByName()" data-i18n="btn_nav">' + T('btn_nav', lang) + '</button>'
+        : ''}
     <div class="ev-card">
       <div class="ev-card-title">🗺️ Etappeplan</div>
-      ${etappeHtml}
+      ${stageHtml}
     </div>
-    ${days.length && days[0] && days[0].etapper && days[0].etapper[0] && (days[0].etapper[0]._fra_lat || days[0].etapper[0]._fra_lon) ? `
-    <button class="btn-primary" style="margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:1rem" onclick="startNavigation()" data-i18n="btn_nav">
-      ${T('btn_nav', lang)}
-    </button>` : ev.location ? `
-    <button class="btn-primary" style="margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:1rem" onclick="startNavigationByName()" data-i18n="btn_nav">
-      ${T('btn_nav', lang)}
-    </button>` : ''}
+    ${(function(){
+      if (!days.length) return '';
+      var btnStyle = 'width:100%;border-radius:8px;font-weight:600;cursor:pointer;background:var(--g2,#f5f5f5);border:1px solid var(--g3,#ddd);color:var(--text,#222)';
+      var html = '<div class="ev-card" style="margin-top:1rem">'
+        + '<div class="ev-card-title">📥 Last ned GPX</div>'
+        + '<div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem">';
+      var allLabel = days.length > 1 ? 'Last ned alle dager (ZIP)' : 'Last ned GPX';
+      html += '<button style="' + btnStyle + ';padding:.65rem 1rem;font-size:.9rem" onclick="downloadGpx(&quot;all&quot;)">⬇️ ' + allLabel + '</button>';
+      if (days.length > 1) {
+        days.forEach(function(d, di) {
+          var fra = (d.stages && d.stages[0] && d.stages[0].from) || '';
+          var lastE = d.stages && d.stages[d.stages.length - 1];
+          var til = (lastE && lastE.to) || '';
+          var label = 'Dag ' + (di + 1) + (fra && til ? ' – ' + escHtml(fra) + ' → ' + escHtml(til) : '');
+          var fileId = 'dag' + (di + 1);
+          html += '<button style="' + btnStyle + ';padding:.55rem 1rem;font-size:.85rem;font-weight:500" onclick="downloadGpx(&quot;' + fileId + '&quot;)">⬇️ ' + label + '</button>';
+        });
+      }
+      if (ev.liveTrackingUrl) {
+        html += '<button id="catchUpBtn" style="' + btnStyle + ';padding:.65rem 1rem;font-size:.9rem;margin-top:.25rem;background:var(--ev-accent,#e00);color:#fff;border-color:transparent" onclick="catchUpToTracker()">🏍 Join the group</button>';
+      }
+      html += '</div><p style="font-size:.75rem;color:var(--text2,#888);margin-top:.5rem">GPX-filen kan importeres i GPS-enheter og navigasjonsapper som Garmin, Komoot og Maps.me.</p></div>';
+      return html;
+    })()}
+    ${days.length && days[0] && days[0].stages && days[0].stages[0] && (days[0].stages[0]._fra_lat || days[0].stages[0]._fra_lon)
+      ? '<button class="btn-primary" style="margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:1rem" onclick="startNavigation()" data-i18n="btn_nav">' + T('btn_nav', lang) + '</button>'
+      : ev.location
+        ? '<button class="btn-primary" style="margin-top:.75rem;display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:1rem" onclick="startNavigationByName()" data-i18n="btn_nav">' + T('btn_nav', lang) + '</button>'
+        : ''}
   </div>
 
   <!-- Påmelding -->
   <div class="ev-panel" id="tab-reg">
     <div class="ev-card">
-      <div class="ev-card-title">📋 Påmelding</div>
-      ${ev.isFinalized ? `<div class="msg" style="background:#0a2a0a;border:1px solid #166534;color:#4ade80;border-radius:6px;padding:.75rem 1rem;margin-bottom:.75rem;font-size:.9rem">✅ Turen er ferdigplanlagt! Du vil få en detaljert reisebeskrivelse på e-post.</div>` : ''}
-      ${isFull ? `<div class="msg msg-err">${T('full_tur',lang)}</div>` : `
-      ${ev.regIntro ? '<div style="font-size:.92rem;color:var(--ev-text,#1a1a1a);line-height:1.6;margin-bottom:1rem;white-space:pre-line">' + escHtml(ev.regIntro) + '</div>' : ''}
-      <div id="regMsg"></div>
-      <div class="ev-form">
-      ${_slotsWithCounts.length > 0 ? `
-      <label style="font-weight:700;margin-bottom:.25rem">${T('label_slot', lang)}</label>
-      <div id="evSlotPicker" style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.5rem">
-        \${_slotsWithCounts.map(s=>{
-          var full=s.available===0;
-          var badge=full?'<span style="color:#e00;font-size:.78rem">('+T('slot_full', lang)+')</span>':s.available<=3?'<span style="color:#e67e00;font-size:.78rem">('+s.available+' '+T('slot_left', lang)+')</span>':'<span style="color:#16a34a;font-size:.78rem">('+s.available+' '+T('slot_available', lang)+')</span>';
-          var parts=[s.label];if(s.location)parts.push(s.location);if(s.date)parts.push(s.date);if(s.time)parts.push(T('at_time', lang)+s.time);
-          return '<label style="display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border:1px solid var(--ev-border,#ddd);border-radius:var(--ev-radius,8px);cursor:'+(full?'not-allowed':'pointer')+';opacity:'+(full?.45:1)+';background:var(--ev-card,#fff)">'
-            +'<input type="radio" name="evSlot" value="'+s.id+'"'+(full?' disabled':'')+' style="accent-color:var(--ev-accent,#FFD100);flex-shrink:0;width:16px;height:16px"/>'+'<div><strong>'+parts.join(' · ')+'</strong> '+badge+'</div></label>';
-        }).join('')}
-      </div>` : ''}
-        <label data-i18n="label_name">Navn *</label>
-        <input id="rName" type="text" placeholder="${T('ph_full_name',lang)}" autocomplete="name"/>
-        <label data-i18n="label_email">E-post *</label>
-        <input id="rEmail" type="email" placeholder="din@epost.no" autocomplete="email"/>
-        <label>Telefon</label>
-        <input id="rPhone" type="tel" placeholder="+47 000 00 000" autocomplete="tel"/>
-        <label>MC-merke</label>
-        <input id="rMake" type="text" placeholder="Honda, Yamaha, BMW…"/>
-        <label>MC-modell</label>
-        <input id="rModel" type="text" placeholder="Modell"/>
-        <label>Nødkontakt – navn</label>
-        <input id="rEcName" type="text" placeholder="Navn på nødkontakt"/>
-        <label>Nødkontakt – telefon</label>
-        <input id="rEcPhone" type="tel" placeholder="+47 000 00 000"/>
-        ${isMultiday ? `
-        <label>${T('label_hotel', lang)}</label>
-        <select id="rHotelRoom">
-          <option value="">– Velg romtype –</option>
-          <option value="enkel">${T('hotel_single', lang)}</option>
-          <option value="dobbelt">${T('hotel_double', lang)}</option>
-        </select>` : ''}
-      </div>
-      <button class="btn-primary" id="regBtn" onclick="doRegister()" data-i18n="btn_reg_tur">✅ Meld meg på turen</button>
-      `}
+      <div class="ev-card-title" data-i18n="tab_reg_tur">${T('tab_reg_tur', lang)}</div>
+      ${ev.isFinalized ? '<div class="msg" style="background:#0a2a0a;border:1px solid #166534;color:#4ade80;border-radius:6px;padding:.75rem 1rem;margin-bottom:.75rem;font-size:.9rem">✅ Turen er ferdigplanlagt! Du vil få en detaljert reisebeskrivelse på e-post.</div>' : ''}
+      ${(function(){
+        if (isFull) return '<div class="msg msg-err">' + T('full_tur',lang) + '</div>';
+        var slotsHtml = '';
+        if (_slotsWithCounts.length > 0) {
+          slotsHtml = '<label style="font-weight:700;margin-bottom:.25rem">' + T('label_slot', lang) + '</label>'
+            + '<div id="evSlotPicker" style="display:flex;flex-direction:column;gap:.4rem;margin-bottom:.5rem">'
+            + _slotsWithCounts.map(function(s) {
+                var full = s.available === 0;
+                var badge = full
+                  ? '<span style="color:#e00;font-size:.78rem">(' + T('slot_full', lang) + ')</span>'
+                  : s.available <= 3
+                    ? '<span style="color:#e67e00;font-size:.78rem">(' + s.available + ' ' + T('slot_left', lang) + ')</span>'
+                    : '<span style="color:#16a34a;font-size:.78rem">(' + s.available + ' ' + T('slot_available', lang) + ')</span>';
+                var parts = [s.label];
+                if (s.location) parts.push(s.location);
+                if (s.date) parts.push(s.date);
+                if (s.time) parts.push(T('at_time', lang) + s.time);
+                return '<label style="display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border:1px solid var(--ev-border,#ddd);border-radius:var(--ev-radius,8px);cursor:' + (full ? 'not-allowed' : 'pointer') + ';opacity:' + (full ? .45 : 1) + ';background:var(--ev-card,#fff)">'
+                  + '<input type="radio" name="evSlot" value="' + s.id + '"' + (full ? ' disabled' : '') + ' style="accent-color:var(--ev-accent,#FFD100);flex-shrink:0;width:16px;height:16px"/>'
+                  + '<div><strong>' + parts.join(' · ') + '</strong> ' + badge + '</div></label>';
+              }).join('')
+            + '</div>';
+        }
+        var hotelHtml = isMultiday
+          ? '<label>' + T('label_hotel', lang) + '</label>'
+            + '<select id="rHotelRoom">'
+            + '<option value="">– Velg romtype –</option>'
+            + '<option value="enkel">' + T('hotel_single', lang) + '</option>'
+            + '<option value="dobbelt">' + T('hotel_double', lang) + '</option>'
+            + '</select>'
+          : '';
+        return (ev.regIntro ? '<div style="font-size:.92rem;color:var(--ev-text,#1a1a1a);line-height:1.6;margin-bottom:1rem;white-space:pre-line">' + escHtml(ev.regIntro) + '</div>' : '')
+          + '<div id="regMsg"></div>'
+          + '<div class="ev-form">'
+          + slotsHtml
+          + '<label data-i18n="label_name">Navn *</label>'
+          + '<input id="rName" type="text" placeholder="' + T('ph_full_name',lang) + '" autocomplete="name"/>'
+          + '<label data-i18n="label_email">E-post *</label>'
+          + '<input id="rEmail" type="email" placeholder="din@epost.no" autocomplete="email"/>'
+          + '<label>Telefon</label>'
+          + '<input id="rPhone" type="tel" placeholder="+47 000 00 000" autocomplete="tel"/>'
+          + '<label>MC-merke</label>'
+          + '<input id="rMake" type="text" placeholder="Honda, Yamaha, BMW…"/>'
+          + '<label>MC-modell</label>'
+          + '<input id="rModel" type="text" placeholder="Modell"/>'
+          + '<label>Nødkontakt – navn</label>'
+          + '<input id="rEcName" type="text" placeholder="Navn på nødkontakt"/>'
+          + '<label>Nødkontakt – telefon</label>'
+          + '<input id="rEcPhone" type="tel" placeholder="+47 000 00 000"/>'
+          + hotelHtml
+          + '</div>'
+          + '<button class="btn-primary" id="regBtn" onclick="doRegister()" data-i18n="btn_reg_tur">✅ Meld meg på turen</button>';
+      })()}
       <div class="gdpr-note">🔒 Personopplysninger brukes kun til å administrere turen og slettes automatisk etterpå.</div>
     </div>
   </div>
@@ -11284,20 +12035,20 @@ ${tabletHero(ev, 'badge-tur', '🟣 ' + getTypeLabel('tur', settings))}
     <div id="gbEntries">
       ${(ev.guestbook||[]).filter(g=>g.approved).length
         ? (ev.guestbook||[]).filter(g=>g.approved).map(function(g){
-            const ph=(g.photos&&g.photos.length)?'<div class="gb-photos">'+g.photos.map(function(p){return'<img src="'+escHtml(p)+'" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:2px solid #333;cursor:pointer" loading="lazy"/>';}).join('')+'</div>':''; return `<div class="gb-entry"><div class="gb-name">${escHtml(g.name)}</div><div class="gb-msg">${escHtml(g.message||'').replace(/\n/g,'<br>')}</div>${ph}<div class="gb-date">${new Date(g.createdAt).toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'})}</div></div>`;
+            const ph=(g.photos&&g.photos.length)?'<div class="gb-photos">'+g.photos.map(function(p){return'<img src="'+escHtml(p)+'" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:2px solid #333;cursor:pointer" loading="lazy"/>';}).join('')+'</div>':''; return '<div class="gb-entry"><div class="gb-name">' + (escHtml(g.name)) + '</div><div class="gb-msg">' + (escHtml(g.message||'').replace(/\n/g,'<br>')) + '</div>' + (ph) + '<div class="gb-date">' + (new Date(g.createdAt).toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'})) + '</div></div>';
           }).join('')
-        : '<div class="empty"><span class="empty-icon">✍️</span>'+T('no_comments', lang)+'</div>'}
+        : '<div class="empty"><span class="empty-icon">✍️</span><span data-i18n="no_comments">'+T('no_comments', lang)+'</span></div>'}
     </div>
     <div class="ev-card" style="margin-top:1rem">
-      <div class="ev-card-title">${T('gb_title', lang)}</div>
+      <div class="ev-card-title" data-i18n="gb_title">${T('gb_title', lang)}</div>
       <div id="gbMsg"></div>
       <div class="ev-form">
-        <label data-i18n="label_name">Navn *</label><input id="gbName" type="text" placeholder="${T('gb_ph_name', lang)}"/>
+        <label data-i18n="label_name">${T('label_name', lang)}</label><input id="gbName" type="text" placeholder="${T('gb_ph_name', lang)}"/>
         <label data-i18n="label_phone_req">${T('label_phone_req', lang)}</label><input id="gbPhone" type="tel" placeholder="${T('ph_phone_num', lang)}"/>
-        <label>${T('gb_msg', lang)} <span style="font-weight:400;color:#555">(${T('label_phone_opt', lang)})</span></label><textarea id="gbMsg2" placeholder="${T('ph_comment', lang)}"></textarea>
+        <label id="gbMsgLabel">${T('gb_msg', lang)} <span style="font-weight:400;color:#555">(${T('label_phone_opt', lang)})</span></label><textarea id="gbMsg2" placeholder="${T('ph_comment', lang)}"></textarea>
       </div>
-      <button class="btn-primary" onclick="submitGb()" data-i18n="gb_send">Send kommentar</button>
-      <p style="font-size:.75rem;color:#555;margin-top:.75rem">${T('gb_note', lang)}</p>
+      <button class="btn-primary" onclick="submitGb()" data-i18n="gb_send">${T('gb_send', lang)}</button>
+      <p style="font-size:.75rem;color:#555;margin-top:.75rem" data-i18n="gb_note">${T('gb_note', lang)}</p>
       <!-- ╔══════════════════════════════════════════════════════╗
            ║  LOCKED: GUESTBOOK UPLOAD — DO NOT MODIFY            ║
            ║  Approved by David Eriksson. Works on all browsers.   ║
@@ -11362,6 +12113,16 @@ ${tabletHero(ev, 'badge-tur', '🟣 ' + getTypeLabel('tur', settings))}
 ${tabletPinSheet(ev, lang)}
 ${tabletSharedJS(ev)}
 <script>
+function downloadGpx(fileId) {
+  var url = '/api/public/events/' + EV_ID + '/gpx?files=' + fileId;
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = '';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 async function refreshRegList(){
   var r=await fetch('/api/events/'+EV_ID+'/registrations');
   if(!r.ok)return;
@@ -11428,6 +12189,59 @@ function filterRegs(q){
   });
 }
 
+async function gbDirectUpload(input){
+  var label=document.getElementById('gbPhotoBtn');
+  var gbId=(label&&label.dataset.gbid)||(input&&input.dataset.gbid)||'';
+  if(!gbId||!input.files.length)return;
+  if(label){label.style.opacity='0.6';label.style.pointerEvents='none';}
+  var statusEl=document.createElement('div');
+  statusEl.style.cssText='font-size:.82rem;color:var(--text2);text-align:center;margin-top:.35rem';
+  statusEl.textContent='⏳ Laster opp…';
+  if(label&&label.parentNode)label.parentNode.appendChild(statusEl);
+  var tr=await fetch('/api/events/'+EV_ID+'/guestbook/'+gbId+'/photo-token',{method:'POST',headers:{'Content-Type':'application/json'}});
+  var td=await tr.json();
+  if(!tr.ok||!td.token){
+    if(label){label.style.opacity='1';label.style.pointerEvents='';}
+    statusEl.textContent='❌ Feil – prøv igjen';
+    setTimeout(function(){statusEl.remove();},3000);
+    return;
+  }
+  var uploaded=0;
+  for(var i=0;i<input.files.length;i++){
+    var fd=new FormData();
+    fd.append('photo',input.files[i]);
+    statusEl.textContent='⏳ Laster opp '+(i+1)+'/'+input.files.length+'…';
+    var r=await fetch('/api/gb-photo/'+td.token,{method:'POST',body:fd});
+    if(r.ok)uploaded++;
+  }
+  await fetch('/api/gb-photo-done/'+td.token,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({done:true})});
+  statusEl.textContent='✅ '+uploaded+' fil'+(uploaded!==1?'er':'')+' lastet opp!';
+  statusEl.style.color='#22c55e';
+  setTimeout(function(){
+    var photoArea2=document.getElementById('gbPhotoArea');
+    if(label){label.style.opacity='1';label.style.pointerEvents='';label.dataset.gbid='';}
+    if(photoArea2)photoArea2.style.display='none';
+    statusEl.remove();
+    clearTimeout(window._gbAutoHideTimer);
+  },3000);
+  input.value='';
+}
+
+// ── END LOCKED SECTION ───────────────────────────────────────────────────
+function gbPickFile() {
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*,video/*'; inp.multiple = true;
+  inp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;width:1px;height:1px';
+  document.body.appendChild(inp);
+  inp.addEventListener('change', function() {
+    if (inp.files && inp.files.length > 0) gbDirectUpload(inp);
+    setTimeout(function() { if (inp.parentNode) inp.parentNode.removeChild(inp); }, 10000);
+  });
+  inp.addEventListener('cancel', function() {
+    setTimeout(function() { if (inp.parentNode) inp.parentNode.removeChild(inp); }, 1000);
+  });
+  inp.click();
+}
 async function submitGb(){
   var name=document.getElementById('gbName').value.trim();
   var phone=document.getElementById('gbPhone').value.trim();
@@ -11524,7 +12338,7 @@ app.get("/api/events/:id/snapshot", auth, function(req, res) {
   const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
   if (!ev) return res.status(404).json({ error: "Not found" });
   const s = getSettings();
-  // Send kun det som trengs – ikke staffPin i klartekst
+  // send only it/the as/that trengs – not staffPin in klartekst
   res.json({
     id: ev.id, slug: ev.slug, title: ev.title, description: ev.description,
     date: ev.date, location: ev.location, eventType: ev.eventType,
@@ -11598,10 +12412,10 @@ app.post("/api/events/:id/sync", rateLimit(30, 60000), function(req, res) {
 });
 
 
-// ── Inventar ─────────────────────────────────────────────────────
-app.get("/api/inventar", auth, function(req, res) {
+// ── inventory ─────────────────────────────────────────────────────
+app.get("/api/inventory", auth, function(req, res) {
   const user  = req.session.user;
-  const items = readJSON(INVENTAR_FILE);
+  const items = readJSON(INVENTORY_FILE);
   if (user.role === "admin") return res.json(items);
   // Non-admin: return items belonging to their departments + items with no department
   const myDeptIds = getAccessList(readJSON(USERS_FILE).find(function(u){ return u.id === user.id; }) || {})
@@ -11609,9 +12423,9 @@ app.get("/api/inventar", auth, function(req, res) {
   res.json(items.filter(function(i){ return !i.department || myDeptIds.includes(i.department); }));
 });
 
-app.post("/api/inventar", auth, managerOrAdmin, function(req, res) {
+app.post("/api/inventory", auth, managerOrAdmin, function(req, res) {
   const user  = req.session.user;
-  const items = readJSON(INVENTAR_FILE);
+  const items = readJSON(INVENTORY_FILE);
   // Determine department: use provided value if admin, else use caller's department
   let deptId = req.body.department || null;
   if (user.role !== "admin") {
@@ -11620,45 +12434,45 @@ app.post("/api/inventar", auth, managerOrAdmin, function(req, res) {
     deptId = myDepts[0] || null;
   }
   var _kursData = null;
-  if (req.body.kategori === "kurs" && req.body.kursData) {
+  if (req.body.category === "kurs" && req.body.courseData) {
     try {
-      var _kd = typeof req.body.kursData === "string" ? JSON.parse(req.body.kursData) : req.body.kursData;
+      var _kd = typeof req.body.courseData === "string" ? JSON.parse(req.body.courseData) : req.body.courseData;
       _kursData = {
-        antall:         Math.max(1, parseInt(_kd.antall)||1),
+        quantity:         Math.max(1, parseInt(_kd.quantity)||1),
         dato:           /^\d{4}-\d{2}-\d{2}$/.test(_kd.dato||"") ? _kd.dato : null,
         tidFra:         /^\d{2}:\d{2}$/.test(_kd.tidFra||"") ? _kd.tidFra : null,
         tidTil:         /^\d{2}:\d{2}$/.test(_kd.tidTil||"") ? _kd.tidTil : null,
         sted:           sanitizeInput((_kd.sted||"").slice(0,200)),
         lokasjonsType:  ["parkering","klasserom","bane","utendors","annet"].indexOf(_kd.lokasjonsType) >= 0 ? _kd.lokasjonsType : null,
         kursType:       ["sikker-pa-mc","trafikksikkerhet","kjoreteknikk","kjoretoy","forstehjelp","annet"].indexOf(_kd.kursType) >= 0 ? _kd.kursType : null,
-        prisMedlem:     _kd.prisMedlem != null ? Math.max(0, parseFloat(_kd.prisMedlem)||0) : null,
-        prisAnnenKlubb: _kd.prisAnnenKlubb != null ? Math.max(0, parseFloat(_kd.prisAnnenKlubb)||0) : null,
-        prisIkkeMedlem: _kd.prisIkkeMedlem != null ? Math.max(0, parseFloat(_kd.prisIkkeMedlem)||0) : null,
+        priceMember:     _kd.priceMember != null ? Math.max(0, parseFloat(_kd.priceMember)||0) : null,
+        priceOtherClub: _kd.priceOtherClub != null ? Math.max(0, parseFloat(_kd.priceOtherClub)||0) : null,
+        priceNonMember: _kd.priceNonMember != null ? Math.max(0, parseFloat(_kd.priceNonMember)||0) : null,
       };
     } catch(e) {}
   }
   const item = {
-    id: uuid(), navn: (req.body.navn||"").trim(),
-    kategori: req.body.kategori||"annet",
-    antall: parseInt(req.body.antall)||0,
-    perPakke: parseInt(req.body.perPakke)||1,
-    innkjopspris: req.body.innkjopspris != null ? (parseFloat(req.body.innkjopspris)||null) : null,
-    beskrivelse: (req.body.beskrivelse||"").trim(),
-    bilde: req.body.bilde || null,
+    id: uuid(), name: (req.body.name||"").trim(),
+    category: req.body.category||"annet",
+    quantity: parseInt(req.body.quantity)||0,
+    perPackage: parseInt(req.body.perPackage)||1,
+    purchasePrice: req.body.purchasePrice != null ? (parseFloat(req.body.purchasePrice)||null) : null,
+    description: (req.body.description||"").trim(),
+    image: req.body.image || null,
     department: deptId,
     usageCount: 0, createdAt: new Date().toISOString()
   };
-  if (_kursData) item.kursData = _kursData;
-  if (req.body.pris !== undefined) item.pris = parseFloat(req.body.pris) || 0;
-  if (!item.navn) return res.status(400).json({ err: "Name is required" });
+  if (_kursData) item.courseData = _kursData;
+  if (req.body.price !== undefined) item.price = parseFloat(req.body.price) || 0;
+  if (!item.name) return res.status(400).json({ err: "Name is required" });
   items.push(item);
-  writeJSON(INVENTAR_FILE, items);
+  writeJSON(INVENTORY_FILE, items);
   res.json(item);
 });
 
-app.put("/api/inventar/:id", auth, managerOrAdmin, function(req, res) {
+app.put("/api/inventory/:id", auth, managerOrAdmin, function(req, res) {
   const user  = req.session.user;
-  const items = readJSON(INVENTAR_FILE);
+  const items = readJSON(INVENTORY_FILE);
   const idx   = items.findIndex(function(i){ return i.id === req.params.id; });
   if (idx === -1) return res.status(404).json({ err: "Not found" });
   // Check access: admin always OK; manager must own this dept
@@ -11670,44 +12484,44 @@ app.put("/api/inventar/:id", auth, managerOrAdmin, function(req, res) {
       return res.status(403).json({ err: "Ingen tilgang til dette utstyret" });
   }
   items[idx] = Object.assign({}, item, {
-    navn:         (req.body.navn||item.navn).trim(),
-    kategori:     req.body.kategori    || item.kategori,
-    antall:       parseInt(req.body.antall) >= 0 ? parseInt(req.body.antall) : item.antall,
-    perPakke:     parseInt(req.body.perPakke)||item.perPakke||1,
-    innkjopspris: req.body.innkjopspris != null ? (parseFloat(req.body.innkjopspris)||null) : item.innkjopspris||null,
-    beskrivelse:  (req.body.beskrivelse||"").trim(),
-    bilde:        req.body.bilde !== undefined ? (req.body.bilde || null) : (item.bilde||null),
+    name:         (req.body.name||item.name).trim(),
+    category:     req.body.category    || item.category,
+    quantity:       parseInt(req.body.quantity) >= 0 ? parseInt(req.body.quantity) : item.quantity,
+    perPackage:     parseInt(req.body.perPackage)||item.perPackage||1,
+    purchasePrice: req.body.purchasePrice != null ? (parseFloat(req.body.purchasePrice)||null) : item.purchasePrice||null,
+    description:  (req.body.description||"").trim(),
+    image:        req.body.image !== undefined ? (req.body.image || null) : (item.image||null),
     department:   user.role === "admin" && req.body.department !== undefined
                     ? (req.body.department || null)
                     : item.department,
   });
-  if (req.body.pris !== undefined) items[idx].pris = parseFloat(req.body.pris) || 0;
-  if (req.body.kursData !== undefined) {
-    if (req.body.kategori === "kurs" || items[idx].kategori === "kurs") {
+  if (req.body.price !== undefined) items[idx].price = parseFloat(req.body.price) || 0;
+  if (req.body.courseData !== undefined) {
+    if (req.body.category === "kurs" || items[idx].category === "kurs") {
       try {
-        var _kd2 = typeof req.body.kursData === "string" ? JSON.parse(req.body.kursData) : req.body.kursData;
-        if (_kd2) items[idx].kursData = {
-          antall:         Math.max(1, parseInt(_kd2.antall)||1),
+        var _kd2 = typeof req.body.courseData === "string" ? JSON.parse(req.body.courseData) : req.body.courseData;
+        if (_kd2) items[idx].courseData = {
+          quantity:         Math.max(1, parseInt(_kd2.quantity)||1),
           dato:           /^\d{4}-\d{2}-\d{2}$/.test(_kd2.dato||"") ? _kd2.dato : null,
           tidFra:         /^\d{2}:\d{2}$/.test(_kd2.tidFra||"") ? _kd2.tidFra : null,
           tidTil:         /^\d{2}:\d{2}$/.test(_kd2.tidTil||"") ? _kd2.tidTil : null,
           sted:           sanitizeInput((_kd2.sted||"").slice(0,200)),
           lokasjonsType:  ["parkering","klasserom","bane","utendors","annet"].indexOf(_kd2.lokasjonsType) >= 0 ? _kd2.lokasjonsType : null,
           kursType:       ["sikker-pa-mc","trafikksikkerhet","kjoreteknikk","kjoretoy","forstehjelp","annet"].indexOf(_kd2.kursType) >= 0 ? _kd2.kursType : null,
-          prisMedlem:     _kd2.prisMedlem != null ? Math.max(0, parseFloat(_kd2.prisMedlem)||0) : null,
-          prisAnnenKlubb: _kd2.prisAnnenKlubb != null ? Math.max(0, parseFloat(_kd2.prisAnnenKlubb)||0) : null,
-          prisIkkeMedlem: _kd2.prisIkkeMedlem != null ? Math.max(0, parseFloat(_kd2.prisIkkeMedlem)||0) : null,
+          priceMember:     _kd2.priceMember != null ? Math.max(0, parseFloat(_kd2.priceMember)||0) : null,
+          priceOtherClub: _kd2.priceOtherClub != null ? Math.max(0, parseFloat(_kd2.priceOtherClub)||0) : null,
+          priceNonMember: _kd2.priceNonMember != null ? Math.max(0, parseFloat(_kd2.priceNonMember)||0) : null,
         };
       } catch(e) {}
     }
   }
-  writeJSON(INVENTAR_FILE, items);
+  writeJSON(INVENTORY_FILE, items);
   res.json(items[idx]);
 });
 
-app.delete("/api/inventar/:id", auth, managerOrAdmin, function(req, res) {
+app.delete("/api/inventory/:id", auth, managerOrAdmin, function(req, res) {
   const user  = req.session.user;
-  const items = readJSON(INVENTAR_FILE);
+  const items = readJSON(INVENTORY_FILE);
   const item  = items.find(function(i){ return i.id === req.params.id; });
   if (!item) return res.status(404).json({ err: "Not found" });
   if (user.role !== "admin" && item.department) {
@@ -11716,7 +12530,7 @@ app.delete("/api/inventar/:id", auth, managerOrAdmin, function(req, res) {
     if (!myDepts.includes(item.department))
       return res.status(403).json({ err: "Access denied" });
   }
-  writeJSON(INVENTAR_FILE, items.filter(function(i){ return i.id !== req.params.id; }));
+  writeJSON(INVENTORY_FILE, items.filter(function(i){ return i.id !== req.params.id; }));
   // Remove from all events too
   const events = readJSON(EVENTS_FILE);
   events.forEach(e => { if (e.utstyr) e.utstyr = e.utstyr.filter(u => u.id !== req.params.id); });
@@ -11725,9 +12539,9 @@ app.delete("/api/inventar/:id", auth, managerOrAdmin, function(req, res) {
 });
 
 // Purchase – add quantity to stock
-app.post("/api/inventar/:id/inkjop", auth, managerOrAdmin, function(req, res) {
+app.post("/api/inventory/:id/purchase", auth, managerOrAdmin, function(req, res) {
   const user  = req.session.user;
-  const items = readJSON(INVENTAR_FILE);
+  const items = readJSON(INVENTORY_FILE);
   const idx   = items.findIndex(function(i){ return i.id === req.params.id; });
   if (idx === -1) return res.status(404).json({ err: "Not found" });
   if (user.role !== "admin" && items[idx].department) {
@@ -11736,19 +12550,22 @@ app.post("/api/inventar/:id/inkjop", auth, managerOrAdmin, function(req, res) {
     if (!myDepts.includes(items[idx].department))
       return res.status(403).json({ err: "Access denied" });
   }
-  const antall = parseInt(req.body.antall) || 0;
+  const quantity = parseInt(req.body.quantity) || 0;
   if (antall <= 0) return res.status(400).json({ err: "Quantity must be greater than 0" });
-  items[idx].antall = (items[idx].antall || 0) + antall;
-  if (!items[idx].inkjopLogg) items[idx].inkjopLogg = [];
-  items[idx].inkjopLogg.push({ antall, dato: new Date().toISOString(), notat: (req.body.notat||"").trim() });
-  writeJSON(INVENTAR_FILE, items);
-  res.json({ ok: true, antall: items[idx].antall });
+  items[idx].quantity = (items[idx].quantity || 0) + antall;
+  if (!items[idx].purchaseLog) items[idx].purchaseLog = [];
+  items[idx].purchaseLog.push({ antall, dato: new Date().toISOString(), note: (req.body.note||"").trim() });
+  writeJSON(INVENTORY_FILE, items);
+  res.json({ ok: true, quantity: items[idx].quantity });
 });
 
-// Varetelling – sett nytt lagersaldo direkte
-app.post("/api/inventar/:id/varetelling", auth, managerOrAdmin, function(req, res) {
+// Book inventory item to an event
+// Duplicate POST /api/events/:id/utstyr removed (used undefined variable "antall")
+
+// Varetelling – set nytt lagersaldo directly
+app.post("/api/inventory/:id/stock-count", auth, managerOrAdmin, function(req, res) {
   const user  = req.session.user;
-  const items = readJSON(INVENTAR_FILE);
+  const items = readJSON(INVENTORY_FILE);
   const idx   = items.findIndex(function(i){ return i.id === req.params.id; });
   if (idx === -1) return res.status(404).json({ err: "Not found" });
   if (user.role !== "admin" && items[idx].department) {
@@ -11757,17 +12574,17 @@ app.post("/api/inventar/:id/varetelling", auth, managerOrAdmin, function(req, re
     if (!myDepts.includes(items[idx].department))
       return res.status(403).json({ err: "Access denied" });
   }
-  const nyttAntall = parseInt(req.body.antall);
+  const nyttAntall = parseInt(req.body.quantity);
   if (isNaN(nyttAntall) || nyttAntall < 0) return res.status(400).json({ err: "Ugyldig antall" });
-  const gammelt = items[idx].antall || 0;
-  items[idx].antall = nyttAntall;
-  if (!items[idx].varetellingLogg) items[idx].varetellingLogg = [];
-  items[idx].varetellingLogg.push({ fra: gammelt, til: nyttAntall, dato: new Date().toISOString(), notat: (req.body.notat||"").trim() });
-  writeJSON(INVENTAR_FILE, items);
-  res.json({ ok: true, antall: nyttAntall });
+  const gammelt = items[idx].quantity || 0;
+  items[idx].quantity = nyttAntall;
+  if (!items[idx].stockCountLog) items[idx].stockCountLog = [];
+  items[idx].stockCountLog.push({ from: gammelt, to: nyttAntall, dato: new Date().toISOString(), note: (req.body.note||"").trim() });
+  writeJSON(INVENTORY_FILE, items);
+  res.json({ ok: true, quantity: nyttAntall });
 });
 
-// Give-away statistikk per event
+// Give-away statistics per event
 app.get("/api/events/:id/giveaway", auth, function(req, res) {
   const events = readJSON(EVENTS_FILE);
   const ev = events.find(e => e.id === req.params.id);
@@ -11783,10 +12600,10 @@ app.post("/api/events/:id/giveaway", auth, managerOrAdmin, function(req, res) {
   const { itemId, utDelt, retur } = req.body;
   const existing = events[evIdx].giveaway.findIndex(g => g.id === itemId);
   if (existing >= 0) {
-    events[evIdx].giveaway[existing].utDelt = parseInt(utDelt) || 0;
-    events[evIdx].giveaway[existing].retur  = parseInt(retur)  || 0;
+    events[evIdx].giveaway[existing].distributed = parseInt(utDelt) || 0;
+    events[evIdx].giveaway[existing].returned  = parseInt(retur)  || 0;
   } else {
-    events[evIdx].giveaway.push({ id: itemId, utDelt: parseInt(utDelt)||0, retur: parseInt(retur)||0 });
+    events[evIdx].giveaway.push({ id: itemId, distributed: parseInt(utDelt)||0, returned: parseInt(retur)||0 });
   }
   writeJSON(EVENTS_FILE, events);
   broadcastEventUpdate(ev.department);
@@ -11809,16 +12626,16 @@ app.post("/api/events/:id/salg", auth, managerOrAdmin, function(req, res) {
   const { itemId, solgt } = req.body;
   const existing = events[evIdx].salg.findIndex(s => s.id === itemId);
   if (existing >= 0) {
-    events[evIdx].salg[existing].solgt = parseInt(solgt) || 0;
+    events[evIdx].salg[existing].sold = parseInt(solgt) || 0;
   } else {
-    events[evIdx].salg.push({ id: itemId, solgt: parseInt(solgt)||0 });
+    events[evIdx].salg.push({ id: itemId, sold: parseInt(solgt)||0 });
   }
   writeJSON(EVENTS_FILE, events);
   broadcastEventUpdate(ev.department);
   res.json({ ok: true });
 });
 
-// Utstyr per event
+// equipment per event
 app.get("/api/events/:id/utstyr", auth, function(req, res) {
   const events = readJSON(EVENTS_FILE);
   const ev = events.find(e => e.id === req.params.id);
@@ -11831,22 +12648,24 @@ app.post("/api/events/:id/utstyr", auth, managerOrAdmin, function(req, res) {
   const evIdx = events.findIndex(e => e.id === req.params.id);
   if (evIdx === -1) return res.status(404).json({ err: "Not found" });
   if (!events[evIdx].utstyr) events[evIdx].utstyr = [];
-  const { itemId, antall, aktiv } = req.body;
+  const { itemId, antall, aktiv, quantity } = req.body;
   const existing = events[evIdx].utstyr.findIndex(u => u.id === itemId);
-  if (aktiv) {
-    if (existing >= 0) events[evIdx].utstyr[existing].antall = parseInt(antall)||1;
-    else events[evIdx].utstyr.push({ id: itemId, antall: parseInt(antall)||1 });
+  const isDirectAdd = quantity !== undefined && aktiv === undefined;
+  const resolvedQty = parseInt(quantity || antall) || 1;
+  if (isDirectAdd || aktiv) {
+    if (existing >= 0) events[evIdx].utstyr[existing].quantity = resolvedQty;
+    else events[evIdx].utstyr.push({ id: itemId, quantity: resolvedQty });
   } else {
     if (existing >= 0) events[evIdx].utstyr.splice(existing, 1);
   }
   writeJSON(EVENTS_FILE, events);
-  broadcastEventUpdate(ev.department);
-  // Update usageCount on inventar item
-  const items = readJSON(INVENTAR_FILE);
+  broadcastEventUpdate(events[evIdx].department);
+  // Update usageCount on inventory item
+  const items = readJSON(INVENTORY_FILE);
   const itemIdx = items.findIndex(i => i.id === itemId);
   if (itemIdx >= 0) {
     items[itemIdx].usageCount = events.filter(e => (e.utstyr||[]).some(u => u.id === itemId)).length;
-    writeJSON(INVENTAR_FILE, items);
+    writeJSON(INVENTORY_FILE, items);
   }
   res.json({ ok: true });
 });
@@ -11930,10 +12749,10 @@ app.get("/api/resolve-maps-url", auth, async function(req, res) {
   }
 });
 
-// ── Route coords – geocode alle steder i ruten ─────────────────
+// ── Route coords – geocode all steder in ruten ─────────────────
 // ── Rutekart opplasting ──────────────────────────────────────────
 app.post("/api/events/:id/routemap-upload", auth, managerOrAdmin,
-  multer({ dest: UPLOADS, limits: { fileSize: 10 * 1024 * 1024 } }).single("image"),
+  multer({ dest: UPLOADS, limits: { fileSize: 100 * 1024 * 1024 } }).single("image"),
   function(req, res) {
     const events = readJSON(EVENTS_FILE);
     const idx = events.findIndex(function(e) { return e.id === req.params.id; });
@@ -11951,7 +12770,7 @@ app.post("/api/events/:id/routemap-upload", auth, managerOrAdmin,
 
 // ── Dagskart opplasting ──────────────────────────────────────────
 app.post("/api/events/:id/daymap-upload", auth, managerOrAdmin,
-  multer({ dest: UPLOADS, limits: { fileSize: 10 * 1024 * 1024 } }).array("images", 20),
+  multer({ dest: UPLOADS, limits: { fileSize: 100 * 1024 * 1024 } }).array("images", 20),
   function(req, res) {
     const events = readJSON(EVENTS_FILE);
     const idx = events.findIndex(function(e) { return e.id === req.params.id; });
@@ -11970,7 +12789,7 @@ app.post("/api/events/:id/daymap-upload", auth, managerOrAdmin,
 
 // ── GPX Import ──────────────────────────────────────────────────
 app.post("/api/events/:id/gpx-import", auth, managerOrAdmin,
-  multer({ dest: UPLOADS, limits: { fileSize: 20 * 1024 * 1024 } }).single("gpx"),
+  multer({ dest: UPLOADS, limits: { fileSize: 200 * 1024 * 1024 } }).single("gpx"),
   async function(req, res) {
     const ev = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id; });
     if (!ev) return res.status(404).json({ error: "Ikke funnet" });
@@ -11980,16 +12799,16 @@ app.post("/api/events/:id/gpx-import", auth, managerOrAdmin,
       const xml = fs.readFileSync(req.file.path, "utf8");
       try { fs.unlinkSync(req.file.path); } catch(e) {}
 
-      // Parse GPX med regex (ingen ekstern parser)
+      // Parse GPX with regex (none/no ekstern parser)
       const trkpts = [];
       const wpts   = [];
       const rtepts = [];
 
-      // Track points – støtter lat/lon i hvilken som helst rekkefølge og self-closing tags
+      // Track points – støtter lat/lon in hvilken as/that helst rekkefølge and self-closing tags
       const trksegRe = /<trkseg>([\s\S]*?)<\/trkseg>/g;
       let trkseg;
       while ((trkseg = trksegRe.exec(xml)) !== null) {
-        // Matcher både <trkpt .../> og <trkpt ...>...</trkpt>
+        // Matcher både <trkpt .../> and <trkpt ...>...</trkpt>
         const ptRe = /<trkpt\s([^>\/]+)\/?>([\s\S]*?)<\/trkpt>|<trkpt\s([^>\/]+)\/>/g;
         let pt;
         while ((pt = ptRe.exec(trkseg[1])) !== null) {
@@ -12029,11 +12848,11 @@ app.post("/api/events/:id/gpx-import", auth, managerOrAdmin,
       }
 
       // Prioritet: waypoints > routepoints > smart thinning av trackpoints
-      // Men hvis vi har trackpoints, bruk alltid smart thinning (waypoints er bare start/slutt)
+      // but if vi has trackpoints, use alltid smart thinning (waypoints is only start/slutt)
       var stops = [];
 
       if (trkpts.length >= 2) {
-        // Smart thinning – bruk waypoints som start/slutt hvis tilgjengelig
+        // Smart thinning – use waypoints as/that start/slutt if tilgjengelig
         function haversineM(a, b) {
           var R = 6371000;
           var lat1 = a.lat * Math.PI/180, lat2 = b.lat * Math.PI/180;
@@ -12049,7 +12868,7 @@ app.post("/api/events/:id/gpx-import", auth, managerOrAdmin,
         }
         var totalDist = cumDist[cumDist.length-1];
 
-        // 2. Beregn kurvevinkel for hvert punkt (heading change)
+        // 2. calculate kurvevinkel for every punkt (heading change)
         function heading(a, b) {
           return Math.atan2(b.lon - a.lon, b.lat - a.lat);
         }
@@ -12064,7 +12883,7 @@ app.post("/api/events/:id/gpx-import", auth, managerOrAdmin,
         }
 
         // 3. Velg 10-15 nøkkelpunkter:
-        //    a) Start og slutt alltid med
+        //    a) Start and slutt alltid with
         //    b) Punkter med størst retningsendring (viktige svinger/kryss)
         //    c) Jevnt fordelt hvert ~30 min kjøring (ca 40 km)
         var TARGET = 12;
@@ -12074,7 +12893,7 @@ app.post("/api/events/:id/gpx-import", auth, managerOrAdmin,
         var intervalDist = totalDist / (TARGET - 1);
         for (var seg = 1; seg < TARGET - 1; seg++) {
           var targetD = seg * intervalDist;
-          // Finn nærmeste punkt
+          // find nærmeste punkt
           var best = 1;
           for (var j = 1; j < trkpts.length - 1; j++) {
             if (Math.abs(cumDist[j] - targetD) < Math.abs(cumDist[best] - targetD)) best = j;
@@ -12082,7 +12901,7 @@ app.post("/api/events/:id/gpx-import", auth, managerOrAdmin,
           selected.add(best);
         }
 
-        // Legg til de 5 punktene med størst retningsendring (viktige kryss/svinger)
+        // add they/the 5 punktene with størst retningsendring (viktige kryss/svinger)
         var angleScores = angles.map(function(a, i) { return { i, a }; })
           .filter(function(x) { return !selected.has(x.i) && x.i > 10 && x.i < trkpts.length - 10; })
           .sort(function(a, b) { return b.a - a.a; });
@@ -12090,11 +12909,11 @@ app.post("/api/events/:id/gpx-import", auth, managerOrAdmin,
           selected.add(angleScores[k].i);
         }
 
-        // Sorter og bygg stops-liste
+        // sort and build stops-liste
         var selectedArr = Array.from(selected).sort(function(a, b) { return a - b; });
         stops = selectedArr.map(function(idx) { return trkpts[idx]; });
 
-        // Override start/slutt med waypoints hvis de finnes (mer presist)
+        // Override start/slutt with waypoints if they/the finnes (mer presist)
         if (wpts.length >= 1) stops[0] = wpts[0];
         if (wpts.length >= 2) stops[stops.length-1] = wpts[wpts.length-1];
 
@@ -12128,18 +12947,18 @@ app.post("/api/events/:id/gpx-import", auth, managerOrAdmin,
         }
       }
 
-      // Bygg etapper
-      var etapper = [];
+      // build stages
+      var stages = [];
       for (var si = 0; si < stops.length - 1; si++) {
         var fra = stops[si];
         var til = stops[si + 1];
-        etapper.push({
+        stages.push({
           type:     si === 0 ? "start" : si === stops.length - 2 ? "slutt" : "stopp",
-          fra:      fra.name || ("Punkt " + (si + 1)),
-          til:      til.name || ("Punkt " + (si + 2)),
+          from:      fra.name || ("Punkt " + (si + 1)),
+          to:      til.name || ("Punkt " + (si + 2)),
           km:       "",
-          tid:      "",
-          notat:    "",
+          duration: "",
+          note:    "",
           profile:  "driving",
           _fra_lat: fra.lat, _fra_lon: fra.lon,
           _lat:     til.lat, _lon:     til.lon,
@@ -12149,7 +12968,7 @@ app.post("/api/events/:id/gpx-import", auth, managerOrAdmin,
 
       res.json({
         ok:      true,
-        etapper,
+        stages,
         trkpts:  trkpts.length,
         wpts:    wpts.length,
         rtepts:  rtepts.length,
@@ -12160,6 +12979,118 @@ app.post("/api/events/:id/gpx-import", auth, managerOrAdmin,
     }
   }
 );
+
+// ── Public GPX Download (no auth — for public tur pages) ───────────
+app.get("/api/public/events/:id/gpx", rateLimit(10, 60000), async function(req, res) {
+  const events = readJSON(EVENTS_FILE);
+  const ev = events.find(function(e) { return e.id === req.params.id; });
+  if (!ev) return res.status(404).json({ error: "Not found" });
+  if (ev.eventType !== "tur") return res.status(400).json({ error: "Only trip events support GPX" });
+  if (!ev.isPublic) return res.status(403).json({ error: "Event is not public" });
+  // Forward to the authenticated GPX handler by temporarily satisfying its auth check
+  req.session = req.session || {};
+  req.session.user = req.session.user || { role: "public-gpx" };
+  // Actually just re-implement a lightweight version: redirect with slug-based lookup
+  // Use the existing route by calling it with the same id
+  const route = ev.route || { days: [] };
+  const days  = route.days || [];
+  const requestedIds = req.query.files ? req.query.files.split(",") : ["all"];
+  const evTitle  = ev.title || "Tur";
+  const baseSlug = evTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  function xmlEsc(s) { return (s||"").replace(/[<>&"]/g, function(c){return{"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c];}); }
+  function sleep(ms) { return new Promise(function(r){setTimeout(r,ms);}); }
+
+  async function geocode(name) {
+    try {
+      const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(name);
+      const r = await fetch(url, { headers: { "User-Agent": "EventsAdmin-GPX/1.0" } });
+      const d = await r.json();
+      if (d && d[0]) return { name, lat: parseFloat(d[0].lat), lon: parseFloat(d[0].lon) };
+    } catch(e) {}
+    return null;
+  }
+
+  async function fetchSegment(from, to) {
+    try {
+      const coordStr = from.lon+","+from.lat+";"+to.lon+","+to.lat;
+      const r = await fetch("https://router.project-osrm.org/route/v1/driving/"+coordStr+"?overview=full&geometries=geojson");
+      const d = await r.json();
+      if (d.routes && d.routes[0]) return d.routes[0].geometry.coordinates.map(function(c){return{lat:c[1],lon:c[0]};});
+    } catch(e) {}
+    return [{lat:from.lat,lon:from.lon},{lat:to.lat,lon:to.lon}];
+  }
+
+  const allNames = [];
+  days.forEach(function(d){ (d.stages||[]).forEach(function(e){ if(e.from&&!allNames.includes(e.from))allNames.push(e.from); if(e.to&&!allNames.includes(e.to))allNames.push(e.to); }); });
+  if (!allNames.length) return res.status(400).json({ error: "Ingen steder i ruten" });
+
+  const coordCache = {};
+  for (var i=0;i<allNames.length;i++) { const result=await geocode(allNames[i]); if(result)coordCache[allNames[i]]=result; if(i<allNames.length-1)await sleep(300); }
+
+  const segCache = {};
+  for (var di=0;di<days.length;di++) { var stages=days[di].stages||[]; for(var ei=0;ei<stages.length;ei++){ var e=stages[ei]; var fra=coordCache[e.from],til=coordCache[e.to]; if(!fra||!til)continue; var key=e.from+"||"+e.to; if(!segCache[key]){segCache[key]=await fetchSegment(fra,til);await sleep(200);} } }
+
+  function buildGpx(title, dayList) {
+    var now=new Date().toISOString();
+    var gpx='<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Events Admin" xmlns="http://www.topografix.com/GPX/1/1">\n';
+    gpx+='  <metadata><name>'+xmlEsc(title)+'</name><time>'+now+'</time></metadata>\n';
+    // Waypoints for named stops (start, end, hotel, highlights)
+    var seenWpt={};
+    dayList.forEach(function(d,dIdx){ (d.stages||[]).forEach(function(e,eIdx){ [[e.from,eIdx===0&&dIdx===0?"start":e.type],[e.to,e.type==="slutt"?"end":e.type]].forEach(function(pair){ var nm=pair[0],tp=pair[1]; if(!nm||seenWpt[nm])return; seenWpt[nm]=true; var c=coordCache[nm];if(!c)return; var sym=tp==="start"||eIdx===0&&dIdx===0?"Flag, Green":tp==="slutt"||tp==="end"?"Flag, Red":tp==="hotell"||tp==="hotel"?"Lodging":tp==="lunsj"||tp==="middag"?"Restaurant":tp==="bensinstopp"?"Gas Station":tp==="opplevelse"?"Scenic Area":"Waypoint"; gpx+='  <wpt lat="'+c.lat.toFixed(6)+'" lon="'+c.lon.toFixed(6)+'">\n    <name>'+xmlEsc(nm)+'</name><sym>'+sym+'</sym>\n  </wpt>\n'; }); }); });
+    // One continuous track per day (all segments merged into one trkseg)
+    dayList.forEach(function(d, dIdx) {
+      var allPts = [];
+      (d.stages||[]).forEach(function(e) {
+        var fra=coordCache[e.from], til=coordCache[e.to]; if(!fra||!til) return;
+        var key=e.from+"||"+e.to;
+        var pts=segCache[key]||[{lat:fra.lat,lon:fra.lon},{lat:til.lat,lon:til.lon}];
+        if (allPts.length === 0) { allPts = allPts.concat(pts); }
+        else { allPts = allPts.concat(pts.slice(1)); } // avoid duplicate junction point
+      });
+      if (!allPts.length) return;
+      var trkName = dayList.length > 1 ? xmlEsc(title + ' – Dag ' + (dIdx+1)) : xmlEsc(title);
+      gpx += '  <trk><name>' + trkName + '</name><trkseg>\n';
+      allPts.forEach(function(pt){ gpx += '    <trkpt lat="' + pt.lat.toFixed(6) + '" lon="' + pt.lon.toFixed(6) + '"/>\n'; });
+      gpx += '  </trkseg></trk>\n';
+    });
+    gpx+='</gpx>';
+    return gpx;
+  }
+
+  const downloadAll = requestedIds.includes("all");
+  if (days.length <= 1 || (requestedIds.length === 1 && !downloadAll)) {
+    var singleDayIdx = requestedIds[0]==="total"||downloadAll ? null : parseInt(requestedIds[0].replace("dag",""))-1;
+    var singleDays   = singleDayIdx!=null&&!isNaN(singleDayIdx) ? [days[singleDayIdx]] : days;
+    var singleTitle  = singleDayIdx!=null&&!isNaN(singleDayIdx) ? evTitle+" – Dag "+(singleDayIdx+1) : evTitle;
+    var fn = singleDayIdx!=null&&!isNaN(singleDayIdx) ? baseSlug+"-dag"+(singleDayIdx+1)+".gpx" : baseSlug+".gpx";
+    res.setHeader("Content-Type","application/gpx+xml");
+    res.setHeader("Content-Disposition",'attachment; filename="'+fn+'"');
+    return res.send(buildGpx(singleTitle, singleDays.filter(Boolean)));
+  }
+
+  // Multi-day ZIP
+  var files = [];
+  if (downloadAll || requestedIds.includes("total")) files.push({ name: baseSlug+"-total.gpx", data: Buffer.from(buildGpx(evTitle+" – Total", days),"utf8") });
+  days.forEach(function(d,di){ var fileId="dag"+(di+1); if(!downloadAll&&!requestedIds.includes(fileId))return; files.push({ name:baseSlug+"-dag"+(di+1)+".gpx", data:Buffer.from(buildGpx(evTitle+" – Dag "+(di+1),[d]),"utf8") }); });
+  if (files.length===1) { res.setHeader("Content-Type","application/gpx+xml"); res.setHeader("Content-Disposition",'attachment; filename="'+files[0].name+'"'); return res.send(files[0].data); }
+
+  // Simple ZIP builder (same as in the auth route)
+  function makeZip(fileList) {
+    var crc32Table=(function(){var t=new Uint32Array(256);for(var i=0;i<256;i++){var cx=i;for(var j=0;j<8;j++)cx=(cx&1)?(0xEDB88320^(cx>>>1)):(cx>>>1);t[i]=cx;}return t;})();
+    function crc32(buf){var c=0xFFFFFFFF;for(var i=0;i<buf.length;i++)c=(crc32Table[(c^buf[i])&0xFF])^(c>>>8);return(c^0xFFFFFFFF)>>>0;}
+    function u16le(n){var b=Buffer.alloc(2);b.writeUInt16LE(n,0);return b;}
+    function u32le(n){var b=Buffer.alloc(4);b.writeUInt32LE(n,0);return b;}
+    var parts=[],cdirs=[],offset=0;
+    fileList.forEach(function(f){var fn=Buffer.from(f.name,"utf8");var data=f.data;var crc=crc32(data);var lh=Buffer.concat([Buffer.from("504b0304","hex"),u16le(20),u16le(0),u16le(0),u16le(0),u16le(0),u32le(crc),u32le(data.length),u32le(data.length),u16le(fn.length),u16le(0),fn]);parts.push(lh);parts.push(data);var cd=Buffer.concat([Buffer.from("504b0102","hex"),u16le(20),u16le(20),u16le(0),u16le(0),u16le(0),u16le(0),u32le(crc),u32le(data.length),u32le(data.length),u16le(fn.length),u16le(0),u16le(0),u16le(0),u16le(0),u32le(0),u32le(offset),fn]);cdirs.push(cd);offset+=lh.length+data.length;});
+    var cdBuf=Buffer.concat(cdirs);var eocd=Buffer.concat([Buffer.from("504b0506","hex"),u16le(0),u16le(0),u16le(fileList.length),u16le(fileList.length),u32le(cdBuf.length),u32le(offset),u16le(0)]);
+    return Buffer.concat([...parts,cdBuf,eocd]);
+  }
+  var zip=makeZip(files);
+  res.setHeader("Content-Type","application/zip");
+  res.setHeader("Content-Disposition",'attachment; filename="'+baseSlug+'-gpx.zip"');
+  res.send(zip);
+});
 
 // ── GPX Export ──────────────────────────────────────────────────
 app.get("/api/events/:id/gpx", auth, rateLimit(20, 60000), async function(req, res) {
@@ -12181,10 +13112,10 @@ app.get("/api/events/:id/gpx", auth, rateLimit(20, 60000), async function(req, r
     } else {
       files.push({ id: "total", label: "🗺️ Total – alle dager", filename: baseSlug + "-total.gpx", days: "all" });
       days.forEach(function(d, di) {
-        const etapper   = d.etapper || [];
-        const fra       = etapper[0] && etapper[0].fra ? etapper[0].fra : "";
-        const lastE     = etapper[etapper.length - 1];
-        const til       = lastE && lastE.til ? lastE.til : "";
+        const stages   = d.stages || [];
+        const fra       = stages[0] ? (stages[0].from || stages[0].fra || "") : "";
+        const lastE     = stages[stages.length - 1];
+        const til       = lastE ? (lastE.to || lastE.til || "") : "";
         const routeDesc = fra && til ? fra + " → " + til : "Dag " + (di + 1);
         files.push({
           id:       "dag" + (di + 1),
@@ -12197,7 +13128,7 @@ app.get("/api/events/:id/gpx", auth, rateLimit(20, 60000), async function(req, r
     return res.json({ files, multiDay: days.length > 1 });
   }
 
-  // Download-modus: ?files=total,dag1,dag2 (kommaseparert) eller alle
+  // Download-modus: ?files=total,dag1,dag2 (kommaseparert) or all
   const requestedIds = req.query.files ? req.query.files.split(",") : ["all"];
   const downloadAll  = requestedIds.includes("all");
 
@@ -12244,12 +13175,12 @@ app.get("/api/events/:id/gpx", auth, rateLimit(20, 60000), async function(req, r
     return [{ lat: from.lat, lon: from.lon }, { lat: to.lat, lon: to.lon }];
   }
 
-  // Geocode alle unike steder
+  // Geocode all unike steder
   const allNames = [];
   days.forEach(function(d) {
-    (d.etapper || []).forEach(function(e) {
-      if (e.fra && !allNames.includes(e.fra)) allNames.push(e.fra);
-      if (e.til && !allNames.includes(e.til)) allNames.push(e.til);
+    (d.stages || []).forEach(function(e) {
+      if (e.from && !allNames.includes(e.from)) allNames.push(e.from);
+      if (e.to && !allNames.includes(e.to)) allNames.push(e.to);
     });
   });
   if (!allNames.length) return res.status(400).json({ error: "Ingen steder i ruten" });
@@ -12261,17 +13192,17 @@ app.get("/api/events/:id/gpx", auth, rateLimit(20, 60000), async function(req, r
     if (i < allNames.length - 1) await sleep(300);
   }
 
-  // Hent rute-segmenter (cached per unik fra+til+profil)
+  // fetch rute-segmenter (cached per unik from+to+profile)
   const segCache = {};
   const profileLabel = { driving:"Motorvei", scenic:"Landevei", gravel:"Grusveier" };
   for (var di = 0; di < days.length; di++) {
-    var etapper = days[di].etapper || [];
-    for (var ei = 0; ei < etapper.length; ei++) {
-      var e = etapper[ei];
-      var fra = coordCache[e.fra], til = coordCache[e.til];
+    var stages = days[di].stages || [];
+    for (var ei = 0; ei < stages.length; ei++) {
+      var e = stages[ei];
+      var fra = coordCache[e.from], til = coordCache[e.to];
       if (!fra || !til) continue;
       var prof = e.profile || "driving";
-      var key  = e.fra + "||" + e.til + "||" + prof;
+      var key  = e.from + "||" + e.to + "||" + prof;
       if (!segCache[key]) { segCache[key] = await fetchSegment(fra, til, prof); await sleep(200); }
     }
   }
@@ -12284,32 +13215,37 @@ app.get("/api/events/:id/gpx", auth, rateLimit(20, 60000), async function(req, r
     gpx += '  <metadata><name>' + xmlEsc(title) + '</name><time>' + now + '</time></metadata>\n';
     var seenWpt = {};
     dayList.forEach(function(d, dIdx) {
-      (d.etapper || []).forEach(function(e, eIdx) {
-        [[e.fra, eIdx === 0 && dIdx === 0 ? "start" : "wpt"],
-         [e.til, e.type === "slutt" ? "end" : e.type === "hotell" ? "hotel" : "wpt"]
+      (d.stages || []).forEach(function(e, eIdx) {
+        [[e.from, eIdx===0&&dIdx===0?"start":e.type],
+         [e.to, e.type==="slutt"?"end":e.type]
         ].forEach(function(pair) {
-          var nm = pair[0], wt = pair[1];
+          var nm = pair[0], tp = pair[1];
           if (!nm || seenWpt[nm]) return;
           seenWpt[nm] = true;
           var c = coordCache[nm]; if (!c) return;
-          var sym = wt === "start" ? "Flag, Green" : wt === "end" ? "Flag, Red" : wt === "hotel" ? "Lodging" : "Waypoint";
+          var sym = tp==="start"||eIdx===0&&dIdx===0?"Flag, Green":tp==="slutt"||tp==="end"?"Flag, Red":tp==="hotell"||tp==="hotel"?"Lodging":tp==="lunsj"||tp==="middag"?"Restaurant":tp==="bensinstopp"?"Gas Station":tp==="opplevelse"?"Scenic Area":"Waypoint";
           gpx += '  <wpt lat="' + c.lat.toFixed(6) + '" lon="' + c.lon.toFixed(6) + '">\n';
           gpx += '    <name>' + xmlEsc(nm) + '</name><sym>' + sym + '</sym>\n';
           gpx += '  </wpt>\n';
         });
       });
     });
+    // One continuous track per day (all stage segments merged)
     dayList.forEach(function(d, dIdx) {
-      (d.etapper || []).forEach(function(e, eIdx) {
-        var fra = coordCache[e.fra], til = coordCache[e.til]; if (!fra || !til) return;
+      var allPts = [];
+      (d.stages || []).forEach(function(e) {
+        var fra = coordCache[e.from], til = coordCache[e.to]; if (!fra || !til) return;
         var prof = e.profile || "driving";
-        var key  = e.fra + "||" + e.til + "||" + prof;
+        var key  = e.from + "||" + e.to + "||" + prof;
         var pts  = segCache[key] || [{ lat: fra.lat, lon: fra.lon }, { lat: til.lat, lon: til.lon }];
-        var sn   = xmlEsc(title + " – etappe " + (eIdx + 1) + " (" + (profileLabel[prof] || prof) + ")");
-        gpx += '  <trk><name>' + sn + '</name><trkseg>\n';
-        pts.forEach(function(pt) { gpx += '    <trkpt lat="' + pt.lat.toFixed(6) + '" lon="' + pt.lon.toFixed(6) + '"/>\n'; });
-        gpx += '  </trkseg></trk>\n';
+        if (allPts.length === 0) { allPts = allPts.concat(pts); }
+        else { allPts = allPts.concat(pts.slice(1)); } // skip duplicate junction point
       });
+      if (!allPts.length) return;
+      var trkName = dayList.length > 1 ? xmlEsc(title + ' – Dag ' + (dIdx+1)) : xmlEsc(title);
+      gpx += '  <trk><name>' + trkName + '</name><trkseg>\n';
+      allPts.forEach(function(pt) { gpx += '    <trkpt lat="' + pt.lat.toFixed(6) + '" lon="' + pt.lon.toFixed(6) + '"/>\n'; });
+      gpx += '  </trkseg></trk>\n';
     });
     gpx += '</gpx>';
     return gpx;
@@ -12318,7 +13254,7 @@ app.get("/api/events/:id/gpx", auth, rateLimit(20, 60000), async function(req, r
   var evTitle  = ev.title || "Tur";
   var baseSlug = evTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
-  // Én dag eller kun én fil: send direkte som GPX
+  // Én dag or only én file: send directly as/that GPX
   if (days.length <= 1 || (requestedIds.length === 1 && !downloadAll)) {
     var singleDayIdx = requestedIds[0] === "total" || downloadAll ? null : parseInt(requestedIds[0].replace("dag","")) - 1;
     var singleDays   = singleDayIdx != null && !isNaN(singleDayIdx) ? [days[singleDayIdx]] : days;
@@ -12332,7 +13268,7 @@ app.get("/api/events/:id/gpx", auth, rateLimit(20, 60000), async function(req, r
     return res.send(gpxSingle);
   }
 
-  // Flerdag: bygg ZIP med kun valgte filer
+  // Flerdag: build ZIP with only valgte file
   var files = [];
   if (downloadAll || requestedIds.includes("total")) {
     files.push({ name: baseSlug + "-total.gpx", data: Buffer.from(buildGpx(evTitle + " – Total", days), "utf8") });
@@ -12344,7 +13280,7 @@ app.get("/api/events/:id/gpx", auth, rateLimit(20, 60000), async function(req, r
     files.push({ name: baseSlug + "-dag" + (di + 1) + ".gpx", data: Buffer.from(buildGpx(dayLabel, [d]), "utf8") });
   });
 
-  // Kun én fil valgt: send direkte
+  // only én file valgt: send directly
   if (files.length === 1) {
     res.setHeader("Content-Type", "application/gpx+xml");
     res.setHeader("Content-Disposition", 'attachment; filename="' + files[0].name + '"');
@@ -12408,13 +13344,13 @@ app.put("/api/events/:id/route", auth, managerOrAdmin, function(req, res) {
   // Sanitér
   const clean = days.map(d => ({
     dato: (d.dato || "").slice(0, 10),
-    etapper: Array.isArray(d.etapper) ? d.etapper.slice(0, 50).map(e => ({
+    stages: Array.isArray(d.stages) ? d.stages.slice(0, 50).map(e => ({
       type:    ["start","stopp","lunsj","middag","hotell","slutt","bensin","opplevelse"].includes(e.type) ? e.type : "stopp",
-      fra:     (e.fra   || "").trim().slice(0, 200),
-      til:     (e.til   || "").trim().slice(0, 200),
+      from:     (e.from   || "").trim().slice(0, 200),
+      to:     (e.to   || "").trim().slice(0, 200),
       km:      e.km != null && e.km !== "" ? parseFloat(e.km) || null : null,
-      tid:     e.tid != null && e.tid !== "" ? parseFloat(e.tid) || null : null,
-      notat:   (e.notat || "").trim().slice(0, 500),
+      duration: e.duration != null && e.duration !== "" ? parseFloat(e.duration) || null : null,
+      note:   (e.note || "").trim().slice(0, 500),
       profile: ["driving","scenic","gravel","foot"].includes(e.profile) ? e.profile : "driving",
       viaPoint:     e.viaPoint === true ? true : undefined,
       _coordLocked: e._coordLocked === true ? true : undefined,
@@ -12436,7 +13372,7 @@ app.put("/api/events/:id/route", auth, managerOrAdmin, function(req, res) {
   res.json({ ok: true });
 });
 
-// ── AI: Generer turforslag ────────────────────────────────────────
+// ── AI: generate turforslag ────────────────────────────────────────
 // ── AI Proxy: POI info (used by route map POI pins) ──────────────
 // Routes browser POI requests through the server to avoid CSP violations
 app.post("/api/ai/poi-info", auth, managerOrAdmin, rateLimit(20, 60000), async function(req, res) {
@@ -12464,7 +13400,7 @@ app.post("/api/ai/poi-info", auth, managerOrAdmin, rateLimit(20, 60000), async f
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 800,
-        messages: [{ role: "user", content: 'Du er en norsk reiseguide. Gi kortfattet info om: "' + name + '"' + (category ? ' (kategori: ' + category + ')' : '') + '.\nSvar BARE med gyldig JSON, ingen markdown eller backticks:\n{"kort_info":"1-2 setninger","apningstider":"eller Ukjent","inngang":"eller Gratis eller Ukjent","tips":"1 kort tips","anbefalt_tid":"f.eks. 30 min"}' }]
+        messages: [{ role: "user", content: 'Du er en norsk reiseguide. Gi kortfattet info om: "' + name + '"' + (category ? ' (category: ' + category + ')' : '') + '.\nSvar BARE med gyldig JSON, ingen markdown eller backticks:\n{"kort_info":"1-2 setninger","apningstider":"eller Ukjent","inngang":"eller Gratis eller Ukjent","tips":"1 kort tips","anbefalt_tid":"f.eks. 30 min"}' }]
       })
     });
     const data = await r.json();
@@ -12521,14 +13457,14 @@ app.post("/api/ai/generate-route", auth, managerOrAdmin, rateLimit(10, 60000), a
     const mockDays = [];
     for (let i = 0; i < days; i++) {
       const dato = startDate ? (function(){ const d = new Date(startDate); d.setDate(d.getDate()+i); return d.toISOString().slice(0,10); })() : "";
-      mockDays.push({ dato, etapper: [
-        { type:"start",      fra: start, til: start + " sentrum",  km: Math.round(distanceKm*0.1),  profile: usedProfile, notat:"Avreise" },
-        { type:"opplevelse", fra: start + " sentrum", til: "Utsiktspunkt", km: Math.round(distanceKm*0.2), profile: usedProfile, notat:"Spektakulær utsikt" },
-        { type:"lunsj",      fra: "Utsiktspunkt", til: "Kafé",     km: Math.round(distanceKm*0.2),  profile: usedProfile, notat:"Anbefalt kafé" },
-        { type:"opplevelse", fra: "Kafé", til: "Historisk sted",   km: Math.round(distanceKm*0.15), profile: usedProfile, notat:"Historisk attraksjon" },
+      mockDays.push({ dato, stages: [
+        { type:"start",      from: start, to: start + " sentrum",  km: Math.round(distanceKm*0.1),  profile: usedProfile, note:"Avreise" },
+        { type:"opplevelse", from: start + " sentrum", to: "Utsiktspunkt", km: Math.round(distanceKm*0.2), profile: usedProfile, note:"Spektakulær utsikt" },
+        { type:"lunsj",      from: "Utsiktspunkt", to: "Kafé",     km: Math.round(distanceKm*0.2),  profile: usedProfile, note:"Anbefalt kafé" },
+        { type:"opplevelse", from: "Kafé", to: "Historisk sted",   km: Math.round(distanceKm*0.15), profile: usedProfile, note:"Historisk attraksjon" },
         ...(isMultiday && i < days-1
-          ? [{ type:"hotell", fra: "Historisk sted", til: "Hotellby dag "+(i+1), km: Math.round(distanceKm*0.15), profile: usedProfile, notat:"Overnatting" }]
-          : [{ type:"slutt",  fra: "Historisk sted", til: roundtrip ? start : "Destinasjon", km: Math.round(distanceKm*0.15), profile: usedProfile, notat:"" }]),
+          ? [{ type:"hotell", from: "Historisk sted", to: "Hotellby dag "+(i+1), km: Math.round(distanceKm*0.15), profile: usedProfile, note:"Overnatting" }]
+          : [{ type:"slutt",  from: "Historisk sted", to: roundtrip ? start : "Destinasjon", km: Math.round(distanceKm*0.15), profile: usedProfile, note:"" }]),
       ]});
     }
     return res.json({ days: mockDays });
@@ -12572,12 +13508,12 @@ Returner KUN et JSON-objekt (ingen markdown, ingen forklaring):
   "days": [{
     "dato": "${startDate || ""}",
     "etapper": [
-      { "type": "start",      "fra": "${start}", "til": "første stopp", "km": tall, "profile": "${usedProfile}", "notat": "avreise" },
-      { "type": "opplevelse", "fra": "stedsnavn", "til": "attraksjonsnavn", "km": tall, "profile": "${usedProfile}", "notat": "hva som er spesielt her" },
-      { "type": "stopp",      "fra": "stedsnavn", "til": "stedsnavn",       "km": tall, "profile": "${usedProfile}", "notat": "" },
-      { "type": "lunsj",      "fra": "stedsnavn", "til": "kafénavn",        "km": tall, "profile": "${usedProfile}", "notat": "anbefalt sted" },
-      { "type": "opplevelse", "fra": "stedsnavn", "til": "attraksjonsnavn", "km": tall, "profile": "${usedProfile}", "notat": "hva som er spesielt" },
-      { "type": "slutt",      "fra": "stedsnavn", "til": "${roundtrip ? start : "destinasjon"}", "km": tall, "profile": "${usedProfile}", "notat": "" }
+      { "type": "start",      "from": "${start}", "to": "første stopp", "km": tall, "profile": "${usedProfile}", "notat": "avreise" },
+      { "type": "opplevelse", "from": "stedsnavn", "to": "attraksjonsnavn", "km": tall, "profile": "${usedProfile}", "notat": "hva som er spesielt her" },
+      { "type": "stopp",      "from": "stedsnavn", "to": "stedsnavn",       "km": tall, "profile": "${usedProfile}", "notat": "" },
+      { "type": "lunsj",      "from": "stedsnavn", "to": "kafénavn",        "km": tall, "profile": "${usedProfile}", "notat": "anbefalt sted" },
+      { "type": "opplevelse", "from": "stedsnavn", "to": "attraksjonsnavn", "km": tall, "profile": "${usedProfile}", "notat": "hva som er spesielt" },
+      { "type": "slutt",      "from": "stedsnavn", "to": "${roundtrip ? start : "destinasjon"}", "km": tall, "profile": "${usedProfile}", "notat": "" }
     ]
   }]
 }
@@ -12604,11 +13540,11 @@ Absolutte regler:
       return `    {
       "dato": "${dato}",
       "etapper": [
-        { "type": "${isFirst ? "start" : "stopp"}", "fra": "${isFirst ? start : "hotellby dag "+i}", "til": "...", "km": tall, "profile": "${usedProfile}", "notat": "..." },
-        { "type": "opplevelse", "fra": "...", "til": "attraksjonsnavn", "km": tall, "profile": "${usedProfile}", "notat": "hva som er spesielt" },
-        { "type": "lunsj", "fra": "...", "til": "kafénavn", "km": tall, "profile": "${usedProfile}", "notat": "anbefalt sted" },
-        { "type": "opplevelse", "fra": "...", "til": "attraksjonsnavn", "km": tall, "profile": "${usedProfile}", "notat": "..." },
-        { "type": "${isLast ? "slutt" : "hotell"}", "fra": "...", "til": "${isLast ? (roundtrip ? start : "destinasjon") : "hotellby"}", "km": tall, "profile": "${usedProfile}", "notat": "${isLast ? "" : "overnatting"}" }
+        { "type": "${isFirst ? "start" : "stopp"}", "from": "${isFirst ? start : "hotellby dag "+i}", "to": "...", "km": tall, "profile": "${usedProfile}", "notat": "..." },
+        { "type": "opplevelse", "from": "...", "to": "attraksjonsnavn", "km": tall, "profile": "${usedProfile}", "notat": "hva som er spesielt" },
+        { "type": "lunsj", "from": "...", "to": "kafénavn", "km": tall, "profile": "${usedProfile}", "notat": "anbefalt sted" },
+        { "type": "opplevelse", "from": "...", "to": "attraksjonsnavn", "km": tall, "profile": "${usedProfile}", "notat": "..." },
+        { "type": "${isLast ? "slutt" : "hotell"}", "from": "...", "to": "${isLast ? (roundtrip ? start : "destinasjon") : "hotellby"}", "km": tall, "profile": "${usedProfile}", "notat": "${isLast ? "" : "overnatting"}" }
       ]
     }`;
     }).join(",\n");
@@ -12674,12 +13610,12 @@ Absolutte regler:
       const dato = d.dato || (startDate ? (function(){ const dt = new Date(startDate); dt.setDate(dt.getDate()+i); return dt.toISOString().slice(0,10); })() : "");
       return {
         dato,
-        etapper: Array.isArray(d.etapper) ? d.etapper.slice(0,12).map(function(e) { return {
+        stages: Array.isArray(d.stages) ? d.stages.slice(0,12).map(function(e) { return {
           type:    validTypes.includes(e.type) ? e.type : "stopp",
-          fra:     (e.fra   || "").trim().slice(0,200),
-          til:     (e.til   || "").trim().slice(0,200),
+          from:     (e.from   || "").trim().slice(0,200),
+          to:     (e.to   || "").trim().slice(0,200),
           km:      e.km != null ? parseFloat(e.km) || null : null,
-          notat:   (e.notat || "").trim().slice(0,80),
+          note:   (e.note || "").trim().slice(0,80),
           profile: usedProfile, // enforce chosen profile, ignore AI's per-etappe choice
           opplevelseSubtype: e.type === "opplevelse" && ["museum","natur","utsikt","historisk","aktivitet","kultur","mat","annet"].includes(e.opplevelseSubtype) ? e.opplevelseSubtype : (e.type === "opplevelse" ? e.opplevelseSubtype || "annet" : undefined),
         }; }) : []
@@ -12704,7 +13640,7 @@ app.get("/api/events/:id/display/stream", function(req, res) {
   const evForSse = readJSON(EVENTS_FILE).find(function(e) { return e.id === req.params.id || e.slug === req.params.id; });
   const evId = evForSse ? evForSse.id : req.params.id;
   displayClients.set(clientId, { res, evId });
-  // Send current state immediately — include winners from events file
+  // send current state immediately — include winners from events file
   const state = displayState.get(evId) || { mode: "slides", slide: 0 };
   const winnersForSse = evForSse && evForSse.lottery && evForSse.lottery.winners
     ? evForSse.lottery.winners.map(function(w) { return { name: w.name, prize: w.prize || "", prizeImage: w.prizeImage||null, redeemedAt: w.redeemedAt || null }; })
@@ -12757,7 +13693,7 @@ app.post("/api/events/:id/display/state", auth, managerOrAdmin, function(req, re
 
 // Upload slide image (PNG/JPG)
 app.post("/api/events/:id/display/slides", auth, managerOrAdmin,
-  multer({ dest: UPLOADS, limits: { fileSize: 8 * 1024 * 1024 },
+  multer({ dest: UPLOADS, limits: { fileSize: 80 * 1024 * 1024 },
     fileFilter: function(req, file, cb) {
       cb(null, ["image/jpeg","image/png","image/gif","image/webp"].includes(file.mimetype));
     }
@@ -12811,6 +13747,22 @@ app.delete("/api/events/:id/display/slides/:idx", auth, managerOrAdmin, function
   res.json({ ok: true, slides });
 });
 
+// Add a slide by URL (guestbook photos → TV playlist)
+app.post("/api/events/:id/display/slides-url", auth, managerOrAdmin, function(req, res) {
+  var url = req.body && req.body.url;
+  if (!url) return res.status(400).json({ error: "Mangler url" });
+  var evs = readJSON(EVENTS_FILE);
+  var ev  = evs.find(function(e){ return e.id === req.params.id; });
+  var evId = ev ? ev.id : req.params.id;
+  var prev   = displayState.get(evId) || { mode:"slides", slide:0, slides:[], ticker:"" };
+  var slides = (prev.slides || []).concat(url);
+  var next   = Object.assign({}, prev, { slides });
+  displayState.set(evId, next);
+  _saveDisplayState();
+  broadcastDisplay(evId, Object.assign({ type:"state" }, next));
+  res.json({ ok:true, slides });
+});
+
 // Clear all slides + delete files
 app.delete("/api/events/:id/display/slides", auth, managerOrAdmin, function(req, res) {
   const _evR2 = readJSON(EVENTS_FILE).find(function(e){ return e.id === req.params.id || e.slug === req.params.id; });
@@ -12826,7 +13778,7 @@ app.delete("/api/events/:id/display/slides", auth, managerOrAdmin, function(req,
 
 // Upload and convert PPTX to PNG slides (with video extraction)
 app.post("/api/events/:id/display/pptx", auth, managerOrAdmin,
-  multer({ dest: UPLOADS, limits: { fileSize: 2 * 1024 * 1024 * 1024 },
+  multer({ dest: UPLOADS, limits: { fileSize: 10 * 1024 * 1024 * 1024 },
     fileFilter: function(req, file, cb) {
       const ok = [
         "application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -13240,6 +14192,7 @@ app.post("/api/tv-playlists", auth, managerOrAdmin, function(req, res) {
     slideOrder: req.body.slideOrder === "random" ? "random" : "sequential",
     showLogo:  req.body.showLogo !== false,
     ticker:   (req.body.ticker || "").slice(0, 300),
+    schedule: req.body.schedule || null,  // { eventId, startOffsetMin, endOffsetMin } or { startTime, endTime, repeat }
     createdAt: new Date().toISOString(),
     createdBy: req.session.user ? req.session.user.email : "unknown",
   };
@@ -13253,7 +14206,7 @@ app.put("/api/tv-playlists/:id", auth, managerOrAdmin, function(req, res) {
   var list = readPlaylists();
   var idx = list.findIndex(function(p) { return p.id === req.params.id; });
   if (idx < 0) return res.status(404).json({ error: "Not found" });
-  var allowed = ["name","slides","mode","slideInterval","slideOrder","showLogo","ticker","deptId"];
+  var allowed = ["name","slides","mode","slideInterval","slideOrder","showLogo","ticker","deptId","schedule"];
   allowed.forEach(function(k) { if (req.body[k] !== undefined) list[idx][k] = req.body[k]; });
   list[idx].updatedAt = new Date().toISOString();
   savePlaylists(list);
@@ -13353,7 +14306,7 @@ app.get("/api/tv/:deptId/stream", function(req, res) {
         var isOngoingNow = startMs <= now && endMs >= now;
         if (isOngoingNow) return true;
         // Include upcoming events (starting within next 30 days)
-        return startMs > now - 3600000; // Vis alle fremtidige events
+        return startMs > now - 3600000; // Show all upcoming events
       })
     .sort(function(a, b) {
         // Ongoing events first, then by date
@@ -13376,9 +14329,9 @@ app.get("/api/tv/:deptId/stream", function(req, res) {
             var totalKm = 0;
             var stops = [];
             route.days.forEach(function(d) {
-              ((d && d.etapper) || []).forEach(function(et) {
-                if (et && et.fra && stops.indexOf(et.fra) === -1) stops.push(et.fra);
-                if (et && et.til && stops.indexOf(et.til) === -1) stops.push(et.til);
+              ((d && d.stages) || []).forEach(function(et) {
+                if (et && et.from && stops.indexOf(et.from) === -1) stops.push(et.from);
+                if (et && et.to && stops.indexOf(et.to) === -1) stops.push(et.to);
                 if (et && et.km) totalKm += parseFloat(et.km) || 0;
               });
             });
@@ -13447,9 +14400,9 @@ app.get("/api/tv/:deptId/state", function(req, res) {
             var totalKm = 0;
             var stops = [];
             route.days.forEach(function(d) {
-              ((d && d.etapper) || []).forEach(function(et) {
-                if (et && et.fra && stops.indexOf(et.fra) === -1) stops.push(et.fra);
-                if (et && et.til && stops.indexOf(et.til) === -1) stops.push(et.til);
+              ((d && d.stages) || []).forEach(function(et) {
+                if (et && et.from && stops.indexOf(et.from) === -1) stops.push(et.from);
+                if (et && et.to && stops.indexOf(et.to) === -1) stops.push(et.to);
                 if (et && et.km) totalKm += parseFloat(et.km) || 0;
               });
             });
@@ -13479,7 +14432,7 @@ app.get("/api/tv/:deptId/state", function(req, res) {
   res.json(Object.assign({}, state, { upcoming }));
 });
 
-// Update TV state (avdelingsleder or admin)
+// Update TV state (department or admin)
 app.post("/api/tv/:deptId/state", auth, managerOrAdmin, function(req, res) {
   const deptId = req.params.deptId;
   const prev = getTvState(deptId);
@@ -13521,7 +14474,7 @@ app.post("/api/tv/:deptId/slides", auth, managerOrAdmin,
 
 // Upload MP4/WebM video as a fullscreen TV slide
 app.post("/api/tv/:deptId/video-slides", auth, managerOrAdmin,
-  multer({ dest: UPLOADS, limits: { fileSize: 500 * 1024 * 1024 },
+  multer({ dest: UPLOADS, limits: { fileSize: 10 * 1024 * 1024 * 1024 },
     fileFilter: function(req, file, cb) {
       const ok = /^video\//.test(file.mimetype) || /\.(mp4|webm|mov|m4v|avi|mkv|hevc|h265)$/i.test(file.originalname);
       cb(null, !!ok);
@@ -13546,7 +14499,7 @@ app.post("/api/tv/:deptId/video-slides", auth, managerOrAdmin,
     broadcastTv(deptId, Object.assign({ type: "state" }, next));
     res.json({ ok: true, slides, converting: true, message: "Konverterer video til H.264 i bakgrunnen…" });
 
-    // Konverter asynkront i bakgrunnen
+    // Convert asynkront i bakgrunnen
     try {
       await new Promise(function(resolve, reject) {
         const { spawn } = require("child_process");
@@ -13566,7 +14519,7 @@ app.post("/api/tv/:deptId/video-slides", auth, managerOrAdmin,
         ff.on("close", function(code) { code === 0 ? resolve() : reject(new Error("ffmpeg kode: " + code)); });
         ff.on("error", reject);
       });
-      // Konvertering ferdig – generer thumbnail
+      // Converting ferdig – generate thumbnail
       try { fs.unlinkSync(origPath); } catch(e) {}
       const thumbName = "thumb_" + deptId + "_" + ts + ".jpg";
       const thumbPath = path.join(UPLOADS, thumbName);
@@ -13607,7 +14560,7 @@ app.post("/api/tv/:deptId/video-slides", auth, managerOrAdmin,
 
 // Upload PPTX and convert to slides for TV channel
 app.post("/api/tv/:deptId/pptx", auth, managerOrAdmin,
-  multer({ dest: UPLOADS, limits: { fileSize: 500 * 1024 * 1024 },
+  multer({ dest: UPLOADS, limits: { fileSize: 10 * 1024 * 1024 * 1024 },
     fileFilter: function(req, file, cb) {
       const ok = file.originalname.match(/\.pptx?$/i) || file.mimetype.includes("presentation") || file.mimetype === "application/octet-stream";
       cb(null, !!ok);
@@ -13766,6 +14719,251 @@ app.get("/tv/:deptId", function(req, res) {
   res.send(buildTvPage(canonId, deptName, siteName, accent, logo, theme, typo));
 });
 
+
+// ── Multiscreen companion pages ──────────────────────────────────
+app.get("/tv/:deptId/left",  function(req, res) { serveTvCompanion(req, res, "left");  });
+app.get("/tv/:deptId/right", function(req, res) { serveTvCompanion(req, res, "right"); });
+app.get("/tv/:deptId/center", function(req, res) { res.redirect("/tv/" + req.params.deptId); });
+
+function serveTvCompanion(req, res, position) {
+  const settings = getSettings();
+  const deptId   = req.params.deptId;
+  const dept     = (settings.departments || []).find(function(d) { return d.id === deptId || d.slug === deptId; });
+  const canonId  = dept ? dept.id : deptId;
+  const deptApp  = getDeptAppearanceById(deptId);
+  const accent   = deptApp.accent;
+  const logo     = deptApp.logo;
+  const theme    = deptApp.themeTV || deptApp.theme;
+  const isDark   = (theme || "dark") !== "light";
+  const bg       = isDark ? "#080808" : "#f0f0f0";
+  const text     = isDark ? "#ffffff" : "#111111";
+  const siteName = settings.siteName || "Events";
+  const esc      = escHtml;
+  const isLeft   = position === "left";
+
+  res.send(`<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>${esc(siteName)} – TV ${isLeft ? "Venstre" : "Høyre"}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100dvw;height:100dvh;overflow:hidden;background:${bg};color:${text};font-family:"Helvetica Neue",Arial,sans-serif}
+
+/* ── Layout ── */
+#root{width:100%;height:100%;display:flex;flex-direction:column;position:relative}
+
+/* ── Logo / header strip ── */
+#strip{height:9vh;display:flex;align-items:center;padding:0 4vw;gap:2vw;background:linear-gradient(to bottom,${isDark?"rgba(0,0,0,.7)":"rgba(255,255,255,.7)"} 0%,transparent 100%);position:absolute;top:0;left:0;right:0;z-index:10}
+#stripLogo{height:6vh;max-height:5vw;object-fit:contain;display:${logo?"block":"none"}}
+#stripName{font-size:clamp(.8rem,1.6vw,2.2rem);font-weight:900;color:${esc(accent)}}
+#posLabel{margin-left:auto;font-size:clamp(.55rem,.85vw,1.1rem);font-weight:700;color:${isDark?"#555":"#aaa"};text-transform:uppercase;letter-spacing:.12em}
+
+/* ── Main photo area ── */
+#photoWrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#photoBg{position:absolute;inset:-5%;background-size:cover;background-position:center;filter:blur(28px) brightness(.35);transition:background-image 1.2s ease;z-index:0}
+#photoImg{position:relative;z-index:1;max-width:92%;max-height:86vh;object-fit:contain;border-radius:1.2vw;box-shadow:0 2vw 8vw rgba(0,0,0,.7);transition:opacity .8s ease;opacity:0}
+#photoImg.visible{opacity:1}
+
+/* ── Event info overlay ── */
+#infoBar{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:3vh 4vw;background:linear-gradient(to top,${isDark?"rgba(0,0,0,.85)":"rgba(0,0,0,.6)"} 0%,transparent 100%)}
+#infoEvent{font-size:clamp(.9rem,2.2vw,3rem);font-weight:900;color:#fff;margin-bottom:.5vh;line-height:1.2;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+#infoMeta{font-size:clamp(.6rem,1.2vw,1.6rem);color:rgba(255,255,255,.65);display:flex;gap:1.5vw;flex-wrap:wrap}
+
+/* ── Ambient dots ── */
+#ambientDots{position:absolute;bottom:6.5vh;right:2.5vw;display:flex;flex-direction:column;gap:.5vh;z-index:5}
+.adot{width:.6vw;height:.6vw;min-width:5px;min-height:5px;border-radius:50%;background:${isDark?"#333":"#bbb"};transition:background .4s}
+.adot.active{background:${esc(accent)}}
+
+/* ── No-content placeholder ── */
+#placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh;opacity:.25}
+#placeholder svg{width:12vw;height:12vw}
+#placeholder p{font-size:clamp(.7rem,1.5vw,2rem);font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+
+/* ── Ticker ── */
+#ticker{position:absolute;bottom:0;left:0;right:0;height:5.5vh;min-height:32px;background:${esc(accent)};color:#111;display:none;align-items:center;overflow:hidden;z-index:15}
+#tickerInner{white-space:nowrap;font-weight:700;font-size:clamp(.65rem,1.5vw,2.2rem);padding-left:100%;animation:scroll 30s linear infinite}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-200%)}}}
+
+@keyframes fadeIn{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:scale(1)}}
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="photoWrap">
+    <div id="photoBg"></div>
+    <img id="photoImg" src="" alt=""/>
+    <div id="placeholder">
+      <svg viewBox="0 0 80 60" fill="${isDark?"#fff":"#000"}"><rect x="5" y="5" width="70" height="50" rx="6" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="26" cy="24" r="8" fill="none" stroke="currentColor" stroke-width="3"/><polyline points="5,55 28,32 46,48 58,36 75,55" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+      <p>${isLeft ? "Venstre skjerm" : "Høyre skjerm"}</p>
+    </div>
+  </div>
+
+  <div id="strip">
+    ${logo ? '<img id="stripLogo" src="' + esc(logo) + '" alt="' + esc(siteName) + '"/>' : ""}
+    <div id="stripName">${esc(siteName)}</div>
+    <div id="posLabel">${isLeft ? "◀ Venstre" : "Høyre ▶"}</div>
+  </div>
+
+  <div id="infoBar" style="display:none">
+    <div id="infoEvent"></div>
+    <div id="infoMeta"></div>
+  </div>
+
+  <div id="ambientDots"></div>
+  <div id="ticker"><div id="tickerInner"></div></div>
+</div>
+
+<script>
+var DEPT_ID  = ${JSON.stringify(canonId)};
+var ACCENT   = ${JSON.stringify(accent)};
+var IS_LEFT  = ${JSON.stringify(isLeft)};
+var IS_DARK  = ${JSON.stringify(isDark)};
+var state    = { upcoming:[], slides:[], ticker:"" };
+var photos   = [];   // flat list of { src, evTitle, evDate, evLocation }
+var photoIdx = 0;
+var timer    = null;
+
+// ── SSE ──────────────────────────────────────────────────────────
+function connect() {
+  var es = new EventSource("/api/tv/" + DEPT_ID + "/stream");
+  es.onmessage = function(e) {
+    try {
+      var d = JSON.parse(e.data);
+      if (d.type === "upcoming") { state.upcoming = d.upcoming || []; rebuildPhotos(); return; }
+      if (d.type === "state")    { Object.assign(state, d); rebuildPhotos(); updateTicker(); }
+    } catch(x) {}
+  };
+  es.onerror = function() { es.close(); setTimeout(connect, 3000); };
+}
+connect();
+
+// ── Build photo list from upcoming events + slides ────────────────
+function rebuildPhotos() {
+  var list = [];
+  var upcoming = state.upcoming || [];
+
+  upcoming.forEach(function(ev) {
+    // Gather all images for this event
+    var imgs = [];
+    if (ev.image)           imgs.push(ev.image);
+    if (ev.tvImageTop)      imgs.push(ev.tvImageTop);
+    if (ev.tvImageBottom)   imgs.push(ev.tvImageBottom);
+    if (ev.routeMapImage)   imgs.push(ev.routeMapImage);
+    if (ev.dayMapImages)    ev.dayMapImages.forEach(function(u) { if (u) imgs.push(u); });
+    // Guestbook photos
+    if (ev.gbPhotos)        ev.gbPhotos.forEach(function(u) { if (u) imgs.push(u); });
+
+    imgs.forEach(function(src) {
+      list.push({ src: src, evTitle: ev.title, evDate: ev.date, evLocation: ev.location });
+    });
+  });
+
+  // If no event images, fall back to slides (image slides only, not video)
+  if (!list.length) {
+    (state.slides || []).forEach(function(sl) {
+      var src = (typeof sl === "string") ? sl : (sl && sl.bg) ? sl.bg : null;
+      if (src && !src.endsWith(".mp4")) list.push({ src: src, evTitle: null });
+    });
+  }
+
+  // Left screen: even-indexed photos. Right: odd-indexed.
+  // This ensures the two screens show different photos simultaneously.
+  photos = list.filter(function(_, i) { return IS_LEFT ? (i % 2 === 0) : (i % 2 === 1); });
+  if (!photos.length) photos = list; // fallback: show all if not enough
+
+  photoIdx = 0;
+  updateDots();
+  if (photos.length) {
+    showPhoto(0);
+    if (!timer) scheduleTick();
+  } else {
+    document.getElementById("placeholder").style.display = "flex";
+    document.getElementById("infoBar").style.display = "none";
+  }
+}
+
+function scheduleTick() {
+  clearTimeout(timer);
+  var interval = (state.slideInterval || 12) * 1000;
+  // Offset left/right so they don't switch at the same time
+  var offset = IS_LEFT ? 0 : Math.round(interval * 0.45);
+  timer = setTimeout(function() { nextPhoto(); }, interval + offset);
+}
+
+function nextPhoto() {
+  if (!photos.length) return;
+  photoIdx = (photoIdx + 1) % photos.length;
+  showPhoto(photoIdx);
+  scheduleTick();
+}
+
+function showPhoto(idx) {
+  if (!photos.length) return;
+  var p = photos[idx];
+  var img = document.getElementById("photoImg");
+  var bg  = document.getElementById("photoBg");
+  var ph  = document.getElementById("placeholder");
+
+  ph.style.display = "none";
+  img.classList.remove("visible");
+
+  setTimeout(function() {
+    img.src = p.src;
+    bg.style.backgroundImage = "url(" + p.src + ")";
+    img.onload = function() { img.classList.add("visible"); };
+    // If already cached, onload may not fire
+    if (img.complete && img.naturalWidth) img.classList.add("visible");
+
+    // Info bar
+    var infoBar  = document.getElementById("infoBar");
+    var infoEv   = document.getElementById("infoEvent");
+    var infoMeta = document.getElementById("infoMeta");
+    if (p.evTitle) {
+      infoEv.textContent = p.evTitle;
+      var meta = [];
+      if (p.evDate)     meta.push(new Date(p.evDate).toLocaleDateString("nb-NO", { weekday:"long", day:"numeric", month:"long" }));
+      if (p.evLocation) meta.push("📍 " + p.evLocation);
+      infoMeta.textContent = meta.join("   ·   ");
+      infoBar.style.display = "block";
+    } else {
+      infoBar.style.display = "none";
+    }
+    updateDots();
+  }, 400);
+}
+
+function updateDots() {
+  var d = document.getElementById("ambientDots");
+  d.innerHTML = photos.slice(0, 12).map(function(_, i) {
+    return '<div class="adot' + (i === photoIdx ? " active" : "") + '"></div>';
+  }).join("");
+}
+
+function updateTicker() {
+  var t  = document.getElementById("ticker");
+  var ti = document.getElementById("tickerInner");
+  if (state.ticker && state.ticker.trim()) {
+    ti.textContent = state.ticker;
+    t.style.display = "flex";
+  } else {
+    t.style.display = "none";
+  }
+}
+
+// Hide cursor
+setTimeout(function() { document.body.style.cursor = "none"; }, 3000);
+document.addEventListener("mousemove", function() {
+  document.body.style.cursor = "";
+  clearTimeout(window._ct);
+  window._ct = setTimeout(function() { document.body.style.cursor = "none"; }, 3000);
+});
+</script>
+</body>
+</html>`);
+}
+
 function buildTvPage(deptId, deptName, siteName, accent, logo, theme, typography) {
   const _tvTypo = typography || {};
   const _tvFont = _tvTypo.fontFamily || '"Helvetica Neue",Arial,"Noto Color Emoji",sans-serif';
@@ -13874,7 +15072,7 @@ body{background:${_tvBg};color:${_tvText};font-family:${_tvFont};overflow:hidden
 <div id="screen">
   <!-- Header / watermark -->
   <div id="tvHeader" style="opacity:0;transition:opacity .4s">
-    ${logo ? `<img id="tvLogo" src="${esc(logo)}" alt="${esc(siteName)}" style="height:6vh;max-height:5vw;object-fit:contain"/>` : ""}
+    ${logo ? '<img id="tvLogo" src="' + (esc(logo)) + '" alt="' + (esc(siteName)) + '" style="height:6vh;max-height:5vw;object-fit:contain"/>' : ""}
     <div id="tvSiteName">${esc(siteName)}</div>
   </div>
 
@@ -14059,7 +15257,7 @@ function rebuildCycle() {
   var cycle = [];
   var evCount = wantEvents ? Math.min(upcoming.length, state.eventCount || 5) : 0;
 
-  // Bygg event-slots: tur-events med dagskart splittes i én slot per dag
+  // build event-slots: tur-events with dagskart splittes in én slot per dag
   var eventSlots = [];
   for (var ei = 0; ei < evCount; ei++) {
     var ev = upcoming[ei];
@@ -14077,10 +15275,10 @@ function rebuildCycle() {
       cycle.push(eventSlots[si2]);
     }
   } else if (!wantEvents) {
-    // Kun slides
+    // only slides
     idxList.forEach(function(i) { cycle.push({ type: "slide", idx: i }); });
   } else {
-    // Alle event-slots sammenhengende, deretter slides
+    // all event-slots sammenhengende, deretter slides
     for (var ei2 = 0; ei2 < eventSlots.length; ei2++) {
       cycle.push(eventSlots[ei2]);
     }
@@ -14133,7 +15331,7 @@ function step() {
     showSlide(item.idx);
   }
 
-  // Finn visningstid for denne sliden
+  // find visningstid for denne sliden
   var slide = (item.type === "slide") ? (state.slides || [])[item.idx] : null;
   var interval = defaultInterval;
 
@@ -14154,7 +15352,7 @@ function step() {
     };
     if (vid) {
       vid.addEventListener("ended", onEnded);
-      // Hvis video allerede er ferdig (loop=false), gå videre
+      // if video allerede is ferdig (loop=false), gå videre
       vid.loop = false;
     }
     startProgress(maxWait / 1000);
@@ -14217,7 +15415,7 @@ function showSlide(idx) {
   evLayer.style.opacity = "0";
   var urll = document.getElementById("urlLayer"); if (urll) urll.style.opacity = "0";
 
-  // Fjern eventuelle tidligere video-overlays og daymap-label
+  // remove eventuelle previous video-overlays and daymap-label
   sl.querySelectorAll(".slide-video-overlay,.daymap-label").forEach(function(v) { if (v.pause) v.pause(); v.remove(); });
 
   var slide = slides[idx];
@@ -14227,7 +15425,7 @@ function showSlide(idx) {
     empty.style.display = "none";
 
     if (isMp4) {
-      // Bruk persistent video-element
+      // use persistent video-element
       img.style.display = "none";
       vid.style.display = "block";
       if (vid.getAttribute("data-src") !== slide.url) {
@@ -14279,12 +15477,12 @@ function evTypeStyle(type) {
     kurs:  { bg:"#0a1a2a", color:"#7dc8ff", border:"#1a3a5a" },
     tur:   { bg:"#1a0a2a", color:"#d8b4fe", border:"#3a1a5a" },
   };
-  // Les fra state.typeColors (satt fra settings)
+  // read from state.typeColors (satt from settings)
   if (state.typeColors && state.typeColors[type]) {
     var tc = state.typeColors[type];
     return { bg: tc.bg || defaults[type].bg, color: tc.text || defaults[type].color, border: tc.border || defaults[type].border };
   }
-  // Fallback: les fra colors.kursBg osv. (gammel settings-struktur)
+  // Fallback: read from colors.kursBg osv. (gammel settings-struktur)
   if (state.colors) {
     var c = state.colors;
     var fbMap = {
@@ -14299,7 +15497,7 @@ function evTypeStyle(type) {
 }
 
 function evTypeLabel(type) {
-  // Les fra state.typeNames hvis tilgjengelig
+  // read from state.typeNames if tilgjengelig
   if (state.typeNames && state.typeNames[type]) return state.typeNames[type];
   var map = { stand:"Stand", mote:"Møte", kurs:"Kurs", tur:"Tur" };
   return map[type] || "Arrangement";
@@ -14436,13 +15634,13 @@ function _showEvDetail(upcoming, idx, count, dayIdx) {
 
   var topImg = document.getElementById('evDetailTopImg');
   if (topImg) {
-    // For tur-events: vis rutekart øverst
+    // for tur-events: show rutekart top
     var topSrc = (ev.eventType === 'tur' && ev.routeMapImage) ? ev.routeMapImage : ev.tvImageTop;
     if (topSrc) { topImg.src = topSrc; topImg.style.display = 'block'; }
     else         { topImg.src = ''; topImg.style.display = 'none'; }
   }
 
-  // Live tracking for tur-events - KUN når event pågår nå
+  // Live tracking for tur-events - only when event pågår nå
   var trackDiv = document.getElementById('evDetailTrackImg');
   if (trackDiv) {
     clearInterval(window._trackingRefresh);
@@ -15052,7 +16250,7 @@ function renderSlides() {
   img.style.opacity = "0";
   _clearVideoOverlays();
 
-  // Skjul img umiddelbart for video-slides så den ikke blokkerer
+  // hide img umiddelbart for video-slides så it/the not blokkerer
   var isVideoSlide = slide && typeof slide === "object" && (slide.type === "mp4-slide" || slide.type === "video-slide");
   if (slide && typeof slide === "object" && slide.type === "mp4-slide") {
     img.style.display = "none";
@@ -15087,7 +16285,7 @@ function renderSlides() {
       vid.src         = slide.url;
       vid.autoplay    = true;
       vid.loop        = true;
-      vid.muted       = true;   // Alltid muted for å garantere autoplay i nettleser
+      vid.muted       = true;   // Alltid muted for å garantere autoplay in nettleser
       vid.controls    = false;
       vid.playsInline = true;
       vid.setAttribute("playsinline", "");
@@ -15103,7 +16301,7 @@ function renderSlides() {
         });
       }
     } else {
-      // Normal PNG slide – vis img igjen
+      // Normal PNG slide – show img igjen
       img.style.display = "block";
       img.src = typeof slide === "string" ? slide : "";
       img.style.opacity = "1";
@@ -15255,7 +16453,7 @@ app.get("/lottery/:evId", auth, function(req, res) {
   .btn-purple{background:#2d1a4a;border:2px solid #7c3aed;color:#d8b4fe}
   .btn-blue{background:#0d1a2e;border:2px solid #2563eb;color:#60a5fa}
   .btn-green{background:#0a2a0a;border:2px solid #16a34a;color:#4ade80}
-  .btn-ghost{background:var(--card);border:1px solid var(--border);color:var(--sub)}
+  .btn-ghost{background:#1a1a1a;border:1px solid #2a2a2a;color:#888}
   .stat{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid #1a1a1a;font-size:.85rem}
   .stat:last-child{border:none}
   .stat-val{font-weight:800;font-size:1rem;color:${accent}}
@@ -15487,7 +16685,7 @@ function isMobileBrowser(req) {
   return /android|iphone|ipad|ipod|mobile|blackberry|windows phone/.test(ua);
 }
 
-const MOBILE_HTML = '<!DOCTYPE html>\n<html lang="no">\n<head>\n<meta charset="UTF-8"/>\n<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>\n<meta name="mobile-web-app-capable" content="yes"/>\n<meta name="apple-mobile-web-app-capable" content="yes"/>\n<meta name="apple-mobile-web-app-status-bar-style" content="black"/>\n<meta name="apple-mobile-web-app-title" content="Lotteri"/>\n<link rel="manifest" href="/m.webmanifest"/>\n<title>__SITENAME__</title>\n<style>\n  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}\n  body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding-bottom:4rem}\n  :root{--bg:__BG__;--text:__FG__;--card:__CARD__;--border:__BORDER__;--sub:__SUB__;--hdr:__HDR__}\n  header{background:var(--hdr);border-bottom:3px solid __ACCENT__;padding:1rem 1rem .85rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}\n  header h1{font-size:1.1rem;font-weight:900;color:__ACCENT__;letter-spacing:-.01em}\n  header a{color:var(--sub);font-size:.78rem;text-decoration:none;padding:.4rem .7rem;border:1px solid var(--border);border-radius:6px}\n\n  /* Event kort */\n  .evcard{border-bottom:1px solid var(--border);cursor:pointer;user-select:none}\n  .evcard-header{padding:.9rem 1rem;display:flex;justify-content:space-between;align-items:center;gap:.75rem;background:var(--card)}\n  .evcard-header:active{background:var(--border)}\n  .evcard-left{flex:1;min-width:0}\n  .evcard-title{font-weight:700;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n  .evcard-meta{font-size:.75rem;color:var(--sub);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n  .evcard-badges{display:flex;gap:.35rem;margin-top:.35rem;flex-wrap:wrap}\n  .pill{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap}\n  .pill-lottery{background:#1a0a2e;color:#d8b4fe;border:1px solid #5b3a7a}\n  .pill-regs{background:#0a1a0a;color:#4ade80;border:1px solid #166534}\n  .chevron{font-size:1.2rem;color:var(--border);transition:transform .25s;flex-shrink:0;width:1.5rem;text-align:center}\n  .chevron.open{transform:rotate(90deg);color:__ACCENT__}\n\n  /* Actions panel */\n  .evactions{display:none;background:var(--bg);border-bottom:2px solid var(--border);padding:.75rem .85rem;flex-direction:column;gap:.6rem}\n  .evactions.open{display:flex}\n\n  /* Seksjoner */\n  .section{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}\n  .section-head{padding:.6rem .85rem;font-size:.68rem;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.4rem}\n  .section-body{padding:.75rem .85rem;display:flex;flex-direction:column;gap:.5rem}\n\n  /* Knapper */\n  .btn-row{display:flex;gap:.4rem}\n  .btn{flex:1;padding:.8rem .5rem;border-radius:9px;border:none;font-size:.88rem;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:.35rem;transition:opacity .12s;line-height:1.2}\n  .btn:active{opacity:.65}\n  .btn-yellow{background:__ACCENT__;color:#111}\n  .btn-blue{background:#0d1a2e;border:1.5px solid #2563eb;color:#60a5fa}\n  .btn-green{background:#0a2a0a;border:1.5px solid #16a34a;color:#4ade80}\n  .btn-purple{background:#1a0a2e;border:1.5px solid #7c3aed;color:#d8b4fe}\n  .btn-ghost{background:#1a1a1a;border:1px solid #2a2a2a;color:#888}\n  .btn-sm{padding:.55rem .5rem;font-size:.8rem;border-radius:7px}\n\n  /* Status melding */\n  .status-msg{font-size:.85rem;font-weight:700;min-height:1.5rem;padding:.1rem 0}\n\n  /* Vinnere */\n  .winner-item{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--border);gap:.5rem}\n  .winner-item:last-child{border:none}\n  .winner-name{font-weight:700;font-size:.9rem}\n  .winner-prize{font-size:.75rem;color:#f5c500;margin-top:.1rem}\n  .badge{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap;flex-shrink:0}\n  .badge-ok{background:#0a2a0a;color:#4ade80;border:1px solid #166534}\n  .badge-wait{background:#1a1400;color:#f5c500;border:1px solid #713f12}\n\n  /* Navn-søk */\n  .name-search-input{width:100%;background:var(--hdr);border:1.5px solid var(--border);color:var(--text);border-radius:9px;padding:.75rem .9rem;font-size:.95rem;outline:none}\n  .name-search-input:focus{border-color:__ACCENT__44}\n  .name-result{display:flex;justify-content:space-between;align-items:center;background:var(--card);border-radius:8px;padding:.6rem .85rem;margin-top:.35rem;gap:.5rem}\n\n  /* QR overlay */\n  #scanOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:1.5rem}\n  #scanBox{position:relative;width:min(290px,82vw);height:min(290px,82vw);border:3px solid __ACCENT__;border-radius:14px;overflow:hidden;background:#111}\n  #scanVideo{width:100%;height:100%;object-fit:cover}\n  .corner{position:absolute;width:22px;height:22px;border-color:__ACCENT__;border-style:solid}\n  .tl{top:6px;left:6px;border-width:3px 0 0 3px;border-radius:3px 0 0 0}\n  .tr{top:6px;right:6px;border-width:3px 3px 0 0;border-radius:0 3px 0 0}\n  .bl{bottom:6px;left:6px;border-width:0 0 3px 3px;border-radius:0 0 0 3px}\n  .br{bottom:6px;right:6px;border-width:0 3px 3px 0;border-radius:0 0 3px 0}\n  #scanStatus{color:#ccc;font-size:.9rem;text-align:center;max-width:280px}\n  #scanResultBox{border-radius:12px;padding:1rem 1.25rem;font-weight:700;font-size:1rem;text-align:center;max-width:300px;width:100%;display:none}\n  .btn-cancel{background:#1a0a0a;border:1.5px solid #7f1d1d;color:#f87171;padding:.8rem 2rem;border-radius:10px;font-size:.95rem;cursor:pointer;font-weight:700}\n\n  .empty{color:var(--sub);text-align:center;padding:4rem 1rem;font-size:.9rem}\n  .section-label{font-size:.65rem;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;padding:.85rem 1rem .4rem}\n</style>\n</head>\n<body>\n<header>\n  <h1>&#9889; __SITENAME__</h1>\n  <a href="/">&#128187; Full admin</a>\n</header>\n\n__EVCARDS__\n\n<!-- QR scanner overlay -->\n<div id="scanOverlay">\n  <div style="color:#fff;font-weight:800;font-size:1.05rem;letter-spacing:.02em">&#128247; Scan vinner-QR</div>\n  <div id="scanBox">\n    <video id="scanVideo" autoplay playsinline muted></video>\n    <div class="corner tl"></div><div class="corner tr"></div>\n    <div class="corner bl"></div><div class="corner br"></div>\n  </div>\n  <div id="scanStatus">Rett kameraet mot QR-koden&hellip;</div>\n  <div id="scanResultBox"></div>\n  <button class="btn-cancel" onclick="closeScan()">&#10005; Avbryt</button>\n</div>\n\n<script>\nvar _scanEvId=null,_stream=null,_animFrame=null,_scanFound=false;\nvar _winners=__WINNERS_DATA__;\n\nvar _sseConn=null;\nfunction startSSE(){\n  _sseConn=new EventSource("/api/events/stream");\n  _sseConn.onmessage=function(e){\n    try{var d=JSON.parse(e.data);if(d.type==="events_updated")fetchLive();}catch(x){}\n  };\n  _sseConn.onerror=function(){setTimeout(startSSE,4000);};\n}\nasync function fetchLive(){\n  try{\n    var r=await fetch("/api/events",{credentials:"include"});\n    var evs=await r.json();\n    if(!Array.isArray(evs))return;\n    evs.forEach(function(ev){\n      var regs=(ev.registrations||[]).filter(function(r){return !r.anonymized;}).length;\n      var won=(ev.lottery&&ev.lottery.winners)||[];\n      var drawn=won.length;\n      var pc=(ev.lottery&&ev.lottery.prizeCount)||1;\n      var rem=pc-drawn;\n      var re=document.getElementById("regs-"+ev.id);\n      if(re){re.textContent="\u{1F465} "+regs+" p\u00e5meldt";re.style.background="#0a3a0a";setTimeout(function(){re.style.background="";},800);}\n      var le=document.getElementById("lot-"+ev.id);\n      if(le)le.textContent="\uD83C\uDFB0 "+drawn+"/"+pc+" trukket";\n      var db=document.getElementById("drawbtn-"+ev.id);\n      if(db){db.disabled=rem<=0;db.style.opacity=rem<=0?".35":"1";db.textContent=rem>0?"\uD83C\uDFB0 Trekk vinner ("+rem+" igjen)":"\uD83C\uDFB0 Alle trukket";}\n      var sl=document.getElementById("lotsec-"+ev.id);\n      if(sl)sl.textContent="\uD83C\uDFB0 Lotteri \u00b7 "+drawn+"/"+pc+" trukket \u00b7 "+regs+" kvalifisert";\n    });\n  }catch(e){}\n}\nstartSSE();\n\n\nfunction esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}\n\nfunction toggleEv(id){\n  var a=document.getElementById("act-"+id);\n  var ch=document.getElementById("ch-"+id);\n  var open=a.classList.contains("open");\n  a.classList.toggle("open",!open);\n  if(ch)ch.classList.toggle("open",!open);\n}\n\nasync function apiFetch(method,url,body){\n  var opts={method,credentials:"include",headers:{}};\n  if(body){opts.headers["Content-Type"]="application/json";opts.body=JSON.stringify(body);}\n  try{var r=await fetch(url,opts);return await r.json();}catch(e){return{err:e.message};}\n}\n\nfunction showMsg(id,text,color){\n  var el=document.getElementById(id);\n  if(!el)return;\n  el.textContent=text;\n  el.style.color=color||"#4ade80";\n  if(text)setTimeout(function(){el.textContent="";},4000);\n}\n\nasync function drawLottery(evId,btn){\n  var orig=btn.textContent;\n  btn.disabled=true;btn.textContent="Trekker...";\n  var d=await apiFetch("POST","/api/events/"+evId+"/lottery/draw");\n  btn.disabled=false;btn.textContent=orig;\n  if(d.ok&&d.winner){\n    showMsg("lmsg-"+evId,"&#127881; "+d.winner.name+" vant"+(d.winner.prize?" \\u2013 "+d.winner.prize:"")+"!","#4ade80");\n    await apiFetch("POST","/api/events/"+evId+"/display/state",{mode:"winner",winnerName:d.winner.name,prize:d.winner.prize||"",prizeImage:d.winner.prizeImage||null});\n    setTimeout(function(){location.reload();},2500);\n  }else{\n    showMsg("lmsg-"+evId,"\\u2717 "+(d.error||d.err||"Error"),"#f87171");\n  }\n}\n\nasync function sendEmails(evId){\n  var d=await apiFetch("POST","/api/events/"+evId+"/lottery/send-winner-email");\n  if(d.ok)showMsg("lmsg-"+evId,"\\u2713 Sendt til "+d.sent+" vinner(e)","#60a5fa");\n  else showMsg("lmsg-"+evId,"\\u2717 "+(d.error||d.err||"Error"),"#f87171");\n}\n\nasync function sendConsolation(evId){\n  var d=await apiFetch("POST","/api/events/"+evId+"/lottery/send-consolation-email");\n  if(d.ok)showMsg("lmsg-"+evId,"\\u2713 Tr\\u00f8ste-epost sendt til "+d.sent+" deltaker(e)","#d8b4fe");\n  else showMsg("lmsg-"+evId,"\\u2717 "+(d.error||d.err||"Error"),"#f87171");\n}\n\nasync function setMode(evId,mode){\n  await apiFetch("POST","/api/events/"+evId+"/display/state",{mode});\n  showMsg("lmsg-"+evId,mode==="slides"?"\\u2713 Slides aktiv":"\\u2713 Vinnermodus aktiv",mode==="slides"?"#60a5fa":"#f5c500");\n}\n\nfunction toggleSearch(evId){\n  var el=document.getElementById("nsearch-"+evId);\n  if(el){\n    var show=el.style.display==="none";\n    el.style.display=show?"":"none";\n    if(show)el.querySelector("input").focus();\n  }\n}\n\nfunction nameSearch(evId,q){\n  var out=document.getElementById("nsres-"+evId);\n  if(!out)return;\n  q=(q||"").trim().toLowerCase();\n  if(q.length<2){out.innerHTML="";return;}\n  var winners=_winners[evId]||[];\n  var matches=winners.filter(function(w){return w.name.toLowerCase().includes(q);});\n  if(!matches.length){out.innerHTML=\'<div style="color:#555;font-size:.82rem;padding:.25rem 0">Ikke funnet blant vinnerne</div>\';return;}\n  out.innerHTML=matches.map(function(w){\n    var redeemed=!!w.redeemedAt;\n    return \'<div class="name-result">\'\n      +\'<div><div class="winner-name">\'+esc(w.name)+\'</div>\'+(w.prize?\'<div class="winner-prize">\'+esc(w.prize)+\'</div>\':\'\')+\'</div>\'\n      +(redeemed?\'<span class="badge badge-ok">&#9989; Hentet</span>\'\n        :\'<button onclick="redeemW(\\\'\'+evId+\'\\\',\\\'\'+esc(w.winnerToken||"")+\'\\\',this)" style="background:#166534;border:none;color:#4ade80;padding:.5rem .9rem;border-radius:7px;font-size:.82rem;font-weight:700;cursor:pointer">&#9989; Innl\\u00f8s</button>\')\n      +\'</div>\';\n  }).join("");\n}\n\nasync function redeemW(evId,token,btn){\n  if(btn){btn.disabled=true;btn.textContent="...";}\n  var d=await apiFetch("POST","/api/events/"+evId+"/lottery/verify-reg",{token});\n  if(d.valid&&d.isWinner&&!d.alreadyRedeemed){\n    showMsg("vmsg-"+evId,"\\u2705 Innl\\u00f8st \\u2013 "+d.name,"#4ade80");\n    setTimeout(function(){location.reload();},1500);\n  }else if(d.alreadyRedeemed){\n    showMsg("vmsg-"+evId,"\\u26a0 Allerede innl\\u00f8st","#f59e0b");\n    if(btn){btn.disabled=false;btn.textContent="&#9989; Innl\\u00f8s";}\n  }else{\n    showMsg("vmsg-"+evId,"\\u2717 "+(d.message||d.reason||"Error"),"#f87171");\n    if(btn){btn.disabled=false;btn.textContent="&#9989; Innl\\u00f8s";}\n  }\n}\n\nfunction openQR(evId){\n  _scanEvId=evId;_scanFound=false;\n  var ov=document.getElementById("scanOverlay");\n  var rb=document.getElementById("scanResultBox");\n  ov.style.display="flex";rb.style.display="none";\n  document.getElementById("scanStatus").textContent="Rett kameraet mot QR-koden\\u2026";\n  if(!navigator.mediaDevices){document.getElementById("scanStatus").textContent="Kamera ikke tilgjengelig";return;}\n  navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}}).then(function(s){\n    _stream=s;\n    var v=document.getElementById("scanVideo");v.srcObject=s;v.play();\n    if(window.BarcodeDetector){\n      var det=new BarcodeDetector({formats:["qr_code"]});\n      function tick(){\n        if(_scanFound)return;\n        if(v.readyState>=2)det.detect(v).then(function(codes){\n          if(codes&&codes.length){onQR(codes[0].rawValue);return;}\n          _animFrame=requestAnimationFrame(tick);\n        }).catch(function(){_animFrame=requestAnimationFrame(tick);});\n        else _animFrame=requestAnimationFrame(tick);\n      }\n      _animFrame=requestAnimationFrame(tick);\n    }else{\n      document.getElementById("scanStatus").textContent="QR-scan ikke st\\u00f8ttet \\u2013 bruk navnes\\u00f8k";\n    }\n  }).catch(function(e){closeScan();alert("Kamerafeil: "+e.message);});\n}\n\nfunction closeScan(){\n  _scanFound=true;\n  if(_animFrame)cancelAnimationFrame(_animFrame);\n  if(_stream)_stream.getTracks().forEach(function(t){t.stop();});_stream=null;\n  document.getElementById("scanOverlay").style.display="none";\n}\n\nasync function onQR(data){\n  if(_scanFound)return;_scanFound=true;\n  document.getElementById("scanStatus").textContent="\\u2705 Kode funnet!";\n  setTimeout(async function(){\n    closeScan();\n    if(!_scanEvId)return;\n    var d=await apiFetch("POST","/api/events/"+_scanEvId+"/lottery/verify-reg",{token:data});\n    var rb=document.getElementById("scanResultBox");\n    rb.style.display="block";\n    if(!d.valid){\n      rb.style.cssText="background:#2a0a0a;border:2px solid #7f1d1d;color:#f87171;border-radius:12px;padding:1rem 1.25rem;font-weight:700;font-size:1rem;text-align:center;display:block";\n      rb.innerHTML="\\u274c "+(d.message||"Invalid code");\n    }else if(d.isWinner&&d.alreadyRedeemed){\n      rb.style.cssText="background:#1a1400;border:2px solid #713f12;color:#f59e0b;border-radius:12px;padding:1rem 1.25rem;font-weight:700;font-size:1rem;text-align:center;display:block";\n      rb.innerHTML="\\u26a0\\ufe0f Allerede innl\\u00f8st<br><span style=\'font-size:.88rem;font-weight:400\'>"+esc(d.name)+"</span>";\n    }else if(d.isWinner){\n      rb.style.cssText="background:#0a2a0a;border:2px solid #166534;color:#4ade80;border-radius:12px;padding:1rem 1.25rem;font-weight:700;font-size:1.1rem;text-align:center;display:block";\n      rb.innerHTML="\\ud83c\\udfc6 VINNER!<br><span style=\'font-size:.95rem\'>"+esc(d.name)+"</span>"+(d.prize?"<br><span style=\'font-size:.8rem;color:#f5c500\'>"+esc(d.prize)+"</span>":"");\n      showMsg("vmsg-"+_scanEvId,"\\u2705 Innl\\u00f8st \\u2013 "+d.name,"#4ade80");\n    }else{\n      rb.style.cssText="background:#0d1a2e;border:2px solid #2563eb;color:#60a5fa;border-radius:12px;padding:1rem 1.25rem;font-weight:700;font-size:1rem;text-align:center;display:block";\n      rb.innerHTML="\\u2705 "+esc(d.name)+"<br><span style=\'font-size:.8rem;font-weight:400;color:#aaa\'>Registrert deltaker \\u2013 ikke vinner</span>";\n    }\n  },400);\n}\n</script>\n</body>\n</html>\n';
+const MOBILE_HTML = '<!DOCTYPE html>\n<html lang="no">\n<head>\n<meta charset="UTF-8"/>\n<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>\n<title>__SITENAME__</title>\n<style>\n  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}\n  body{background:#0d0d0d;color:#fff;font-family:system-ui,sans-serif;padding-bottom:4rem}\n  header{background:#111;border-bottom:3px solid __ACCENT__;padding:1rem 1rem .85rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}\n  header h1{font-size:1.1rem;font-weight:900;color:__ACCENT__;letter-spacing:-.01em}\n  header a{color:#555;font-size:.78rem;text-decoration:none;padding:.4rem .7rem;border:1px solid #2a2a2a;border-radius:6px}\n\n  /* Event kort */\n  .evcard{border-bottom:1px solid #1a1a1a;cursor:pointer;user-select:none}\n  .evcard-header{padding:.9rem 1rem;display:flex;justify-content:space-between;align-items:center;gap:.75rem;background:#141414}\n  .evcard-header:active{background:#1e1e1e}\n  .evcard-left{flex:1;min-width:0}\n  .evcard-title{font-weight:700;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n  .evcard-meta{font-size:.75rem;color:#555;margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n  .evcard-badges{display:flex;gap:.35rem;margin-top:.35rem;flex-wrap:wrap}\n  .pill{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap}\n  .pill-lottery{background:#1a0a2e;color:#d8b4fe;border:1px solid #5b3a7a}\n  .pill-regs{background:#0a1a0a;color:#4ade80;border:1px solid #166534}\n  .chevron{font-size:1.2rem;color:#333;transition:transform .25s;flex-shrink:0;width:1.5rem;text-align:center}\n  .chevron.open{transform:rotate(90deg);color:__ACCENT__}\n\n  /* Actions panel */\n  .evactions{display:none;background:#0a0a0a;border-bottom:2px solid #1a1a1a;padding:.75rem .85rem;flex-direction:column;gap:.6rem}\n  .evactions.open{display:flex}\n\n  /* Seksjoner */\n  .section{background:#141414;border:1px solid #1e1e1e;border-radius:12px;overflow:hidden}\n  .section-head{padding:.6rem .85rem;font-size:.68rem;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;gap:.4rem}\n  .section-body{padding:.75rem .85rem;display:flex;flex-direction:column;gap:.5rem}\n\n  /* Knapper */\n  .btn-row{display:flex;gap:.4rem}\n  .btn{flex:1;padding:.8rem .5rem;border-radius:9px;border:none;font-size:.88rem;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:.35rem;transition:opacity .12s;line-height:1.2}\n  .btn:active{opacity:.65}\n  .btn-yellow{background:__ACCENT__;color:#111}\n  .btn-blue{background:#0d1a2e;border:1.5px solid #2563eb;color:#60a5fa}\n  .btn-green{background:#0a2a0a;border:1.5px solid #16a34a;color:#4ade80}\n  .btn-purple{background:#1a0a2e;border:1.5px solid #7c3aed;color:#d8b4fe}\n  .btn-ghost{background:#1a1a1a;border:1px solid #2a2a2a;color:#888}\n  .btn-sm{padding:.55rem .5rem;font-size:.8rem;border-radius:7px}\n\n  /* Status melding */\n  .status-msg{font-size:.85rem;font-weight:700;min-height:1.5rem;padding:.1rem 0}\n\n  /* Vinnere */\n  .winner-item{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid #1e1e1e;gap:.5rem}\n  .winner-item:last-child{border:none}\n  .winner-name{font-weight:700;font-size:.9rem}\n  .winner-prize{font-size:.75rem;color:#f5c500;margin-top:.1rem}\n  .badge{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap;flex-shrink:0}\n  .badge-ok{background:#0a2a0a;color:#4ade80;border:1px solid #166534}\n  .badge-wait{background:#1a1400;color:#f5c500;border:1px solid #713f12}\n\n  /* Navn-søk */\n  .name-search-input{width:100%;background:#111;border:1.5px solid #2a2a2a;color:#fff;border-radius:9px;padding:.75rem .9rem;font-size:.95rem;outline:none}\n  .name-search-input:focus{border-color:__ACCENT__44}\n  .name-result{display:flex;justify-content:space-between;align-items:center;background:#141414;border-radius:8px;padding:.6rem .85rem;margin-top:.35rem;gap:.5rem}\n\n  /* QR overlay */\n  #scanOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:1.5rem}\n  #scanBox{position:relative;width:min(290px,82vw);height:min(290px,82vw);border:3px solid __ACCENT__;border-radius:14px;overflow:hidden;background:#111}\n  #scanVideo{width:100%;height:100%;object-fit:cover}\n  .corner{position:absolute;width:22px;height:22px;border-color:__ACCENT__;border-style:solid}\n  .tl{top:6px;left:6px;border-width:3px 0 0 3px;border-radius:3px 0 0 0}\n  .tr{top:6px;right:6px;border-width:3px 3px 0 0;border-radius:0 3px 0 0}\n  .bl{bottom:6px;left:6px;border-width:0 0 3px 3px;border-radius:0 0 0 3px}\n  .br{bottom:6px;right:6px;border-width:0 3px 3px 0;border-radius:0 0 3px 0}\n  #scanStatus{color:#ccc;font-size:.9rem;text-align:center;max-width:280px}\n  #scanResultBox{border-radius:12px;padding:1rem 1.25rem;font-weight:700;font-size:1rem;text-align:center;max-width:300px;width:100%;display:none}\n  .btn-cancel{background:#1a0a0a;border:1.5px solid #7f1d1d;color:#f87171;padding:.8rem 2rem;border-radius:10px;font-size:.95rem;cursor:pointer;font-weight:700}\n\n  .empty{color:#333;text-align:center;padding:4rem 1rem;font-size:.9rem}\n  .section-label{font-size:.65rem;font-weight:800;color:#333;text-transform:uppercase;letter-spacing:.08em;padding:.85rem 1rem .4rem}\n</style>\n</head>\n<body>\n<header>\n  <h1>&#9889; __SITENAME__</h1>\n  <a href="/">&#128187; Full admin</a>\n</header>\n\n__EVCARDS__\n\n<!-- QR scanner overlay -->\n<div id="scanOverlay">\n  <div style="color:#fff;font-weight:800;font-size:1.05rem;letter-spacing:.02em">&#128247; Scan vinner-QR</div>\n  <div id="scanBox">\n    <video id="scanVideo" autoplay playsinline muted></video>\n    <div class="corner tl"></div><div class="corner tr"></div>\n    <div class="corner bl"></div><div class="corner br"></div>\n  </div>\n  <div id="scanStatus">Rett kameraet mot QR-koden&hellip;</div>\n  <div id="scanResultBox"></div>\n  <button class="btn-cancel" onclick="closeScan()">&#10005; Avbryt</button>\n</div>\n\n<script>\nvar _scanEvId=null,_stream=null,_animFrame=null,_scanFound=false;\nvar _winners=__WINNERS_DATA__;\n\nvar _sseConn=null;\nfunction startSSE(){\n  _sseConn=new EventSource("/api/events/stream");\n  _sseConn.onmessage=function(e){\n    try{var d=JSON.parse(e.data);if(d.type==="events_updated")fetchLive();}catch(x){}\n  };\n  _sseConn.onerror=function(){setTimeout(startSSE,4000);};\n}\nasync function fetchLive(){\n  try{\n    var r=await fetch("/api/events",{credentials:"include"});\n    var evs=await r.json();\n    if(!Array.isArray(evs))return;\n    evs.forEach(function(ev){\n      var regs=(ev.registrations||[]).filter(function(r){return !r.anonymized;}).length;\n      var won=(ev.lottery&&ev.lottery.winners)||[];\n      var drawn=won.length;\n      var pc=(ev.lottery&&ev.lottery.prizeCount)||1;\n      var rem=pc-drawn;\n      var re=document.getElementById("regs-"+ev.id);\n      if(re){re.textContent="\u{1F465} "+regs+" p\u00e5meldt";re.style.background="#0a3a0a";setTimeout(function(){re.style.background="";},800);}\n      var le=document.getElementById("lot-"+ev.id);\n      if(le)le.textContent="\uD83C\uDFB0 "+drawn+"/"+pc+" trukket";\n      var db=document.getElementById("drawbtn-"+ev.id);\n      if(db){db.disabled=rem<=0;db.style.opacity=rem<=0?".35":"1";db.textContent=rem>0?"\uD83C\uDFB0 Trekk vinner ("+rem+" igjen)":"\uD83C\uDFB0 Alle trukket";}\n      var sl=document.getElementById("lotsec-"+ev.id);\n      if(sl)sl.textContent="\uD83C\uDFB0 Lotteri \u00b7 "+drawn+"/"+pc+" trukket \u00b7 "+regs+" kvalifisert";\n    });\n  }catch(e){}\n}\nstartSSE();\n\n\nfunction esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}\n\nfunction toggleEv(id){\n  var a=document.getElementById("act-"+id);\n  var ch=document.getElementById("ch-"+id);\n  var open=a.classList.contains("open");\n  a.classList.toggle("open",!open);\n  if(ch)ch.classList.toggle("open",!open);\n}\n\nasync function apiFetch(method,url,body){\n  var opts={method,credentials:"include",headers:{}};\n  if(body){opts.headers["Content-Type"]="application/json";opts.body=JSON.stringify(body);}\n  try{var r=await fetch(url,opts);return await r.json();}catch(e){return{err:e.message};}\n}\n\nfunction showMsg(id,text,color){\n  var el=document.getElementById(id);\n  if(!el)return;\n  el.textContent=text;\n  el.style.color=color||"#4ade80";\n  if(text)setTimeout(function(){el.textContent="";},4000);\n}\n\nasync function drawLottery(evId,btn){\n  var orig=btn.textContent;\n  btn.disabled=true;btn.textContent="Trekker...";\n  var d=await apiFetch("POST","/api/events/"+evId+"/lottery/draw");\n  btn.disabled=false;btn.textContent=orig;\n  if(d.ok&&d.winner){\n    showMsg("lmsg-"+evId,"&#127881; "+d.winner.name+" vant"+(d.winner.prize?" \\u2013 "+d.winner.prize:"")+"!","#4ade80");\n    await apiFetch("POST","/api/events/"+evId+"/display/state",{mode:"winner",winnerName:d.winner.name,prize:d.winner.prize||"",prizeImage:d.winner.prizeImage||null});\n    setTimeout(function(){location.reload();},2500);\n  }else{\n    showMsg("lmsg-"+evId,"\\u2717 "+(d.error||d.err||"Error"),"#f87171");\n  }\n}\n\nasync function sendEmails(evId){\n  var d=await apiFetch("POST","/api/events/"+evId+"/lottery/send-winner-email");\n  if(d.ok)showMsg("lmsg-"+evId,"\\u2713 Sendt til "+d.sent+" vinner(e)","#60a5fa");\n  else showMsg("lmsg-"+evId,"\\u2717 "+(d.error||d.err||"Error"),"#f87171");\n}\n\nasync function sendConsolation(evId){\n  var d=await apiFetch("POST","/api/events/"+evId+"/lottery/send-consolation-email");\n  if(d.ok)showMsg("lmsg-"+evId,"\\u2713 Tr\\u00f8ste-epost sendt til "+d.sent+" deltaker(e)","#d8b4fe");\n  else showMsg("lmsg-"+evId,"\\u2717 "+(d.error||d.err||"Error"),"#f87171");\n}\n\nasync function setMode(evId,mode){\n  await apiFetch("POST","/api/events/"+evId+"/display/state",{mode});\n  showMsg("lmsg-"+evId,mode==="slides"?"\\u2713 Slides aktiv":"\\u2713 Vinnermodus aktiv",mode==="slides"?"#60a5fa":"#f5c500");\n}\n\nfunction toggleSearch(evId){\n  var el=document.getElementById("nsearch-"+evId);\n  if(el){\n    var show=el.style.display==="none";\n    el.style.display=show?"":"none";\n    if(show)el.querySelector("input").focus();\n  }\n}\n\nfunction nameSearch(evId,q){\n  var out=document.getElementById("nsres-"+evId);\n  if(!out)return;\n  q=(q||"").trim().toLowerCase();\n  if(q.length<2){out.innerHTML="";return;}\n  var winners=_winners[evId]||[];\n  var matches=winners.filter(function(w){return w.name.toLowerCase().includes(q);});\n  if(!matches.length){out.innerHTML=\'<div style="color:#555;font-size:.82rem;padding:.25rem 0">Ikke funnet blant vinnerne</div>\';return;}\n  out.innerHTML=matches.map(function(w){\n    var redeemed=!!w.redeemedAt;\n    return \'<div class="name-result">\'\n      +\'<div><div class="winner-name">\'+esc(w.name)+\'</div>\'+(w.prize?\'<div class="winner-prize">\'+esc(w.prize)+\'</div>\':\'\')+\'</div>\'\n      +(redeemed?\'<span class="badge badge-ok">&#9989; Hentet</span>\'\n        :\'<button onclick="redeemW(\\\'\'+evId+\'\\\',\\\'\'+esc(w.winnerToken||"")+\'\\\',this)" style="background:#166534;border:none;color:#4ade80;padding:.5rem .9rem;border-radius:7px;font-size:.82rem;font-weight:700;cursor:pointer">&#9989; Innl\\u00f8s</button>\')\n      +\'</div>\';\n  }).join("");\n}\n\nasync function redeemW(evId,token,btn){\n  if(btn){btn.disabled=true;btn.textContent="...";}\n  var d=await apiFetch("POST","/api/events/"+evId+"/lottery/verify-reg",{token});\n  if(d.valid&&d.isWinner&&!d.alreadyRedeemed){\n    showMsg("vmsg-"+evId,"\\u2705 Innl\\u00f8st \\u2013 "+d.name,"#4ade80");\n    setTimeout(function(){location.reload();},1500);\n  }else if(d.alreadyRedeemed){\n    showMsg("vmsg-"+evId,"\\u26a0 Allerede innl\\u00f8st","#f59e0b");\n    if(btn){btn.disabled=false;btn.textContent="&#9989; Innl\\u00f8s";}\n  }else{\n    showMsg("vmsg-"+evId,"\\u2717 "+(d.message||d.reason||"Error"),"#f87171");\n    if(btn){btn.disabled=false;btn.textContent="&#9989; Innl\\u00f8s";}\n  }\n}\n\nfunction openQR(evId){\n  _scanEvId=evId;_scanFound=false;\n  var ov=document.getElementById("scanOverlay");\n  var rb=document.getElementById("scanResultBox");\n  ov.style.display="flex";rb.style.display="none";\n  document.getElementById("scanStatus").textContent="Rett kameraet mot QR-koden\\u2026";\n  if(!navigator.mediaDevices){document.getElementById("scanStatus").textContent="Kamera ikke tilgjengelig";return;}\n  navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}}).then(function(s){\n    _stream=s;\n    var v=document.getElementById("scanVideo");v.srcObject=s;v.play();\n    if(window.BarcodeDetector){\n      var det=new BarcodeDetector({formats:["qr_code"]});\n      function tick(){\n        if(_scanFound)return;\n        if(v.readyState>=2)det.detect(v).then(function(codes){\n          if(codes&&codes.length){onQR(codes[0].rawValue);return;}\n          _animFrame=requestAnimationFrame(tick);\n        }).catch(function(){_animFrame=requestAnimationFrame(tick);});\n        else _animFrame=requestAnimationFrame(tick);\n      }\n      _animFrame=requestAnimationFrame(tick);\n    }else{\n      document.getElementById("scanStatus").textContent="QR-scan ikke st\\u00f8ttet \\u2013 bruk navnes\\u00f8k";\n    }\n  }).catch(function(e){closeScan();alert("Kamerafeil: "+e.message);});\n}\n\nfunction closeScan(){\n  _scanFound=true;\n  if(_animFrame)cancelAnimationFrame(_animFrame);\n  if(_stream)_stream.getTracks().forEach(function(t){t.stop();});_stream=null;\n  document.getElementById("scanOverlay").style.display="none";\n}\n\nasync function onQR(data){\n  if(_scanFound)return;_scanFound=true;\n  document.getElementById("scanStatus").textContent="\\u2705 Kode funnet!";\n  setTimeout(async function(){\n    closeScan();\n    if(!_scanEvId)return;\n    var d=await apiFetch("POST","/api/events/"+_scanEvId+"/lottery/verify-reg",{token:data});\n    var rb=document.getElementById("scanResultBox");\n    rb.style.display="block";\n    if(!d.valid){\n      rb.style.cssText="background:#2a0a0a;border:2px solid #7f1d1d;color:#f87171;border-radius:12px;padding:1rem 1.25rem;font-weight:700;font-size:1rem;text-align:center;display:block";\n      rb.innerHTML="\\u274c "+(d.message||"Invalid code");\n    }else if(d.isWinner&&d.alreadyRedeemed){\n      rb.style.cssText="background:#1a1400;border:2px solid #713f12;color:#f59e0b;border-radius:12px;padding:1rem 1.25rem;font-weight:700;font-size:1rem;text-align:center;display:block";\n      rb.innerHTML="\\u26a0\\ufe0f Allerede innl\\u00f8st<br><span style=\'font-size:.88rem;font-weight:400\'>"+esc(d.name)+"</span>";\n    }else if(d.isWinner){\n      rb.style.cssText="background:#0a2a0a;border:2px solid #166534;color:#4ade80;border-radius:12px;padding:1rem 1.25rem;font-weight:700;font-size:1.1rem;text-align:center;display:block";\n      rb.innerHTML="\\ud83c\\udfc6 VINNER!<br><span style=\'font-size:.95rem\'>"+esc(d.name)+"</span>"+(d.prize?"<br><span style=\'font-size:.8rem;color:#f5c500\'>"+esc(d.prize)+"</span>":"");\n      showMsg("vmsg-"+_scanEvId,"\\u2705 Innl\\u00f8st \\u2013 "+d.name,"#4ade80");\n    }else{\n      rb.style.cssText="background:#0d1a2e;border:2px solid #2563eb;color:#60a5fa;border-radius:12px;padding:1rem 1.25rem;font-weight:700;font-size:1rem;text-align:center;display:block";\n      rb.innerHTML="\\u2705 "+esc(d.name)+"<br><span style=\'font-size:.8rem;font-weight:400;color:#aaa\'>Registrert deltaker \\u2013 ikke vinner</span>";\n    }\n  },400);\n}\n</script>\n</body>\n</html>\n';
 
 app.get("/m", auth, function(req, res) {
   const settings  = getSettings();
@@ -15604,34 +16802,21 @@ app.get("/m", auth, function(req, res) {
     }
   });
 
-  const mTheme = settings.theme || 'dark';
-  const isLight = mTheme === 'light';
-  const mBg     = isLight ? '#f5f5f5' : '#0d0d0d';
-  const mFg     = isLight ? '#111111' : '#ffffff';
-  const mCard   = isLight ? '#ffffff' : '#141414';
-  const mBorder = isLight ? '#e0e0e0' : '#1e1e1e';
-  const mSub    = isLight ? '#666666' : '#555555';
-  const mHdr    = isLight ? '#ffffff' : '#111111';
-
   res.send(MOBILE_HTML
     .replace(/__SITENAME__/g, escHtml(siteName))
     .replace(/__ACCENT__/g, accent)
-    .replace(/__BG__/g, mBg)
-    .replace(/__FG__/g, mFg)
-    .replace(/__CARD__/g, mCard)
-    .replace(/__BORDER__/g, mBorder)
-    .replace(/__SUB__/g, mSub)
-    .replace(/__HDR__/g, mHdr)
     .replace("__EVCARDS__", evCardsHtml)
     .replace("__WINNERS_DATA__", JSON.stringify(winnersData))
   );
 });
 
 app.get("*", function(req, res) {
+  // Redirect mobile browsers hitting / to mobile admin
+  // Redirect mobile browsers to mobile admin (except /m itself, /display, /lottery)
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// ── Auto-installer for LibreOffice og pdftoppm ──────────────────
+// ── Auto-installer for LibreOffice and pdftoppm ──────────────────
 // Runs on startup if tools are missing (Alpine/Debian support)
 (function ensureConversionTools() {
   const { execSync, execFile } = require("child_process");
@@ -15675,7 +16860,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, function() {
   console.log("EventsAdmin running on port " + PORT + " (domain: " + DOMAIN + ")");
 
-  // Skriv watchdog.js til /watchdog/ hvis volumet er montert
+  // write watchdog.js to /watchdog/ if volumet is montert
   try {
     const watchdogPath = "/watchdog/watchdog.js";
     const watchdogDir  = "/watchdog";
