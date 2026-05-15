@@ -1,23 +1,23 @@
 {
-  "version": "1.9.0",
+  "version": "1.9.1",
   "released": "2026-05-15",
   "changelog": [
-    "TV Update"
+    "Multi TV-Update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.0/server.js",
-      "sha256": "6a7c7c14d673cba2beb4c7e222c492eaccf1025e5200976fcf755b201a67842b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.1/server.js",
+      "sha256": "b88790781444039b6b2577f558c48402de4a4ef7e3a4d11ef632e3530d9c946b"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.0/index.html",
-      "sha256": "ff78ee6c98fa03f8a47014e5ac07411653239dea65a12ba67830e963dd5d7adb"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.1/index.html",
+      "sha256": "4f51029002027e0a6c77f3bf2414ef3c65a30b3f6207eeecc464655bb5eb0b46"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.1/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
