@@ -1,23 +1,23 @@
 {
-  "version": "1.8.61",
+  "version": "1.8.62",
   "released": "2026-05-15",
   "changelog": [
-    "Lang corrections"
+    "v1.8.62"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.61/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.62/server.js",
       "sha256": "c5bf031cb3d06bbfde2c45b2eaa50a190bed2cf4a72b4d6a47cc84c0bf2a3068"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.61/index.html",
-      "sha256": "42f63a3ab48f14f8ae8600b6d10ab6fc3b3aa7b5fb32983c204de679b9b748ad"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.62/index.html",
+      "sha256": "13e025f733ecd5b848855da5bd512e042c114d884dd871d63a3a57b807f41dfb"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.61/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.8.62/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
