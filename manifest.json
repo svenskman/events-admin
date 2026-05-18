@@ -1,23 +1,23 @@
 {
-  "version": "1.9.2",
+  "version": "1.9.3",
   "released": "2026-05-18",
   "changelog": [
-    "Event fane admin, Avdelingsleder tilgang."
+    "Div fix, spond export."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.2/server.js",
-      "sha256": "efc8cf7205f43e06d276420b776613fa7e50d3ea9a780bc0760fd7958dba2eff"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.3/server.js",
+      "sha256": "3f8f466332edbe7a5cd3e99b93892453361f5ac34c144a40fbe056d37b784772"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.2/index.html",
-      "sha256": "da5066a6d58261da96bc9067eb355493db2c76e56e195bf706e6f572ad6165af"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.3/index.html",
+      "sha256": "8911d608a1c88543196e7688731f555aee683f672b26b752b721e311831b5087"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.2/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.3/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
