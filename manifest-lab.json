@@ -1,23 +1,23 @@
 {
-  "version": "1.9.5",
+  "version": "1.9.6",
   "released": "2026-05-19",
   "changelog": [
-    "Demo update manager"
+    "TV bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.5/server.js",
-      "sha256": "d6623e201990ab6b7a4445dcc6845b33cdf22424e52149415b0f4f953d7541da"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.6/server.js",
+      "sha256": "e67e016f2c91ad2deb360998f10050aab9598c5baf9967bbb71ef6f4f86aee6f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.5/index.html",
-      "sha256": "b11b6d30ef82711ea576e1cb258ab14e55557cd04811bd3c48a4211635d75213"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.6/index.html",
+      "sha256": "c658137bb523e09750d9236c3e8d8e642f914eafb8d3d957da266ac3b02e84ee"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.5/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.6/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
