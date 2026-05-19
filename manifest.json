@@ -1,23 +1,23 @@
 {
-  "version": "1.9.6",
+  "version": "1.9.7",
   "released": "2026-05-19",
   "changelog": [
-    "TV bug fix"
+    "Language bugs, Maps updates."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.6/server.js",
-      "sha256": "e67e016f2c91ad2deb360998f10050aab9598c5baf9967bbb71ef6f4f86aee6f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.7/server.js",
+      "sha256": "fd94cce32133b95eea0b119bbd16a552bedd713c3722499593981acb4b1a30c3"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.6/index.html",
-      "sha256": "c658137bb523e09750d9236c3e8d8e642f914eafb8d3d957da266ac3b02e84ee"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.7/index.html",
+      "sha256": "ed56b04364adbd26a3a3bc2e593527e5d3166ca1d134414a2ac2c2350ce886b2"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.6/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.7/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
