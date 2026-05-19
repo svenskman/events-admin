@@ -1,23 +1,23 @@
 {
-  "version": "1.9.4",
+  "version": "1.9.5",
   "released": "2026-05-19",
   "changelog": [
-    "Secondary Department"
+    "Demo update manager"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.4/server.js",
-      "sha256": "bc363c83ff87e63798ee063c1b122c95e8b937869f846f8b7419b481945e8576"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.5/server.js",
+      "sha256": "d6623e201990ab6b7a4445dcc6845b33cdf22424e52149415b0f4f953d7541da"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.4/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.5/index.html",
       "sha256": "b11b6d30ef82711ea576e1cb258ab14e55557cd04811bd3c48a4211635d75213"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.5/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
