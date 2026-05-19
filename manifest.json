@@ -1,23 +1,23 @@
 {
-  "version": "1.9.7",
+  "version": "1.9.8",
   "released": "2026-05-19",
   "changelog": [
-    "Language bugs, Maps updates."
+    "Maps bugs"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.7/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.8/server.js",
       "sha256": "fd94cce32133b95eea0b119bbd16a552bedd713c3722499593981acb4b1a30c3"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.7/index.html",
-      "sha256": "ed56b04364adbd26a3a3bc2e593527e5d3166ca1d134414a2ac2c2350ce886b2"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.8/index.html",
+      "sha256": "eacf6786c5d679f4cc2cdb46cfac04ca3e1dfb247453bcfb60e091550d2319dd"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.7/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.8/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
