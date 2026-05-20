@@ -1,23 +1,23 @@
 {
-  "version": "1.9.8",
-  "released": "2026-05-19",
+  "version": "1.9.9",
+  "released": "2026-05-20",
   "changelog": [
-    "Maps bugs"
+    "Dynamic History fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.8/server.js",
-      "sha256": "fd94cce32133b95eea0b119bbd16a552bedd713c3722499593981acb4b1a30c3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.9/server.js",
+      "sha256": "2dccfe27b799cf6c9e1c3e0ed05e6d37cfc6bf6d36ffbeb9324afa3e715b4a95"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.8/index.html",
-      "sha256": "eacf6786c5d679f4cc2cdb46cfac04ca3e1dfb247453bcfb60e091550d2319dd"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.9/index.html",
+      "sha256": "07a947b7abe8668a48159e746ddd6a322a1571d463de2e8b4c8335ec4e7bc012"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.8/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.9/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
