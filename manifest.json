@@ -1,23 +1,23 @@
 {
-  "version": "1.9.10",
+  "version": "1.9.11",
   "released": "2026-05-20",
   "changelog": [
-    "Department page mod"
+    "Department list bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.10/server.js",
-      "sha256": "2285a399b8610dc8c9ace32154e8e544a3c1ce7fe79746965bf94ad5bcd8222a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.11/server.js",
+      "sha256": "e8728ec70a9d7ee6d7129ced69dfab2c050437d767ff169f0326740df86718cc"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.10/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.11/index.html",
       "sha256": "1031e565fa66960d5b946628df1e6daaf23290ca00bf48299406104a09a21815"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.10/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.11/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
