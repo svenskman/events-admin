@@ -1,23 +1,23 @@
 {
-  "version": "1.9.16",
+  "version": "1.9.17",
   "released": "2026-05-22",
   "changelog": [
-    "NAF link, Alle choice"
+    "Arrangement of group bar, adjustment of link."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.16/server.js",
-      "sha256": "50776745076b180cb40e3992271d5535e0229efb06027c0d8385cb8c907ff9b6"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.17/server.js",
+      "sha256": "81767f0dd587e4a03f8349248ba313202854f7aeaf180e7cb057cd35291f61ed"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.16/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.17/index.html",
       "sha256": "7089779e534146f558bf1bc921d4019a6ad15cdca90e0547ce29cec6c918600c"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.16/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.17/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
