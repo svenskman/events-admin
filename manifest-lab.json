@@ -1,23 +1,23 @@
 {
-  "version": "1.9.18",
+  "version": "1.9.19",
   "released": "2026-05-22",
   "changelog": [
-    "Footer Adjustment"
+    "Bug hunt"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.18/server.js",
-      "sha256": "90c6b904959103aecfaeae71dc00093b25df3425f487170da4ed589fa8abe90b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.19/server.js",
+      "sha256": "ad169b1861ca7777aefd72f324d8ada9439e33d5d657fa8b0057e09cb31654f5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.18/index.html",
-      "sha256": "7089779e534146f558bf1bc921d4019a6ad15cdca90e0547ce29cec6c918600c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.19/index.html",
+      "sha256": "19a648682add4222004aa243e4a7cea3c0a60f4d4779c425bffa868249de8b7b"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.18/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.19/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
