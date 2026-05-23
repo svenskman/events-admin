@@ -1,5 +1,5 @@
 {
-  "version": "1.9.24",
+  "version": "1.9.25",
   "released": "2026-05-23",
   "changelog": [
     "Bug hunt"
@@ -7,17 +7,17 @@
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.24/server.js",
-      "sha256": "680eb62816af3f31d89ed29813529165720e2dc269bda03370c8969ac9d0bd10"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.25/server.js",
+      "sha256": "23b02a6bed0f516e1c93a882c4863aa7f202d18ea1441bd2a18eecbceff322b3"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.24/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.25/index.html",
       "sha256": "a7fa84a313b354b6682f0edcc6644c54acef4fa6e38b5f680ed07c9d6ffeafac"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.24/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.9.25/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
