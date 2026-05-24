@@ -1,26 +1,23 @@
 {
-  "version": "1.10.0",
-  "released": "2026-05-23",
+  "version": "1.10.1",
+  "released": "2026-05-24",
   "changelog": [
-    "iCal / Calendar feed",
-    "Waiting list",
-    "24h reminder emails",
-    "Annual report"
+    "Media slideshow events,"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.0/server.js",
-      "sha256": "ca4de49b9cf7786f9776f7e1a445a2f17f38606bbb754584b23dfba0448ba8c1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.1/server.js",
+      "sha256": "4bfc309ba94df4ebde5249c2af5eb95b86241242625ebe596efb901667cb1a0d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.0/index.html",
-      "sha256": "795ab603aede08bd747be12c4de1b2d120fdd6c5e28e6f6b82b3da8704f28e79"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.1/index.html",
+      "sha256": "ee840d81f77403e8f194efd21d287a046f27009972d97abb0377b3511004ce34"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.1/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
