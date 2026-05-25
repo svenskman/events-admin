@@ -1,5 +1,5 @@
 {
-  "version": "1.10.4",
+  "version": "1.10.5",
   "released": "2026-05-25",
   "changelog": [
     "Demo update"
@@ -7,17 +7,17 @@
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.4/server.js",
-      "sha256": "d048cd95e445a7a9ad67c49f6c8129e157264d406c4b9afe1e24f39f8e486828"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.5/server.js",
+      "sha256": "63dd0ac3949e1cede90b88a71af90504945c266427d058a69eaf51f54bdef944"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.4/index.html",
-      "sha256": "efcd8ab990f6f983d7e29223faad693f8ffaf7e170cf2f3d14458fc74d438efc"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.5/index.html",
+      "sha256": "cbce7672f855a4b35764387191319f083762d53d892ff06060fb25b9c597d1ab"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.5/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
