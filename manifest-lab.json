@@ -1,23 +1,23 @@
 {
-  "version": "1.10.13",
+  "version": "1.10.14",
   "released": "2026-05-26",
   "changelog": [
-    "Event bug fix"
+    "Event justering"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.13/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.14/server.js",
       "sha256": "ac64c8475a77030a15720236b2e01d45ad9d198b497ca8ec64f1043ab6d7a68d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.13/index.html",
-      "sha256": "0667e1f70e31f63db9fe853906223f83b374862ef60becb719336a086e806697"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.14/index.html",
+      "sha256": "b899cfa1c94a8a4e51b2d20320506c208b250c409b50b336c50d3e6d01b931af"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.13/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.14/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
