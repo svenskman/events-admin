@@ -1,23 +1,23 @@
 {
-  "version": "1.10.12",
+  "version": "1.10.13",
   "released": "2026-05-26",
   "changelog": [
-    "Redesign Events"
+    "Event bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.12/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.13/server.js",
       "sha256": "ac64c8475a77030a15720236b2e01d45ad9d198b497ca8ec64f1043ab6d7a68d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.12/index.html",
-      "sha256": "0faaa0084d5f6059262d7295fd4447b4022f78b75b73c5e51dcebfaf2bbf9ead"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.13/index.html",
+      "sha256": "0667e1f70e31f63db9fe853906223f83b374862ef60becb719336a086e806697"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.12/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.13/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
