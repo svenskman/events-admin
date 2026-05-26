@@ -1,23 +1,23 @@
 {
-  "version": "1.10.10",
-  "released": "2026-05-25",
+  "version": "1.10.11",
+  "released": "2026-05-26",
   "changelog": [
-    "Volonteer bug fix clothing"
+    "Adjustments on event leyout, bug fixes."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.10/server.js",
-      "sha256": "a4c6c2d2acd8f75b2193cecc17f35fe9721b11c673a9ad1a1f208f35f0edd1e0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.11/server.js",
+      "sha256": "1d5cde72e1f54bf2b4c2993914d870d3d789fc2ab0ed0515912dc13a13092f5a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.10/index.html",
-      "sha256": "cbce7672f855a4b35764387191319f083762d53d892ff06060fb25b9c597d1ab"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.11/index.html",
+      "sha256": "3d61cf0ed3fa211f59a35b7f39f4734b5bad2906b3416db6a3d4e872f3d65024"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.10/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.11/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
