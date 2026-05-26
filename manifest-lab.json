@@ -1,23 +1,23 @@
 {
-  "version": "1.10.11",
+  "version": "1.10.12",
   "released": "2026-05-26",
   "changelog": [
-    "Adjustments on event leyout, bug fixes."
+    "Redesign Events"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.11/server.js",
-      "sha256": "1d5cde72e1f54bf2b4c2993914d870d3d789fc2ab0ed0515912dc13a13092f5a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.12/server.js",
+      "sha256": "ac64c8475a77030a15720236b2e01d45ad9d198b497ca8ec64f1043ab6d7a68d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.11/index.html",
-      "sha256": "3d61cf0ed3fa211f59a35b7f39f4734b5bad2906b3416db6a3d4e872f3d65024"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.12/index.html",
+      "sha256": "0faaa0084d5f6059262d7295fd4447b4022f78b75b73c5e51dcebfaf2bbf9ead"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.11/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.10.12/package.json",
       "sha256": "e608ed75f0ad9f2e78ff91fa360e4da567e1d043c48a1d2c61abe9f4b1e4e048"
     }
   ]
