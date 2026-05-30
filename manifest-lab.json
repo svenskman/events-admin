@@ -1,23 +1,23 @@
 {
-  "version": "1.11.3",
-  "released": "2026-05-28",
+  "version": "1.11.4",
+  "released": "2026-05-30",
   "changelog": [
-    "Transcribe fix"
+    "Event visibility bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.3/server.js",
-      "sha256": "95777ab6632632742f0f8982e94f813f7083d028dd3ca9ca82a5ed5fa443d64f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.4/server.js",
+      "sha256": "a98ce1cbb9fce26c89095da95068dea763df3a6636d441f704a9fbcc2f5fc120"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.3/index.html",
-      "sha256": "166b4b0363089cc33ec64ca6456aa368c0f5e752ad320876e2318001ddf1e945"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.4/index.html",
+      "sha256": "46185c3a449d3c29a329cc09cb7b53d0e01820938c114f5e5e2198da651684d9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.3/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.4/package.json",
       "sha256": "b3050ad1a4dd6d4bb9da509a3a85bbe73a50c9479bd61608b4551c72b78efa64"
     }
   ]
