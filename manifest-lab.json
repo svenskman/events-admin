@@ -1,23 +1,23 @@
 {
-  "version": "1.11.6",
+  "version": "1.11.7",
   "released": "2026-05-31",
   "changelog": [
-    "Bug fixes"
+    "Turplanner bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.6/server.js",
-      "sha256": "f59b632cab61abc295b25f3b959b4667bfe44cef584a409c6b74882c4dfd2535"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.7/server.js",
+      "sha256": "f582e6525107f1d5568868188b3ea0ca616336e8d9212e3d1136eb7b91987067"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.6/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.7/index.html",
       "sha256": "2db07b84028d3e5211a57b92ba3e92d5bf992d971e0002e4d32600585892b3ff"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.6/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.7/package.json",
       "sha256": "b3050ad1a4dd6d4bb9da509a3a85bbe73a50c9479bd61608b4551c72b78efa64"
     }
   ]
