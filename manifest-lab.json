@@ -1,23 +1,23 @@
 {
-  "version": "1.11.10",
+  "version": "1.11.11",
   "released": "2026-05-31",
   "changelog": [
-    "Event Department Bug"
+    "Department event list bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.10/server.js",
-      "sha256": "8e635b0b43bef697a17b5010c37023d2131944770ba29ebca7c03cc73fc55753"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.11/server.js",
+      "sha256": "9adb9029b3501c8d6a68c0b63e4fa373690a1b66c92f4b21fee7fef3f5182eac"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.10/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.11/index.html",
       "sha256": "c2f1e5e0a79638bdf908c9cf368d085e33fd1340e8c8073a744b245482e82d8a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.10/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.11/package.json",
       "sha256": "b3050ad1a4dd6d4bb9da509a3a85bbe73a50c9479bd61608b4551c72b78efa64"
     }
   ]
