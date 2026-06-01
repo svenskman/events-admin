@@ -1,23 +1,23 @@
 {
-  "version": "1.11.23",
+  "version": "1.11.24",
   "released": "2026-06-01",
   "changelog": [
-    "Statistics update"
+    "Statistic update other sites"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.23/server.js",
-      "sha256": "0bead0a67e0d3129f35ebdc2391485798165d4b739ff1b5eaeb4c9287fd50d67"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.24/server.js",
+      "sha256": "0e0474205d5aad4162d9e1e6cefe1d2f27508ef291179c38ec385ab386cfad5d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.23/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.24/index.html",
       "sha256": "b05787b7a245e247c6fcbb7c7794ffcaa162e80c72f54c049051c68b040b78d3"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.23/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.24/package.json",
       "sha256": "b3050ad1a4dd6d4bb9da509a3a85bbe73a50c9479bd61608b4551c72b78efa64"
     }
   ]
