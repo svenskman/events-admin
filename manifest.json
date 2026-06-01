@@ -1,23 +1,23 @@
 {
-  "version": "1.11.12",
-  "released": "2026-05-31",
+  "version": "1.11.13",
+  "released": "2026-06-01",
   "changelog": [
-    "LAB test Pinse"
+    "Bug hunting"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.12/server.js",
-      "sha256": "d2bc867dc40a6a7fff35b62adb458e0c6d99ff6fb5bba514391ec7c1ec8127ec"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.13/server.js",
+      "sha256": "466ba4ca914b96f076b71eb4bb622be002829bfb8808a78538fc0257de0c0fb5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.12/index.html",
-      "sha256": "a99be6532787146eb81038488bff02f6f45c96681ce9a93b59b178e0a2d86fc4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.13/index.html",
+      "sha256": "c2f1e5e0a79638bdf908c9cf368d085e33fd1340e8c8073a744b245482e82d8a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.12/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.13/package.json",
       "sha256": "b3050ad1a4dd6d4bb9da509a3a85bbe73a50c9479bd61608b4551c72b78efa64"
     }
   ]
