@@ -1,23 +1,23 @@
 {
-  "version": "1.11.26",
+  "version": "1.11.27",
   "released": "2026-06-02",
   "changelog": [
-    "Weeknumber"
+    "Weeknumber, update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.26/server.js",
-      "sha256": "97a15f9b27cf24fccaa4eaa829673154bc39f37dbd71a7f88de83ce346183004"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.27/server.js",
+      "sha256": "5654f8538ca8e921f7d6526574366ec0ca8f9c997fc033d902f944c93d54674f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.26/index.html",
-      "sha256": "ab0394ab95785cf38a602dc0840fe18df5e2be23afcb34f7d5a739c1adfd0886"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.27/index.html",
+      "sha256": "33a654cb3de060966b48b8e35fb38623cf6ff976c3ab40c98cc7f71c65994b0c"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.26/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.27/package.json",
       "sha256": "b3050ad1a4dd6d4bb9da509a3a85bbe73a50c9479bd61608b4551c72b78efa64"
     }
   ]
