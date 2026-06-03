@@ -1,23 +1,23 @@
 {
-  "version": "1.11.28",
-  "released": "2026-06-02",
+  "version": "1.11.29",
+  "released": "2026-06-03",
   "changelog": [
-    "Traffic filter"
+    "Department access, creator mail copy"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.28/server.js",
-      "sha256": "386868533088faac032b0208a47137821d925ec4e82d7d0ca9e7720d5a078a68"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.29/server.js",
+      "sha256": "1627a721ecdb2e3dbd7a1b22eb0973b496065f0278080f1d22f16fe854cc011c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.28/index.html",
-      "sha256": "3e165f6fbe4d3ca29c6b200e03ca9dd3370a7031fb9b53cccb533fb6cfacec8d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.29/index.html",
+      "sha256": "a017ea88861c082bc20ea0de7c2e097ade0a558c06b75a607625ad0fc72a2c6b"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.28/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.29/package.json",
       "sha256": "b3050ad1a4dd6d4bb9da509a3a85bbe73a50c9479bd61608b4551c72b78efa64"
     }
   ]
