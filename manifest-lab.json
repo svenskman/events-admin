@@ -1,23 +1,23 @@
 {
-  "version": "1.11.33",
+  "version": "1.11.34",
   "released": "2026-06-03",
   "changelog": [
-    "Department fix"
+    "Div fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.33/server.js",
-      "sha256": "5e4e765438cd99899be46bade722fbe3f33ea7c0c03b1728a95ff22443f66493"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.34/server.js",
+      "sha256": "87eba939d2ff5a97ae2d3726f3078114701a67aafe4ca6b3c93a968480b632ae"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.33/index.html",
-      "sha256": "8288cfceb87cf60dc6bcdd1be5f4835630a74fbef502b6204b715630f8b083bb"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.34/index.html",
+      "sha256": "f297ed26bfad609ce60444f9c9b4b46d0a5349f075ed32a05532c4b764c0aebc"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.33/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.34/package.json",
       "sha256": "b3050ad1a4dd6d4bb9da509a3a85bbe73a50c9479bd61608b4551c72b78efa64"
     }
   ]
