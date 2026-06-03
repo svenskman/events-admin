@@ -1,23 +1,23 @@
 {
-  "version": "1.11.29",
+  "version": "1.11.30",
   "released": "2026-06-03",
   "changelog": [
-    "Department access, creator mail copy"
+    "Color GUI"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.29/server.js",
-      "sha256": "1627a721ecdb2e3dbd7a1b22eb0973b496065f0278080f1d22f16fe854cc011c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.30/server.js",
+      "sha256": "756796ca58d80ad02f600e6bfcc0223b0a67fc4a5e581d2956d631ebf3e48956"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.29/index.html",
-      "sha256": "a017ea88861c082bc20ea0de7c2e097ade0a558c06b75a607625ad0fc72a2c6b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.30/index.html",
+      "sha256": "05f9096e1a7faeb538cf74dd635d518375b2d09e7a3bc972e4059272859149d9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.29/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.30/package.json",
       "sha256": "b3050ad1a4dd6d4bb9da509a3a85bbe73a50c9479bd61608b4551c72b78efa64"
     }
   ]
