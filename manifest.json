@@ -1,23 +1,23 @@
 {
-  "version": "1.11.31",
+  "version": "1.11.32",
   "released": "2026-06-03",
   "changelog": [
-    "Department details"
+    "Departments bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.31/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.32/server.js",
       "sha256": "5e4e765438cd99899be46bade722fbe3f33ea7c0c03b1728a95ff22443f66493"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.31/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.32/index.html",
       "sha256": "7f82cd0c32cf94da2f83571ea962281741c623ae83c17861b0a012d9ba7f228f"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.31/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.11.32/package.json",
       "sha256": "b3050ad1a4dd6d4bb9da509a3a85bbe73a50c9479bd61608b4551c72b78efa64"
     }
   ]
