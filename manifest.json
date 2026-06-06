@@ -1,23 +1,23 @@
 {
-  "version": "1.12.0",
-  "released": "2026-06-05",
+  "version": "1.12.1",
+  "released": "2026-06-06",
   "changelog": [
-    "Div bugs, canceled events funksjon"
+    "Canceled event tv update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.12.0/server.js",
-      "sha256": "c58def63acf1762f7c673052d8d903a50589858eaae4e9676500301158a29d6b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.12.1/server.js",
+      "sha256": "80e76399bf6b5666dc25f2aa72808e439efc0acdabe5ef98aa21e4e0a590c7a9"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.12.0/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.12.1/index.html",
       "sha256": "3920f90a83a9560b6030ab7a7c28d31b24eca8f2d834e2580ca3a0b61d23590d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.12.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.12.1/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
