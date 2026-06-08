@@ -1,23 +1,23 @@
 {
-  "version": "1.13.4",
+  "version": "1.13.5",
   "released": "2026-06-08",
   "changelog": [
-    "Bug fix tv."
+    "Bug fixes"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.4/server.js",
-      "sha256": "2d1b8d1a276a27e4f375bc20723ba08ec53a8df74e25e150527ed92922b16196"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.5/server.js",
+      "sha256": "515e7963986f9476185da8f98e8033f94d248011456e9a788442aa41aafd92a9"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.4/index.html",
-      "sha256": "3cc7d747868a041a3b9ec571fa6e6749d11682357816d2e3d5f3f1fbd0dbc562"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.5/index.html",
+      "sha256": "df53e4be7435cdec5b9932e833620c8d1ec5f09449648193862b298a3ee73a7e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.5/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
