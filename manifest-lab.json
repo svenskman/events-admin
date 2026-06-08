@@ -1,23 +1,23 @@
 {
-  "version": "1.13.3",
+  "version": "1.13.4",
   "released": "2026-06-08",
   "changelog": [
-    "TV update cancelations"
+    "Bug fix tv."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.3/server.js",
-      "sha256": "d7c35531c1e814f9e21e0c1561d62d80b6d31633333b770c17b8dbfabeb59f43"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.4/server.js",
+      "sha256": "2d1b8d1a276a27e4f375bc20723ba08ec53a8df74e25e150527ed92922b16196"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.3/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.4/index.html",
       "sha256": "3cc7d747868a041a3b9ec571fa6e6749d11682357816d2e3d5f3f1fbd0dbc562"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.3/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.4/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
