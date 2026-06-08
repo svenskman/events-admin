@@ -1,23 +1,23 @@
 {
-  "version": "1.13.0",
+  "version": "1.13.1",
   "released": "2026-06-08",
   "changelog": [
-    "Redesign Folk, Avlyst_utsatt"
+    "Justering avlysning"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.0/server.js",
-      "sha256": "2fcaa85d9bab4634c1b6c00fba5b67c0da72670ca19a565afdafa846237fdc1a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.1/server.js",
+      "sha256": "dc85ca569881858d464e4d4377727330b34bdff61079cfbf60abca8c7969e863"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.0/index.html",
-      "sha256": "dcffea7f2a1fc6cade3395924607458a5389a4640ba097139dd99b5bca5dc05a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.1/index.html",
+      "sha256": "de79566519b599261e0bd255110231cf4afd211a9b60b00a06c1c5105e29d1e4"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.1/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
