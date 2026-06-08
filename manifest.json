@@ -1,23 +1,23 @@
 {
-  "version": "1.13.2",
+  "version": "1.13.3",
   "released": "2026-06-08",
   "changelog": [
-    "Avlyst bugfix"
+    "TV update cancelations"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.2/server.js",
-      "sha256": "889f41d86a5318730e025fb23c12bf0a98332761a096080274ae45b445eef31b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.3/server.js",
+      "sha256": "d7c35531c1e814f9e21e0c1561d62d80b6d31633333b770c17b8dbfabeb59f43"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.2/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.3/index.html",
       "sha256": "3cc7d747868a041a3b9ec571fa6e6749d11682357816d2e3d5f3f1fbd0dbc562"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.2/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.3/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
