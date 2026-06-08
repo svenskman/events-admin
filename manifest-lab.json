@@ -1,23 +1,23 @@
 {
-  "version": "1.12.1",
-  "released": "2026-06-06",
+  "version": "1.13.0",
+  "released": "2026-06-08",
   "changelog": [
-    "Canceled event tv update"
+    "Redesign Folk, Avlyst_utsatt"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.12.1/server.js",
-      "sha256": "80e76399bf6b5666dc25f2aa72808e439efc0acdabe5ef98aa21e4e0a590c7a9"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.0/server.js",
+      "sha256": "2fcaa85d9bab4634c1b6c00fba5b67c0da72670ca19a565afdafa846237fdc1a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.12.1/index.html",
-      "sha256": "3920f90a83a9560b6030ab7a7c28d31b24eca8f2d834e2580ca3a0b61d23590d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.0/index.html",
+      "sha256": "dcffea7f2a1fc6cade3395924607458a5389a4640ba097139dd99b5bca5dc05a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.12.1/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.0/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
