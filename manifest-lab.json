@@ -1,23 +1,23 @@
 {
-  "version": "1.13.1",
+  "version": "1.13.2",
   "released": "2026-06-08",
   "changelog": [
-    "Justering avlysning"
+    "Avlyst bugfix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.1/server.js",
-      "sha256": "dc85ca569881858d464e4d4377727330b34bdff61079cfbf60abca8c7969e863"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.2/server.js",
+      "sha256": "889f41d86a5318730e025fb23c12bf0a98332761a096080274ae45b445eef31b"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.1/index.html",
-      "sha256": "de79566519b599261e0bd255110231cf4afd211a9b60b00a06c1c5105e29d1e4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.2/index.html",
+      "sha256": "3cc7d747868a041a3b9ec571fa6e6749d11682357816d2e3d5f3f1fbd0dbc562"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.1/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.2/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
