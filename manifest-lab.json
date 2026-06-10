@@ -1,23 +1,23 @@
 {
-  "version": "1.13.12",
+  "version": "1.13.13",
   "released": "2026-06-10",
   "changelog": [
-    "Eyedripper, mypage fix"
+    "Nav bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.12/server.js",
-      "sha256": "944753a991edc01c57d1b671136fb14f9cc02cfc01a140f654cc59bd8924a393"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.13/server.js",
+      "sha256": "7a1106f1f238856aa4813fe63d26d8c63ac72a95b3eaf9280da49309e4b4f343"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.12/index.html",
-      "sha256": "20a1728491c2885a4a4f77b886a8ae83563ccbd0c5ec660f904ebaecfd713026"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.13/index.html",
+      "sha256": "9a09ba2495571585870e91e558e895fdbc854ee04ed475122921ad7b7f66b4c3"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.12/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.13/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
