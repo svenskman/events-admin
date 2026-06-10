@@ -1,23 +1,23 @@
 {
-  "version": "1.13.13",
+  "version": "1.13.14",
   "released": "2026-06-10",
   "changelog": [
-    "Nav bug fix"
+    "Clothing bug hunt"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.13/server.js",
-      "sha256": "7a1106f1f238856aa4813fe63d26d8c63ac72a95b3eaf9280da49309e4b4f343"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.14/server.js",
+      "sha256": "b62433da3401a5cac38bf98d6ae54e9d320c191f2be24d1d1168ba91d2a15670"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.13/index.html",
-      "sha256": "9a09ba2495571585870e91e558e895fdbc854ee04ed475122921ad7b7f66b4c3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.14/index.html",
+      "sha256": "00c215aaff3302baa636b802eb8fb0af79aa8b759a2209565341c6560687d568"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.13/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.14/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
