@@ -1,23 +1,23 @@
 {
-  "version": "1.13.16",
-  "released": "2026-06-14",
+  "version": "1.13.17",
+  "released": "2026-06-15",
   "changelog": [
-    "Nav bugfix"
+    "Volonteer time"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.16/server.js",
-      "sha256": "be3ce07baa0562a6286dcbdbc864959930f001a13521b60d737f3b7b1144427b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.17/server.js",
+      "sha256": "a376bc85fc5c0b0a03b2dd99b9e303316b4791924e8395e1dd01dc6b524a9edd"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.16/index.html",
-      "sha256": "5535fbfa23d3756e4598a72ff76d148b901ed98070d719af1caef62371727afb"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.17/index.html",
+      "sha256": "5a956a05aec85ace5e57eeac6accd5997576e53b3f6a25f26fc1cb3fb82ba0cc"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.16/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.17/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
