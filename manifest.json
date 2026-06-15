@@ -1,23 +1,23 @@
 {
-  "version": "1.13.25",
+  "version": "1.13.26",
   "released": "2026-06-15",
   "changelog": [
-    "Mobile Timeregister bug"
+    "Timemanagement"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.25/server.js",
-      "sha256": "21a90a66a6932403d78c82ba9b48c1ef11de382468b602d9398e729c69137085"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.26/server.js",
+      "sha256": "c08f5be61bb84a8a0465304cdbe35b8f02b570d12f689c65f15a27246622aa7a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.25/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.26/index.html",
       "sha256": "de383a3e679f7800d9d7688b3c937df3d0c3409f0cc1351a5b10507fd5580947"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.25/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.26/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
