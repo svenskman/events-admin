@@ -1,23 +1,23 @@
 {
-  "version": "1.13.20",
+  "version": "1.13.21",
   "released": "2026-06-15",
   "changelog": [
-    "Timeregistrering Frivillig"
+    "Bug hunting timeregister"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.20/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.21/server.js",
       "sha256": "407e88c84ae72d33c3fd0a19db3c0680f3394036647bdee18d028f33987b4d88"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.20/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.21/index.html",
       "sha256": "1db01a2803e7cb4d63f9712683b371c1cd462e878f1d022f95858ea798ebff1a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.20/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.21/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
