@@ -1,23 +1,23 @@
 {
-  "version": "1.13.24",
+  "version": "1.13.25",
   "released": "2026-06-15",
   "changelog": [
-    "Volonteer minside update"
+    "Mobile Timeregister bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.24/server.js",
-      "sha256": "c28d9a6e2df17190bb29df062ac951ccaa30dcabcf0f10474e29d6e338adb8ae"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.25/server.js",
+      "sha256": "21a90a66a6932403d78c82ba9b48c1ef11de382468b602d9398e729c69137085"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.24/index.html",
-      "sha256": "1db01a2803e7cb4d63f9712683b371c1cd462e878f1d022f95858ea798ebff1a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.25/index.html",
+      "sha256": "de383a3e679f7800d9d7688b3c937df3d0c3409f0cc1351a5b10507fd5580947"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.24/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.25/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
