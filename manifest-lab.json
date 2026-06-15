@@ -1,23 +1,23 @@
 {
-  "version": "1.13.22",
+  "version": "1.13.23",
   "released": "2026-06-15",
   "changelog": [
-    "Bug hunt Minside"
+    "Bughunt Volonteer time"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.22/server.js",
-      "sha256": "f6d310acc79bc54848022d9c96848d889b80fe97fd4c69494a324b1ca632b891"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.23/server.js",
+      "sha256": "da6fec116c446fc5f73e8f87d846c03e6a920e090fd3971401bee1c15f38f649"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.22/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.23/index.html",
       "sha256": "1db01a2803e7cb4d63f9712683b371c1cd462e878f1d022f95858ea798ebff1a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.22/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.23/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
