@@ -1,23 +1,23 @@
 {
-  "version": "1.13.28",
+  "version": "1.13.29",
   "released": "2026-06-16",
   "changelog": [
-    "Timeregistrering update"
+    "Volonteer update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.28/server.js",
-      "sha256": "e37e9037f304f896fbdfe01ad7dd6c30c0d10a73201345f25a454a88342a1a4b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.29/server.js",
+      "sha256": "45413509d7999f109d2e8e258d5140c664d3aaffc2bfe11eba7315beca2842fd"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.28/index.html",
-      "sha256": "d3e2720d08f80c85099b442c84edec66224bfd08318fedc54ef07e62b11a8904"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.29/index.html",
+      "sha256": "9de92c82a7a924c3358b2715d0954fd99569c878ebd5afbe31247475a4313d3f"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.28/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.29/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
