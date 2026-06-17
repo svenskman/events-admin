@@ -1,23 +1,23 @@
 {
-  "version": "1.13.29",
-  "released": "2026-06-16",
+  "version": "1.13.30",
+  "released": "2026-06-17",
   "changelog": [
-    "Volonteer update"
+    "Color bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.29/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.30/server.js",
       "sha256": "45413509d7999f109d2e8e258d5140c664d3aaffc2bfe11eba7315beca2842fd"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.29/index.html",
-      "sha256": "9de92c82a7a924c3358b2715d0954fd99569c878ebd5afbe31247475a4313d3f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.30/index.html",
+      "sha256": "f7f0c6b65e8b8171d5da2fc04d03f6c9e754905bb3845a1d227a15398536f257"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.29/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.30/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
