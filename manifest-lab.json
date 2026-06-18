@@ -1,23 +1,23 @@
 {
-  "version": "1.13.32",
+  "version": "1.13.33",
   "released": "2026-06-18",
   "changelog": [
-    "Timesheet fix"
+    "Hour sheet fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.32/server.js",
-      "sha256": "54e2d4e2a72a92a1644815f0e31fdeb41cccfdf9b21c4a20a55396b0c679b046"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.33/server.js",
+      "sha256": "de9a06f0a0f03ddb9e0eb9a332e2ce402cf96f3557d20738298d7c055b56fac9"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.32/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.33/index.html",
       "sha256": "e67e3592319582c7f5e394874e7cdb03c47be98267a5d357b4134f9922b1300d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.32/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.33/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
