@@ -1,23 +1,23 @@
 {
-  "version": "1.13.31",
+  "version": "1.13.32",
   "released": "2026-06-18",
   "changelog": [
-    "Color bug fix"
+    "Timesheet fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.31/server.js",
-      "sha256": "45413509d7999f109d2e8e258d5140c664d3aaffc2bfe11eba7315beca2842fd"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.32/server.js",
+      "sha256": "54e2d4e2a72a92a1644815f0e31fdeb41cccfdf9b21c4a20a55396b0c679b046"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.31/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.32/index.html",
       "sha256": "e67e3592319582c7f5e394874e7cdb03c47be98267a5d357b4134f9922b1300d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.31/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.13.32/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
