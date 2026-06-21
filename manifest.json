@@ -1,23 +1,23 @@
 {
-  "version": "1.14.7",
+  "version": "1.14.8",
   "released": "2026-06-21",
   "changelog": [
-    "Video bugfix GB"
+    "Video GB bugfix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.7/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.8/server.js",
       "sha256": "52c998dd572a35b17bcf0980fcba5b7cdf4d69231949bc993a13b727bcda2d81"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.7/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.8/index.html",
       "sha256": "3aa0d462dd12bfa1c4744350cd813ac386dbb73e6bf9f6be6fa0733e2f320e7b"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.7/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.8/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
