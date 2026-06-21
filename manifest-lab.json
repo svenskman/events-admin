@@ -1,23 +1,23 @@
 {
-  "version": "1.14.4",
+  "version": "1.14.5",
   "released": "2026-06-21",
   "changelog": [
-    "Bug hunt timesheet"
+    "Statistic redesign"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.4/server.js",
-      "sha256": "82b88b72681172d39e9c13a6ca6cd57f62a46b28ddabe85d08aff66c65121246"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.5/server.js",
+      "sha256": "97a7bbf7ba463d3eb77567b11222292a1eb8243cd0f0c9124427fe9024820302"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.4/index.html",
-      "sha256": "608ed85221f9330b3054b753ae41597f0037d43f7fd770e227bbde59f58b498e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.5/index.html",
+      "sha256": "3aa0d462dd12bfa1c4744350cd813ac386dbb73e6bf9f6be6fa0733e2f320e7b"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.5/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
