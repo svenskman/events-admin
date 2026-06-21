@@ -1,23 +1,23 @@
 {
-  "version": "1.14.5",
+  "version": "1.14.6",
   "released": "2026-06-21",
   "changelog": [
-    "Statistic redesign"
+    "Statistics bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.5/server.js",
-      "sha256": "97a7bbf7ba463d3eb77567b11222292a1eb8243cd0f0c9124427fe9024820302"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.6/server.js",
+      "sha256": "0d0134313788180af356f9f73396e90a6fa07949bd363d2d6cfd57f6dfbfd93f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.5/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.6/index.html",
       "sha256": "3aa0d462dd12bfa1c4744350cd813ac386dbb73e6bf9f6be6fa0733e2f320e7b"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.5/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.6/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
