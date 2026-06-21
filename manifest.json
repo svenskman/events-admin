@@ -1,23 +1,23 @@
 {
-  "version": "1.14.11",
+  "version": "1.14.12",
   "released": "2026-06-21",
   "changelog": [
-    "Video stream fix"
+    "VideoStream fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.11/server.js",
-      "sha256": "aba3905fb9f0787e0036b0e3adc6ded01eab4754bc685fb95e05d2f22c3c32f6"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.12/server.js",
+      "sha256": "2cf7557efd1a5599ff5d300a49098e9e0724fbd61528bdf773f834fa635bbb50"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.11/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.12/index.html",
       "sha256": "a27c354bd4cac4df3c2188b2eb3a5f1066706dd34bf5eb86c43cc28b34c98b91"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.11/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.12/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
