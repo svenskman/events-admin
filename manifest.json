@@ -1,23 +1,23 @@
 {
-  "version": "1.14.0",
-  "released": "2026-06-20",
+  "version": "1.14.1",
+  "released": "2026-06-21",
   "changelog": [
-    "Event page fix, TV redesign, Pi remote management."
+    "Timesheet bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.0/server.js",
-      "sha256": "1bd3cb69b75eaa29aeb8b3a188fb55ae1d79306a58091cdd094b9da4a47f4cd3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.1/server.js",
+      "sha256": "9ba374a438d4af9fb3a33c99cc02ba995ed8fbe418185aaf8194bff0d4014165"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.0/index.html",
-      "sha256": "aa00c791d13dc3c78d6a506bc0bbc9597c9186239bbca6f504fd6e597d0aecbc"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.1/index.html",
+      "sha256": "608ed85221f9330b3054b753ae41597f0037d43f7fd770e227bbde59f58b498e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.1/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
