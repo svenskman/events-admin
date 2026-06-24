@@ -1,23 +1,23 @@
 {
-  "version": "1.14.13",
+  "version": "1.14.14",
   "released": "2026-06-24",
   "changelog": [
-    "Pi config fix"
+    "Pi config update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.13/server.js",
-      "sha256": "6e615b816f514f28b5d75ad46b494a165c8b3132e020246370a5084b76d9cf1d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.14/server.js",
+      "sha256": "0ecc386f05273789cb5efbf64621c67153cf7be08a4ed65052603888e78f28ea"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.13/index.html",
-      "sha256": "a27c354bd4cac4df3c2188b2eb3a5f1066706dd34bf5eb86c43cc28b34c98b91"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.14/index.html",
+      "sha256": "dd237f8a2a1341dfe7441cf7f33a2be5f8d5951dbd290b878dce0a8abe6b3c36"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.13/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.14/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
