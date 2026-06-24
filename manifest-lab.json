@@ -1,23 +1,23 @@
 {
-  "version": "1.14.18",
+  "version": "1.14.19",
   "released": "2026-06-24",
   "changelog": [
-    "TV bug fix"
+    "Feilsøking Pi"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.18/server.js",
-      "sha256": "d0be46b33d925385771fad02c6d0b6bcf495c89e344e6a81c2dd29d2af3c37dd"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.19/server.js",
+      "sha256": "04a1a9f8d4d503f79b72162c9441467560f2d8f50ee1af6352d7feb60cfe41d5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.18/index.html",
-      "sha256": "f671e4365712082f6d7900864c66cea47397b580e68f7ca059f2bc90fd73d9db"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.19/index.html",
+      "sha256": "263cb5eb5ff6a6a8d05085fd9b312fbab9ba0ffe7963c777ed184a031e9f1a42"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.18/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.19/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
