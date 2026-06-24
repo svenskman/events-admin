@@ -1,5 +1,5 @@
 {
-  "version": "1.14.15",
+  "version": "1.14.16",
   "released": "2026-06-24",
   "changelog": [
     "TV client update"
@@ -7,17 +7,17 @@
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.15/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.16/server.js",
       "sha256": "96c433e7a416f612294b388513740253f021739a95a52d2f497498ab340a4673"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.15/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.16/index.html",
       "sha256": "f671e4365712082f6d7900864c66cea47397b580e68f7ca059f2bc90fd73d9db"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.15/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.16/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
