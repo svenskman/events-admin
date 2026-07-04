@@ -1,23 +1,23 @@
 {
-  "version": "1.14.20",
+  "version": "1.14.21",
   "released": "2026-07-04",
   "changelog": [
-    "Maps fix, Graf till members"
+    "Month Highlight"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.20/server.js",
-      "sha256": "f2b13a2509c75b22d28704782a3e025767ae751e5bad21d495984fce8078a634"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.21/server.js",
+      "sha256": "b9c7cb5f0303fb144438e11faab959e0b88f601c3fdf185bab271074632c6e51"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.20/index.html",
-      "sha256": "5f08066257f1c59fb7d1255124d017cd5bec1fe823395203e939591bdf751c7c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.21/index.html",
+      "sha256": "fb22c3624387007c3da917579f89ef2a36072e9fc4320bf01111e0ab5cb8b6f4"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.20/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.21/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
