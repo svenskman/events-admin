@@ -1,23 +1,23 @@
 {
-  "version": "1.14.19",
-  "released": "2026-06-24",
+  "version": "1.14.20",
+  "released": "2026-07-04",
   "changelog": [
-    "Feilsøking Pi"
+    "Maps fix, Graf till members"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.19/server.js",
-      "sha256": "04a1a9f8d4d503f79b72162c9441467560f2d8f50ee1af6352d7feb60cfe41d5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.20/server.js",
+      "sha256": "f2b13a2509c75b22d28704782a3e025767ae751e5bad21d495984fce8078a634"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.19/index.html",
-      "sha256": "263cb5eb5ff6a6a8d05085fd9b312fbab9ba0ffe7963c777ed184a031e9f1a42"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.20/index.html",
+      "sha256": "5f08066257f1c59fb7d1255124d017cd5bec1fe823395203e939591bdf751c7c"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.19/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.20/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
