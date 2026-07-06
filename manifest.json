@@ -1,23 +1,23 @@
 {
-  "version": "1.14.23",
+  "version": "1.14.24",
   "released": "2026-07-06",
   "changelog": [
-    "Department overview fix"
+    "Mypage bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.23/server.js",
-      "sha256": "b9c7cb5f0303fb144438e11faab959e0b88f601c3fdf185bab271074632c6e51"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.24/server.js",
+      "sha256": "6f4e4451e45cf3d63d26cf8ff5209aff03178aa6412a5d1a64c25cc6538f90db"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.23/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.24/index.html",
       "sha256": "3bde6e2441ef8723699d26802be9f513c6857c7678b17070e0df7bec1fd007de"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.23/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.24/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
