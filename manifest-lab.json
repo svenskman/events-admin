@@ -1,23 +1,23 @@
 {
-  "version": "1.14.24",
-  "released": "2026-07-06",
+  "version": "1.14.25",
+  "released": "2026-07-10",
   "changelog": [
-    "Mypage bug fix"
+    "SubGrupp tillgång"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.24/server.js",
-      "sha256": "6f4e4451e45cf3d63d26cf8ff5209aff03178aa6412a5d1a64c25cc6538f90db"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.25/server.js",
+      "sha256": "c972df057d0a09526d29327655ccedf385578c994dc6317efb73655d9d131d5b"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.24/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.25/index.html",
       "sha256": "3bde6e2441ef8723699d26802be9f513c6857c7678b17070e0df7bec1fd007de"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.24/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.25/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
