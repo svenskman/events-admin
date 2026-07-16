@@ -1,23 +1,23 @@
 {
-  "version": "1.14.25",
-  "released": "2026-07-10",
+  "version": "1.14.26",
+  "released": "2026-07-16",
   "changelog": [
-    "SubGrupp tillgång"
+    "Media collection settings and media sharing"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.25/server.js",
-      "sha256": "c972df057d0a09526d29327655ccedf385578c994dc6317efb73655d9d131d5b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.26/server.js",
+      "sha256": "68c5e658ede46f09d2aeddc59dc0f026e0450db01edac516b72a6844265fcfaf"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.25/index.html",
-      "sha256": "3bde6e2441ef8723699d26802be9f513c6857c7678b17070e0df7bec1fd007de"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.26/index.html",
+      "sha256": "a60df83f4e9631cdbadef756ba322de6a7119a5d0ffa2c8a7c24ee6c705fc831"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.25/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.26/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
