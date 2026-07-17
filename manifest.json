@@ -1,23 +1,23 @@
 {
-  "version": "1.14.26",
-  "released": "2026-07-16",
+  "version": "1.14.27",
+  "released": "2026-07-17",
   "changelog": [
-    "Media collection settings and media sharing"
+    "Email flow update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.26/server.js",
-      "sha256": "68c5e658ede46f09d2aeddc59dc0f026e0450db01edac516b72a6844265fcfaf"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.27/server.js",
+      "sha256": "76d832c9249fc932bb0abc848c8de9b39b54b8a874c99f7a92686a786443fa24"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.26/index.html",
-      "sha256": "a60df83f4e9631cdbadef756ba322de6a7119a5d0ffa2c8a7c24ee6c705fc831"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.27/index.html",
+      "sha256": "f70021f390756848edc7c2b7293a6022c540628489328168246d3b31876bf60f"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.26/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.27/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
