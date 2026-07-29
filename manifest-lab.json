@@ -1,23 +1,23 @@
 {
-  "version": "1.14.27",
-  "released": "2026-07-17",
+  "version": "1.14.28",
+  "released": "2026-07-29",
   "changelog": [
-    "Email flow update"
+    "Misc fixes"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.27/server.js",
-      "sha256": "76d832c9249fc932bb0abc848c8de9b39b54b8a874c99f7a92686a786443fa24"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.28/server.js",
+      "sha256": "2d3fe912e0a0be34956fe77c1858104caf2a3aca17ba8ae697adc5edb0328c12"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.27/index.html",
-      "sha256": "f70021f390756848edc7c2b7293a6022c540628489328168246d3b31876bf60f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.28/index.html",
+      "sha256": "c626c79f492d6cbfb489a9702ec4eaf3b7d8e95827d27abd21d4334610a7cc23"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.27/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.28/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
