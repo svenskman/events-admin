@@ -1,23 +1,23 @@
 {
-  "version": "1.14.28",
-  "released": "2026-07-29",
+  "version": "1.14.29",
+  "released": "2026-07-30",
   "changelog": [
-    "Misc fixes"
+    "TV-system update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.28/server.js",
-      "sha256": "2d3fe912e0a0be34956fe77c1858104caf2a3aca17ba8ae697adc5edb0328c12"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.29/server.js",
+      "sha256": "3c7a942071a4ed7950bdc92c09d0a92b4cf53ce8f7b95dded40e35b24d19479e"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.28/index.html",
-      "sha256": "c626c79f492d6cbfb489a9702ec4eaf3b7d8e95827d27abd21d4334610a7cc23"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.29/index.html",
+      "sha256": "ccd6ddc4845d54a2fb6e0c3673868a3b9ceed393d2a9d6e7cd74977d8e88bde3"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.28/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.29/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
