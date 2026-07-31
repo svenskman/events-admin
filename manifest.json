@@ -1,23 +1,23 @@
 {
-  "version": "1.14.30",
+  "version": "1.14.31",
   "released": "2026-07-31",
   "changelog": [
-    "Signup button gone"
+    "Påmelding knapp borte"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.30/server.js",
-      "sha256": "2ad8e35235bea5fa383e5f8bb3d9bb682a1c335ad870a7a1cd5bd41689d7163e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.31/server.js",
+      "sha256": "02e19ebd7a7582c93972c8a69200bba22290af4f367ec12352805aaa73e0523b"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.30/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.31/index.html",
       "sha256": "d8380fdb15934295fffa1f8f27b1c4b1a9289f5d05dfedc83287a33e3f1fb70c"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.30/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.31/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
