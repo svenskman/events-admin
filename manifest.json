@@ -1,23 +1,23 @@
 {
-  "version": "1.14.29",
-  "released": "2026-07-30",
+  "version": "1.14.30",
+  "released": "2026-07-31",
   "changelog": [
-    "TV-system update"
+    "Signup button gone"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.29/server.js",
-      "sha256": "3c7a942071a4ed7950bdc92c09d0a92b4cf53ce8f7b95dded40e35b24d19479e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.30/server.js",
+      "sha256": "2ad8e35235bea5fa383e5f8bb3d9bb682a1c335ad870a7a1cd5bd41689d7163e"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.29/index.html",
-      "sha256": "ccd6ddc4845d54a2fb6e0c3673868a3b9ceed393d2a9d6e7cd74977d8e88bde3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.30/index.html",
+      "sha256": "d8380fdb15934295fffa1f8f27b1c4b1a9289f5d05dfedc83287a33e3f1fb70c"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.29/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.30/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
