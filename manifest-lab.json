@@ -1,23 +1,23 @@
 {
-  "version": "1.14.31",
-  "released": "2026-07-31",
+  "version": "1.14.32",
+  "released": "2026-08-01",
   "changelog": [
-    "Påmelding knapp borte"
+    "Startup bug, speed optimization."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.31/server.js",
-      "sha256": "02e19ebd7a7582c93972c8a69200bba22290af4f367ec12352805aaa73e0523b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.32/server.js",
+      "sha256": "edcc603a0253703bb9a6f6f9a727489aca32a4e2548c9587e58f52d6e339e3f0"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.31/index.html",
-      "sha256": "d8380fdb15934295fffa1f8f27b1c4b1a9289f5d05dfedc83287a33e3f1fb70c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.32/index.html",
+      "sha256": "e5482dfef400ba9475d175d0fc4010ec3ebdb1274423b7ff8839e40650a7aecc"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.31/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.32/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
