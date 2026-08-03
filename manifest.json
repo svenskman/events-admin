@@ -1,23 +1,23 @@
 {
-  "version": "1.14.37",
+  "version": "1.14.38",
   "released": "2026-08-03",
   "changelog": [
-    "Trip planning adjustment."
+    "Load Optimization"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.37/server.js",
-      "sha256": "c3538e5fdca037e6685338a3087780bc7ac8b7a816b7c33d57a0b12856a1f832"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.38/server.js",
+      "sha256": "ecd02d692093fa8ec9e1f4aa531b4f82fca4bf9ee5bc3175c12fdcdf7ca3cfd7"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.37/index.html",
-      "sha256": "76f9273625b0924d33409e0015488112376a3174d8afed0282a0d6ce4056d1b7"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.38/index.html",
+      "sha256": "79da6d03a722bf9c5c32157af559814319d25f84b8067f4ef44bcf4d57cf2bab"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.37/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.38/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
