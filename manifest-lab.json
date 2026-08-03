@@ -1,23 +1,23 @@
 {
-  "version": "1.14.38",
+  "version": "1.14.39",
   "released": "2026-08-03",
   "changelog": [
-    "Load Optimization"
+    "Load optimization"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.38/server.js",
-      "sha256": "ecd02d692093fa8ec9e1f4aa531b4f82fca4bf9ee5bc3175c12fdcdf7ca3cfd7"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.39/server.js",
+      "sha256": "5d4b646a025f9bf3469e38b13e14bbdecf3698ab014942bd818b1ad3d4b18012"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.38/index.html",
-      "sha256": "79da6d03a722bf9c5c32157af559814319d25f84b8067f4ef44bcf4d57cf2bab"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.39/index.html",
+      "sha256": "4c3477f1058f4c07e729b3413aedbe21f05ce7d227e296ee5329d95d08643b11"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.38/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.39/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
