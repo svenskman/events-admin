@@ -1,23 +1,23 @@
 {
-  "version": "1.14.35",
+  "version": "1.14.36",
   "released": "2026-08-03",
   "changelog": [
-    "AI Search fix, Cancled design fix"
+    "AI search bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.35/server.js",
-      "sha256": "ec4d8dbd10cd4ac19541351f04f8282612325a405caa72bfa26ccc97d120a95f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.36/server.js",
+      "sha256": "c3538e5fdca037e6685338a3087780bc7ac8b7a816b7c33d57a0b12856a1f832"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.35/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.36/index.html",
       "sha256": "b4adf56c2d28a9cfcdc20ffc0a694e775dbaa18368af7335b61848eaf3d46e73"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.35/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.36/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
