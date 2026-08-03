@@ -1,23 +1,23 @@
 {
-  "version": "1.14.34",
-  "released": "2026-08-01",
+  "version": "1.14.35",
+  "released": "2026-08-03",
   "changelog": [
-    "Access listing bug fix"
+    "AI Search fix, Cancled design fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.34/server.js",
-      "sha256": "edcc603a0253703bb9a6f6f9a727489aca32a4e2548c9587e58f52d6e339e3f0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.35/server.js",
+      "sha256": "ec4d8dbd10cd4ac19541351f04f8282612325a405caa72bfa26ccc97d120a95f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.34/index.html",
-      "sha256": "f2f749ec0bdeecbfc51f422ecffaf46c38b12406102fb95f8a462839e3faa201"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.35/index.html",
+      "sha256": "b4adf56c2d28a9cfcdc20ffc0a694e775dbaa18368af7335b61848eaf3d46e73"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.34/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.35/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
