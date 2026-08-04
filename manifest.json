@@ -1,23 +1,23 @@
 {
-  "version": "1.14.39",
-  "released": "2026-08-03",
+  "version": "1.14.40",
+  "released": "2026-08-04",
   "changelog": [
-    "Load optimization"
+    "Div fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.39/server.js",
-      "sha256": "5d4b646a025f9bf3469e38b13e14bbdecf3698ab014942bd818b1ad3d4b18012"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.40/server.js",
+      "sha256": "f1e480619d16c1d77aba0f3ff68396af715a6206f0451c00fb3a5ed8b204090f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.39/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.40/index.html",
       "sha256": "4c3477f1058f4c07e729b3413aedbe21f05ce7d227e296ee5329d95d08643b11"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.39/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.40/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
