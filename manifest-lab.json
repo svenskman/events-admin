@@ -1,23 +1,23 @@
 {
-  "version": "1.14.42",
+  "version": "1.14.43",
   "released": "2026-08-07",
   "changelog": [
-    "Volonteed department picker"
+    "Div bugfixes"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.42/server.js",
-      "sha256": "537ace513ca7e008da21e51799a7fd6c6bf9b710de5d3d729d044c4f948b75c5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.43/server.js",
+      "sha256": "86facc3022375d561ee5576494bcc5f9a135c54893e7afb0355949397b434c2d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.42/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.43/index.html",
       "sha256": "4c3477f1058f4c07e729b3413aedbe21f05ce7d227e296ee5329d95d08643b11"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.42/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.43/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
