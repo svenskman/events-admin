@@ -1,23 +1,23 @@
 {
-  "version": "1.14.44",
+  "version": "1.14.45",
   "released": "2026-08-07",
   "changelog": [
-    "Div bugfixes"
+    "Volonteer time fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.44/server.js",
-      "sha256": "2100af532703ca424d6c6f4ee8fec2ccb371a82b8cd6a4495e5cb374801b58ef"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.45/server.js",
+      "sha256": "a0ea5b4be5d45d98de4877ccc5b17b099d42e02f8dd738f6451103e175c93b46"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.44/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.45/index.html",
       "sha256": "4c3477f1058f4c07e729b3413aedbe21f05ce7d227e296ee5329d95d08643b11"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.44/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.45/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
