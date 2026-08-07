@@ -1,23 +1,23 @@
 {
-  "version": "1.14.46",
+  "version": "1.14.47",
   "released": "2026-08-07",
   "changelog": [
-    "Inventory photo upload bug"
+    "TV-Section update,"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.46/server.js",
-      "sha256": "74a48ae6bd739823b9027273a2b3e453811ec00ae572a078224e81f49d892605"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.47/server.js",
+      "sha256": "f38f298e6ae5a8f78e0ced84b7e680f8fc79f8957f9f849f0b40fcd7034026d8"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.46/index.html",
-      "sha256": "4c3477f1058f4c07e729b3413aedbe21f05ce7d227e296ee5329d95d08643b11"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.47/index.html",
+      "sha256": "875d0cc1e1b70ef1fc2ac5ee9aecf738efb310165b282f6563cfded9eac3091e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.46/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.47/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
