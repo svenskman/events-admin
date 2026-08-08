@@ -1,23 +1,23 @@
 {
-  "version": "1.14.48",
-  "released": "2026-08-07",
+  "version": "1.14.49",
+  "released": "2026-08-08",
   "changelog": [
-    "TV thumbnail viewer"
+    "Minside bug update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.48/server.js",
-      "sha256": "f38f298e6ae5a8f78e0ced84b7e680f8fc79f8957f9f849f0b40fcd7034026d8"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.49/server.js",
+      "sha256": "aa7f3947ac9c996727cb990e6b986e832d2e074a989ca11e0bff03c1627394de"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.48/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.49/index.html",
       "sha256": "ffb8fd7a24b551f8b5f3929f82b159e773bc0f5da1935a33af7c11746cce0cdd"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.48/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.49/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
