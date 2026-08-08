@@ -1,23 +1,23 @@
 {
-  "version": "1.14.49",
+  "version": "1.14.50",
   "released": "2026-08-08",
   "changelog": [
-    "Minside bug update"
+    "My page update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.49/server.js",
-      "sha256": "aa7f3947ac9c996727cb990e6b986e832d2e074a989ca11e0bff03c1627394de"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.50/server.js",
+      "sha256": "c98cf1939e9dcb48c83d9af60d32cb6f07b510ca7bd0e886164522e7acb8753f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.49/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.50/index.html",
       "sha256": "ffb8fd7a24b551f8b5f3929f82b159e773bc0f5da1935a33af7c11746cce0cdd"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.49/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.50/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
