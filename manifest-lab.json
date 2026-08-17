@@ -1,23 +1,23 @@
 {
-  "version": "1.14.50",
-  "released": "2026-08-08",
+  "version": "1.14.51",
+  "released": "2026-08-17",
   "changelog": [
-    "My page update"
+    "Diverse bugfixes TV enheter"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.50/server.js",
-      "sha256": "c98cf1939e9dcb48c83d9af60d32cb6f07b510ca7bd0e886164522e7acb8753f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.51/server.js",
+      "sha256": "44c126803adc38e026b76d95482302891a6e75db2f7fc89f9c4ea18045f2830a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.50/index.html",
-      "sha256": "ffb8fd7a24b551f8b5f3929f82b159e773bc0f5da1935a33af7c11746cce0cdd"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.51/index.html",
+      "sha256": "811110227f20d92e01f4819918c4e48b2dec54317481b6dfa6f46933f2bc784e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.50/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.51/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
