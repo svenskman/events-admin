@@ -1,23 +1,23 @@
 {
-  "version": "1.14.52",
-  "released": "2026-08-17",
+  "version": "1.14.53",
+  "released": "2026-08-18",
   "changelog": [
-    "Update to TV screen layout"
+    "My page design  button update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.52/server.js",
-      "sha256": "fe25a82b4f130949d4f37fedc45161740cb37264b36377ed898ba03c75896f66"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.53/server.js",
+      "sha256": "f4c98e31aac8d299da1ddbec0104b042d376d766112b1c76afa6bb13525ed0d8"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.52/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.53/index.html",
       "sha256": "811110227f20d92e01f4819918c4e48b2dec54317481b6dfa6f46933f2bc784e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.52/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.53/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
