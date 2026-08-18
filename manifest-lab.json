@@ -1,5 +1,5 @@
 {
-  "version": "1.14.54",
+  "version": "1.14.55",
   "released": "2026-08-18",
   "changelog": [
     "TV design bugfix"
@@ -7,17 +7,17 @@
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.54/server.js",
-      "sha256": "fa599bc63a91edfb6afafbb7648e8fb60c75c0c57208171587312ddabec6984f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.55/server.js",
+      "sha256": "5ba81759cf77963c7bb0d68a2d39cd72caf705a282814ad95d416ed2e7b28150"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.54/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.55/index.html",
       "sha256": "811110227f20d92e01f4819918c4e48b2dec54317481b6dfa6f46933f2bc784e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.54/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.55/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
