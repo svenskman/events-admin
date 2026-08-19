@@ -1,23 +1,23 @@
 {
-  "version": "1.14.60",
+  "version": "1.14.61",
   "released": "2026-08-19",
   "changelog": [
-    "Time registration bug fix"
+    "Branding fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.60/server.js",
-      "sha256": "7961889e659bc354dcb11ed98bc3a67d9064c2d1c0983d89848ae5f86df68f1f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.61/server.js",
+      "sha256": "999e116a23b87822a708fe936b7bfe60db365031aaea58d39e290a9ee6620197"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.60/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.61/index.html",
       "sha256": "42ccf1bd1224f12fb9aff04536ce5ae338e48f8883342f9412c92a8f7b101328"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.60/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.61/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
