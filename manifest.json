@@ -1,23 +1,23 @@
 {
-  "version": "1.14.57",
+  "version": "1.14.58",
   "released": "2026-08-19",
   "changelog": [
-    "Password update,"
+    "Self report meetup fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.57/server.js",
-      "sha256": "4745782cc916ed879e37cc9000bc3f77bd3db9295920b5b425a628cda052eee4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.58/server.js",
+      "sha256": "7961889e659bc354dcb11ed98bc3a67d9064c2d1c0983d89848ae5f86df68f1f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.57/index.html",
-      "sha256": "ac2e426219ec41de5c3512ac86dd515f5ead48998b662b7fa78aa43894f37fa6"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.58/index.html",
+      "sha256": "45dc740eac50a59b1cbe829c7c4c915d1882636fe511cf6f6a027349ecad5bd7"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.57/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.58/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
