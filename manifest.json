@@ -1,23 +1,23 @@
 {
-  "version": "1.14.62",
-  "released": "2026-08-19",
+  "version": "1.14.63",
+  "released": "2026-08-21",
   "changelog": [
-    "Div bugfixes"
+    "Diverse bugfixes"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.62/server.js",
-      "sha256": "cac8eb72b0b9e7bb545fc5644171871d185e924c920980602adece428a3f87ce"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.63/server.js",
+      "sha256": "e7512cc606379af47fae5cc4d3392841ab10247aae48743c776c7c8d575c8e6b"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.62/index.html",
-      "sha256": "75325bd83b0e0558e3989b6f0bacd9ed2c72bde8859d35b4951e2ba9c2fd065b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.63/index.html",
+      "sha256": "ea667d65b47eedf2ffeea0153f6fe91a733dfd7e870da6ee142e8b52a9f03b4f"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.62/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.63/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
