@@ -1,23 +1,23 @@
 {
-  "version": "1.14.68",
+  "version": "1.14.69",
   "released": "2026-08-22",
   "changelog": [
-    "TV secret bug"
+    "TV node bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.68/server.js",
-      "sha256": "65947b61e8027a053d67d5559bf1378466f493179ebd12ec1680c49a6aebe952"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.69/server.js",
+      "sha256": "022d7db4a9f65a370c4751daee731f724ddc6a243560549091c5cd686ad65816"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.68/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.69/index.html",
       "sha256": "bfd7f023d7734fbbe21c652370dda8354db7c761ccaae1ec578e6c0113438eba"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.68/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.69/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
