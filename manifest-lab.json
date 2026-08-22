@@ -1,23 +1,23 @@
 {
-  "version": "1.14.63",
-  "released": "2026-08-21",
+  "version": "1.14.64",
+  "released": "2026-08-22",
   "changelog": [
-    "Diverse bugfixes"
+    "TV-Section update - Pi config"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.63/server.js",
-      "sha256": "e7512cc606379af47fae5cc4d3392841ab10247aae48743c776c7c8d575c8e6b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.64/server.js",
+      "sha256": "54fb2b331e2afcbbe882733e65266faeb24ff72846c905ff817ebf8b9c1fe109"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.63/index.html",
-      "sha256": "ea667d65b47eedf2ffeea0153f6fe91a733dfd7e870da6ee142e8b52a9f03b4f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.64/index.html",
+      "sha256": "479db844ed9e7b48412d14ee5c51be65c6277bee7dd5ae2458c39a42c38e8459"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.63/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.64/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
