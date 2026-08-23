@@ -1,23 +1,23 @@
 {
-  "version": "1.14.72",
+  "version": "1.14.73",
   "released": "2026-08-23",
   "changelog": [
-    "tv node update management and logging."
+    "pi browser fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.72/server.js",
-      "sha256": "7b5b2d647a89cf5b8defe84c2aac2a40b90f13191c372cf5d52c9352f77a1159"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.73/server.js",
+      "sha256": "d6984baa2fe85e15b0d3e5f0ef42ec264bd44e424ebf481f46ff6e678aee11d7"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.72/index.html",
-      "sha256": "c2c1e710755f9611b59f04f8ed4fc9a17f57a4a0269daff00318c94ac5fdf321"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.73/index.html",
+      "sha256": "811110227f20d92e01f4819918c4e48b2dec54317481b6dfa6f46933f2bc784e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.72/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.73/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
