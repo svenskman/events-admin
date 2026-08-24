@@ -1,23 +1,23 @@
 {
-  "version": "1.14.73",
-  "released": "2026-08-23",
+  "version": "1.14.74",
+  "released": "2026-08-24",
   "changelog": [
-    "pi browser fix"
+    "Volonteer time import"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.73/server.js",
-      "sha256": "d6984baa2fe85e15b0d3e5f0ef42ec264bd44e424ebf481f46ff6e678aee11d7"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.74/server.js",
+      "sha256": "ceb6ef4b7bf24fdca4538e717c477f6b1d2836777104bc5b765f982504aad34c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.73/index.html",
-      "sha256": "811110227f20d92e01f4819918c4e48b2dec54317481b6dfa6f46933f2bc784e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.74/index.html",
+      "sha256": "1581802fc9ffe1fc932113e2f32e4c4c18520526a45c78c78a09da2df0587eaa"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.73/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.74/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
