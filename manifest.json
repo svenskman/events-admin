@@ -1,23 +1,23 @@
 {
-  "version": "1.14.75",
+  "version": "1.14.76",
   "released": "2026-08-24",
   "changelog": [
-    "Import bug fix"
+    "Import bugfix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.75/server.js",
-      "sha256": "ceb6ef4b7bf24fdca4538e717c477f6b1d2836777104bc5b765f982504aad34c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.76/server.js",
+      "sha256": "97eab3c4f39d98ca6305cfff1c3cc70a8df8cd2ea56e1194e867ce6837d029ca"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.75/index.html",
-      "sha256": "a96d55db081ef1c7af3218eef7a1d88ea896d1dd907432fe631e4168c4e065e8"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.76/index.html",
+      "sha256": "c442d3cd2ade419f1212bbff6b05b359e7096ee55cbe9374118591c295539f75"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.75/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.76/package.json",
       "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
     }
   ]
