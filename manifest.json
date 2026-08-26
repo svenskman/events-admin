@@ -1,24 +1,24 @@
 {
-  "version": "1.14.78",
-  "released": "2026-08-25",
+  "version": "1.15.0",
+  "released": "2026-08-26",
   "changelog": [
-    "Volonteer bugs"
+    "Export volonteers to PDF"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.78/server.js",
-      "sha256": "5e3e01d0fdd2602e4081a847150bb4d247970140cabc016df54b83e171ae3236"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.0/server.js",
+      "sha256": "5b3b110a2faa49747eb95be41e1cb5e2fe4aa98990ebb9eb64354305227df348"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.78/index.html",
-      "sha256": "809c43b3e37d21e26761fb307d924fbeb0cf2b1579f13f4700b32bf5a0a8753e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.0/index.html",
+      "sha256": "21aa0da7e4858b7908f043e8dc11712bdd0244c936ebc1ffa66534e0f8cb9ba5"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.14.78/package.json",
-      "sha256": "3d93378d53c7d784853fc5e530e575f0a17d99033892a0ceab3d7a64bfbe70da"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.0/package.json",
+      "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
 }
