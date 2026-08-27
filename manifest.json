@@ -1,23 +1,23 @@
 {
-  "version": "1.15.0",
-  "released": "2026-08-26",
+  "version": "1.15.1",
+  "released": "2026-08-27",
   "changelog": [
-    "Export volonteers to PDF"
+    "Kontakt update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.0/server.js",
-      "sha256": "5b3b110a2faa49747eb95be41e1cb5e2fe4aa98990ebb9eb64354305227df348"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.1/server.js",
+      "sha256": "aa8f2c1863f5fb9091f05d1676afeb26575ea229d7b83154217ed815bb0ea10c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.0/index.html",
-      "sha256": "21aa0da7e4858b7908f043e8dc11712bdd0244c936ebc1ffa66534e0f8cb9ba5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.1/index.html",
+      "sha256": "da77abd0bfd43044817d40b01a504fe5ba44d67331cb6d109648a2dbfc0458e1"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.1/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
