@@ -1,23 +1,23 @@
 {
-  "version": "1.15.1",
+  "version": "1.15.2",
   "released": "2026-08-27",
   "changelog": [
-    "Kontakt update"
+    "Public info update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.1/server.js",
-      "sha256": "aa8f2c1863f5fb9091f05d1676afeb26575ea229d7b83154217ed815bb0ea10c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.2/server.js",
+      "sha256": "f7918fb24d4dedcd5858dd5b1a6daae6a8b02500b9d40a2d7a432531a1891254"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.1/index.html",
-      "sha256": "da77abd0bfd43044817d40b01a504fe5ba44d67331cb6d109648a2dbfc0458e1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.2/index.html",
+      "sha256": "265b9950ef0625946b3a738f995ab35f377d292613a61c3cfd5637fa41dfc241"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.1/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.2/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
