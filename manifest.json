@@ -1,23 +1,23 @@
 {
-  "version": "1.15.2",
-  "released": "2026-08-27",
+  "version": "1.16.0",
+  "released": "2026-08-29",
   "changelog": [
-    "Public info update"
+    "Guestbook update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.2/server.js",
-      "sha256": "f7918fb24d4dedcd5858dd5b1a6daae6a8b02500b9d40a2d7a432531a1891254"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.0/server.js",
+      "sha256": "a4e35f8545c946d7f2d28b74d28f3652693e84f96a038f41746aa67a8c04486a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.2/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.0/index.html",
       "sha256": "265b9950ef0625946b3a738f995ab35f377d292613a61c3cfd5637fa41dfc241"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.15.2/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.0/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
