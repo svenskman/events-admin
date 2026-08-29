@@ -1,23 +1,23 @@
 {
-  "version": "1.16.8",
+  "version": "1.16.9",
   "released": "2026-08-29",
   "changelog": [
-    "GB bug hunt"
+    "GB lottery bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.8/server.js",
-      "sha256": "2ff63eb31e72baf5f20b1df85f18b35004ba5dc5bc64d7d0293b8321cc5d3a06"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.9/server.js",
+      "sha256": "25104bb3400f2fdd2828fa3c5cd4a7598ae37b10685678233542cb8d4568ddee"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.8/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.9/index.html",
       "sha256": "66870a9a0b6a719954df35358f9a729af2fb9a197c31f0399c3e3be1d10d2f75"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.8/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.9/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
