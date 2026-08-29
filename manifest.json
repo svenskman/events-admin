@@ -1,23 +1,23 @@
 {
-  "version": "1.16.5",
+  "version": "1.16.6",
   "released": "2026-08-29",
   "changelog": [
-    "GB bug"
+    "GB fixing"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.5/server.js",
-      "sha256": "a3331d5893cc808b729d0e970a838a33f5c1e6ff66f274af42a72390f860ebe5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.6/server.js",
+      "sha256": "2361c4c7d64bf56e2f3cb34b4f23a3d05bbc12523f65135551665a9fc149a999"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.5/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.6/index.html",
       "sha256": "66870a9a0b6a719954df35358f9a729af2fb9a197c31f0399c3e3be1d10d2f75"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.5/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.6/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
