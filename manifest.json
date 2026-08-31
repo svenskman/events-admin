@@ -1,23 +1,23 @@
 {
-  "version": "1.16.11",
+  "version": "1.16.12",
   "released": "2026-08-31",
   "changelog": [
-    "Div bug fixes, volonteers time registration time reports."
+    "Volonteer time bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.11/server.js",
-      "sha256": "c9740ea85d76aa37215025bf5075bbd851f4368d4b9e466754a20db9ffe894f0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.12/server.js",
+      "sha256": "6a45ea3fe9e3dce59fcc9b58e576ab5579c155bf697ef02959cfde60764bccdd"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.11/index.html",
-      "sha256": "a654544d6f266e11905074bf6876c2a289006eeb791e8729e9186958e6971028"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.12/index.html",
+      "sha256": "d15d867642a78d2e05b44574d40177ffe9dd3330a1a674ca36abefc4c305fb8b"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.11/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.16.12/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
