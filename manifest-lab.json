@@ -1,23 +1,23 @@
 {
-  "version": "1.17.0",
+  "version": "1.17.1",
   "released": "2026-09-05",
   "changelog": [
-    "Evaluation Function"
+    "Update Minside"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.0/server.js",
-      "sha256": "47440df9a9a2062b7489cdf3c68cf3978b8d9506f178ca92dc4aa78e1eb0cbea"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.1/server.js",
+      "sha256": "2039ebc81ac3af4867f046e1663d3c4ac06d78e4ef3d627e24ebfd9b3df3d72a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.0/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.1/index.html",
       "sha256": "3a575de9befd5b5bdbb8b7360fdfac2f07f3b17f8a096647462deb99987df57e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.1/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
