@@ -1,23 +1,23 @@
 {
-  "version": "1.17.2",
-  "released": "2026-09-06",
+  "version": "1.17.3",
+  "released": "2026-09-10",
   "changelog": [
-    "Guestbook thumbnails update"
+    "Evaluation per Event, multichoice questions, Send electronic and print."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.2/server.js",
-      "sha256": "53523d499aa5364d2ee5a2ac89df535183407316454ef268674e7261322a4194"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.3/server.js",
+      "sha256": "c516ce00eaacaed60e3f2081665a9d60c43e47b7119c4a7346a84f6b86577b55"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.2/index.html",
-      "sha256": "3a575de9befd5b5bdbb8b7360fdfac2f07f3b17f8a096647462deb99987df57e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.3/index.html",
+      "sha256": "1c24739ede41dbc22e71f4d365380a5a287a65f42d7cf3b18d5ea5ab60cfcdbb"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.2/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.3/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
