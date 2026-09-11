@@ -1,23 +1,23 @@
 {
-  "version": "1.17.4",
+  "version": "1.17.5",
   "released": "2026-09-11",
   "changelog": [
-    "Evaluation update"
+    "Eval form update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.4/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.5/server.js",
       "sha256": "4ca039f1d9a5eb7e83af0f9e9fe03a1f9b128cebf05ba2dba8044890ab825429"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.4/index.html",
-      "sha256": "2195eef191f90ab3585d03e84af889722680fc6baf757fb3c2e384787e582fe4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.5/index.html",
+      "sha256": "69422a92e5997f13c3ea8362d26f50fa2d52f25063b9b98539d42a728187398e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v1.17.5/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
