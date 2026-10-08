@@ -1,23 +1,23 @@
 {
-  "version": "2.0.2",
+  "version": "2.0.3",
   "released": "2026-10-08",
   "changelog": [
-    "Bugfix Eventedit"
+    "Media bulk"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.2/server.js",
-      "sha256": "44c7518c8f2dbc0d1e958953fdae37568b262b0c963116ef0b19fb9daf23d297"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.3/server.js",
+      "sha256": "7ee7369c13b6707907107e8605b502b8cbac31ab98b0baf52cf1aef10a7be8a1"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.2/index.html",
-      "sha256": "27a201822de1302e1e2b4da991f2067c2e6956c75c8c4356e12ebb03707ea834"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.3/index.html",
+      "sha256": "0948103e2508996fb2ac1a9e0a4d4f139d511847f54a61ddc80cdf7362a7540b"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.2/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.3/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
