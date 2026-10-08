@@ -1,23 +1,23 @@
 {
-  "version": "2.0.0",
-  "released": "2026-10-05",
+  "version": "2.0.1",
+  "released": "2026-10-08",
   "changelog": [
-    "Utlån funksjon"
+    "Media per event download"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.0/server.js",
-      "sha256": "78ce2ad4accdd708aaff3ecf92ee4dcc0bcb1e96841135141da754a13612b0d1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.1/server.js",
+      "sha256": "95d11c1088b3f260415714ce0c6c1ca95be6c504471c103067fe7aa2faf0ab23"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.0/index.html",
-      "sha256": "444984a0812e2f240a239b3b83030c5a0fb77c553004951cd67e21cb4a797115"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.1/index.html",
+      "sha256": "da98760159ed24a3a1efa1c34061dd7da65b0b8d11724c6041a75b1fcb23afbd"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.1/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
