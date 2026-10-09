@@ -1,23 +1,23 @@
 {
-  "version": "2.0.4",
-  "released": "2026-10-08",
+  "version": "2.0.5",
+  "released": "2026-10-09",
   "changelog": [
-    "Down speed fix"
+    "Presentation generator"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.4/server.js",
-      "sha256": "114819a5d7842e81642f477a8a099e9b2253c963e99c81e03ac37d5bec175e2e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.5/server.js",
+      "sha256": "6acbc407234326ac2c6c394f55f177c91a3a911087c4e2b7fd2e7ed3bf7eaee5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.4/index.html",
-      "sha256": "0948103e2508996fb2ac1a9e0a4d4f139d511847f54a61ddc80cdf7362a7540b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.5/index.html",
+      "sha256": "dffa13999b25d5dadfbc2556f1b9df4638c2d2634c4bd17e009a6c93c043765d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.5/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
