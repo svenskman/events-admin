@@ -1,23 +1,23 @@
 {
-  "version": "2.0.10",
+  "version": "2.0.11",
   "released": "2026-10-10",
   "changelog": [
-    "TV fix"
+    "Signup redesign"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.10/server.js",
-      "sha256": "ca67439d7abfc7f257c8c186198c593d266a72faa6c9be0a71476d88fd641ec2"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.11/server.js",
+      "sha256": "3662ddf1f31990e5158df9544bd767480dbb46c8cb4632b8ad4cc8368fafb6b1"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.10/index.html",
-      "sha256": "fa619a319eb82de81ed4f986ad4f1e3c6e0ba3e9caa2e2fb9af51cd781bcfb82"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.11/index.html",
+      "sha256": "bf99defae691c53a50eb604e24c32a05851ce43f27f1d2c82647ea7a1f45b7cf"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.10/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.11/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
