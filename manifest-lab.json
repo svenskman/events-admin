@@ -1,23 +1,23 @@
 {
-  "version": "2.0.8",
+  "version": "2.0.9",
   "released": "2026-10-10",
   "changelog": [
-    "PPT Fix"
+    "History fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.8/server.js",
-      "sha256": "4c44ec4f6831fa39a7fe60e15cf4935a7db1c270352f7ee5d5fccd53ca6421ad"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.9/server.js",
+      "sha256": "95f82178fc9981b828ee3ec4673c0839bd434a1f06b9965e8472d1a5eea479a3"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.8/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.9/index.html",
       "sha256": "fa619a319eb82de81ed4f986ad4f1e3c6e0ba3e9caa2e2fb9af51cd781bcfb82"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.8/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.9/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
