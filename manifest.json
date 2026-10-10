@@ -1,23 +1,23 @@
 {
-  "version": "2.0.12",
+  "version": "2.0.13",
   "released": "2026-10-10",
   "changelog": [
-    "Multi Presentasjon fix"
+    "Eval language"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.12/server.js",
-      "sha256": "988945bdfdf5145582385fe2bc1ef86fc75a833b42b6cc74701159752864b405"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.13/server.js",
+      "sha256": "6618eb5c4442219707612cb30bf48b6c83ff854e5577374e0f7bf2aad1453a77"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.12/index.html",
-      "sha256": "6c742b455227a92c30487a6e22c5e4f8b1539bab9461f7fbf96ec7aa28db6150"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.13/index.html",
+      "sha256": "465c7a30275d94a081eb7da3738823d2addc1ea9551a19db8b9cbafdbb0fe7e7"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.12/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.13/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
