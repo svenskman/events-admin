@@ -1,23 +1,23 @@
 {
-  "version": "2.0.9",
+  "version": "2.0.10",
   "released": "2026-10-10",
   "changelog": [
-    "History fix"
+    "TV fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.9/server.js",
-      "sha256": "95f82178fc9981b828ee3ec4673c0839bd434a1f06b9965e8472d1a5eea479a3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.10/server.js",
+      "sha256": "ca67439d7abfc7f257c8c186198c593d266a72faa6c9be0a71476d88fd641ec2"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.9/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.10/index.html",
       "sha256": "fa619a319eb82de81ed4f986ad4f1e3c6e0ba3e9caa2e2fb9af51cd781bcfb82"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.9/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.10/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
