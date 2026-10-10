@@ -1,23 +1,23 @@
 {
-  "version": "2.0.13",
+  "version": "2.0.14",
   "released": "2026-10-10",
   "changelog": [
-    "Eval language"
+    "Pres stats"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.13/server.js",
-      "sha256": "6618eb5c4442219707612cb30bf48b6c83ff854e5577374e0f7bf2aad1453a77"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.14/server.js",
+      "sha256": "440169a4b483545a737ad213bfef47983420d2487c02fb2760a55aab2223db3b"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.13/index.html",
-      "sha256": "465c7a30275d94a081eb7da3738823d2addc1ea9551a19db8b9cbafdbb0fe7e7"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.14/index.html",
+      "sha256": "2c0aed8da2f33b47176a412a81e9bb03d70ccf7f0770d46795a1d13bcdd3eaad"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.13/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.14/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
