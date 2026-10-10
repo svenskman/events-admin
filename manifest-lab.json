@@ -1,23 +1,23 @@
 {
-  "version": "2.0.6",
+  "version": "2.0.7",
   "released": "2026-10-10",
   "changelog": [
-    "PPTX export"
+    "PPT Template"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.6/server.js",
-      "sha256": "f70049cf0d4fe94378bc0d32e0e5e52bf8037a4188c53be1140f744bf9b2acfa"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.7/server.js",
+      "sha256": "eac10f5f2c5141bdd0c166225b3ec71a067320bdcfed02e4b94daaa14ba691a6"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.6/index.html",
-      "sha256": "58575203a9a731ec3b3f40ad5124e59edc7c28679828be0c6de6d93c5360166b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.7/index.html",
+      "sha256": "0e8fe24685850354436a79ba3ed2e7887e7925a061d75c125397d3daa49aac9e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.6/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.0.7/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
