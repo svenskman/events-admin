@@ -1,23 +1,23 @@
 {
-  "version": "2.1.0",
+  "version": "2.1.1",
   "released": "2026-10-11",
   "changelog": [
-    "Recurring fix"
+    "Serier layout fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.0/server.js",
-      "sha256": "01b9509694818202f81555a59a310ea9badd14f3209dc407ccfb50fb7cb4a9b9"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.1/server.js",
+      "sha256": "78a4094f4f28551f90abf413084bf0c862fd8ec7d30ce06c577baaa2015bbfad"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.0/index.html",
-      "sha256": "02246f80085b37ac429bea4c2c3fa72aa3d950c0323a5fd952d7b8ef9520ddba"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.1/index.html",
+      "sha256": "fbe653ee3fc4c1a3eeb7707f53afef16e75521aa5271aa12faaa3ecff3fbe85f"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.1/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
