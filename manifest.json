@@ -1,23 +1,23 @@
 {
-  "version": "2.1.5",
+  "version": "2.1.6",
   "released": "2026-10-12",
   "changelog": [
-    "PPT Editor"
+    "Evaluation Q management"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.5/server.js",
-      "sha256": "9090d6003f632c43bd834089a4cdf00bbb3f64c2ce6803bf54006a93a7c4a926"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.6/server.js",
+      "sha256": "4418cd8f369102a2d18db03a7d3dfecf4251e2d39b3e9743850bdfb28cff0aad"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.5/index.html",
-      "sha256": "2df55b7dbf81517b18000fa84fad8ca06b1deed032eb59bf70c7614b8ef231fe"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.6/index.html",
+      "sha256": "3eab2c04323d9f6e337da5c97734fd1808fced6d9fe3bae0bee22eb770597f3a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.5/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.6/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
