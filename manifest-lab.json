@@ -1,23 +1,23 @@
 {
-  "version": "2.1.4",
+  "version": "2.1.5",
   "released": "2026-10-12",
   "changelog": [
-    "Delete action"
+    "PPT Editor"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.4/server.js",
-      "sha256": "0268a0768a8408ae66650effa23ff293c0a58833c623fe66f3b0c88839b5351b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.5/server.js",
+      "sha256": "9090d6003f632c43bd834089a4cdf00bbb3f64c2ce6803bf54006a93a7c4a926"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.4/index.html",
-      "sha256": "6610b9e11d7d8c171097f456e680c7b84aaa0c160962d4e37809dfebc80225be"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.5/index.html",
+      "sha256": "2df55b7dbf81517b18000fa84fad8ca06b1deed032eb59bf70c7614b8ef231fe"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.5/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
