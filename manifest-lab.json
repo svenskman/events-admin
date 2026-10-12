@@ -1,23 +1,23 @@
 {
-  "version": "2.1.6",
+  "version": "2.1.7",
   "released": "2026-10-12",
   "changelog": [
-    "Evaluation Q management"
+    "Toolbar button Design update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.6/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.7/server.js",
       "sha256": "4418cd8f369102a2d18db03a7d3dfecf4251e2d39b3e9743850bdfb28cff0aad"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.6/index.html",
-      "sha256": "3eab2c04323d9f6e337da5c97734fd1808fced6d9fe3bae0bee22eb770597f3a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.7/index.html",
+      "sha256": "e39c6b02dea6dc9e89c952692e5ba372d8d41720d49ef14ffd0df9e62d2967eb"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.6/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.7/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
