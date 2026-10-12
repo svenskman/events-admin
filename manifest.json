@@ -1,23 +1,23 @@
 {
-  "version": "2.1.3",
+  "version": "2.1.4",
   "released": "2026-10-12",
   "changelog": [
-    "TV-Year update"
+    "Delete action"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.3/server.js",
-      "sha256": "36153ebbc7a0c079d549215fa4e5f1e99f520c61a4b9305753cecb816e2f6212"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.4/server.js",
+      "sha256": "0268a0768a8408ae66650effa23ff293c0a58833c623fe66f3b0c88839b5351b"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.3/index.html",
-      "sha256": "03a1ce38681c0c0cdf754cce2c7a0748622577dc399d1b7e0c73ab560aca9651"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.4/index.html",
+      "sha256": "6610b9e11d7d8c171097f456e680c7b84aaa0c160962d4e37809dfebc80225be"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.3/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.4/package.json",
       "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
     }
   ]
