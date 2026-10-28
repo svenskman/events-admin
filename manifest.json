@@ -1,24 +1,24 @@
 {
-  "version": "2.1.11",
-  "released": "2026-10-14",
+  "version": "2.1.12",
+  "released": "2026-10-28",
   "changelog": [
-    "List redesign"
+    "Hightlight TV List"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.11/server.js",
-      "sha256": "0b7a97c111fd75e8fa3aa4899101f97beb707c435b107359e05e374feebca9f5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.12/server.js",
+      "sha256": "7a8341dc8659e664e13193922c5e768a1069dc02778b670956c6757de1c97d2f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.11/index.html",
-      "sha256": "157dd08eb3b582875c83143bb37ff07d09a7ea5642fef57f83cfc687b3bb997b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.12/index.html",
+      "sha256": "a8d1a8626bd85bc61c9da00bdf2d7fc1fa5b75de0358ab22296a6b40c2d43440"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.11/package.json",
-      "sha256": "4c6aa8b402c54db517a720b14c9f864e0b0de65d2aa770267e36e41cf12ad53d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.1.12/package.json",
+      "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
 }
