@@ -1,23 +1,23 @@
 {
-  "version": "2.2.0",
+  "version": "2.2.1",
   "released": "2026-10-29",
   "changelog": [
-    "Redesign Admin console"
+    "Mypage update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.0/server.js",
-      "sha256": "3af4a53ea79c2cfd62cded8cdd443cea3f6e71c7041c8bc18707b9f29100de11"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.1/server.js",
+      "sha256": "bc7a2e38ca855b0fd44f2f326a4491c295a12eaf6d917b5f7c9ccb8cf1a1d012"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.0/index.html",
-      "sha256": "8f8c588aff11683e64c95c12843ee950731768fe39c2adf88949190a7be08430"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.1/index.html",
+      "sha256": "a9088e5be6388064c33a2f7614cbb87afb2a9a07acd05cb9861221261ba9ea9d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.1/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
