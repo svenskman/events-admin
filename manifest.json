@@ -1,23 +1,23 @@
 {
-  "version": "2.2.3",
-  "released": "2026-10-29",
+  "version": "2.2.4",
+  "released": "2026-10-30",
   "changelog": [
-    "Forms update"
+    "Calendar theme, buttons fix, Personvern dokumentasjon."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.3/server.js",
-      "sha256": "bc7a2e38ca855b0fd44f2f326a4491c295a12eaf6d917b5f7c9ccb8cf1a1d012"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.4/server.js",
+      "sha256": "d93058896791f8125c81c49fa0c3c764981577a063d33d7dae4bfb4ba54be3c4"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.3/index.html",
-      "sha256": "f8fe9e1b2ead47c8fcacee8d747da79bc1309e79a520c15528efc516478b4a55"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.4/index.html",
+      "sha256": "664750c6f0721d6275218e265e8822edd7119d97554b65c1c63193f1c5f5eda9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.3/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.2.4/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
