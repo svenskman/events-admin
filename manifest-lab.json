@@ -1,23 +1,23 @@
 {
-  "version": "2.4.0",
+  "version": "2.4.1",
   "released": "2026-10-31",
   "changelog": [
-    "Tour fixes"
+    "Route update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.0/server.js",
-      "sha256": "dc40489f8e6f9ffb06f12c8a5cb3236fb5cb7a762244f3ce06a99cc98124510c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.1/server.js",
+      "sha256": "aa935d7b55392492f0ff405d3530413e69ad1c34de791b0f6c4cfe729711c029"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.0/index.html",
-      "sha256": "404802372f99e1e775b0a58fe7b7928cc3b7a1fe307d62d9c8e03799429d12bb"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.1/index.html",
+      "sha256": "8a45b6511b125f7afd46c54ea50e514106f35de16cd6f9196429136d883efc73"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.1/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
