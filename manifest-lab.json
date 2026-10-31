@@ -1,23 +1,23 @@
 {
-  "version": "2.3.3",
+  "version": "2.3.4",
   "released": "2026-10-31",
   "changelog": [
-    "Sticky menu"
+    "Group contact information."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.3/server.js",
-      "sha256": "705c0d48c78f1d7088da6810eba00675bd51a9f479dfe15439292b81492d3ea0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.4/server.js",
+      "sha256": "26583214cecd437708de4116b461c38a3b86880e1eebec2e9596b91f0d1792d9"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.3/index.html",
-      "sha256": "46a83e8dc1331dca162acc49959e9a8cafdae49fef9730022a3b18865e55e0bc"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.4/index.html",
+      "sha256": "ea4ba446f8889d8946d24e7cc59a74e46036b8c6ab529c646856815cf73b7bbd"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.3/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.4/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
