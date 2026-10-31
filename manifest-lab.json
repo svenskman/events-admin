@@ -1,23 +1,23 @@
 {
-  "version": "2.3.4",
+  "version": "2.3.5",
   "released": "2026-10-31",
   "changelog": [
-    "Group contact information."
+    "Multiday badging"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.4/server.js",
-      "sha256": "26583214cecd437708de4116b461c38a3b86880e1eebec2e9596b91f0d1792d9"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.5/server.js",
+      "sha256": "150382c84a32b01d9478848d183adefca58799be361fd44b49757997791c44b8"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.4/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.5/index.html",
       "sha256": "ea4ba446f8889d8946d24e7cc59a74e46036b8c6ab529c646856815cf73b7bbd"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.3.5/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
