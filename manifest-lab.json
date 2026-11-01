@@ -1,23 +1,23 @@
 {
-  "version": "2.4.1",
-  "released": "2026-10-31",
+  "version": "2.4.2",
+  "released": "2026-11-01",
   "changelog": [
-    "Route update"
+    "Modal space management"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.1/server.js",
-      "sha256": "aa935d7b55392492f0ff405d3530413e69ad1c34de791b0f6c4cfe729711c029"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.2/server.js",
+      "sha256": "6c3d550efee371a15876ecadd93e230245d4a6f21cbb11435e9cff75f1c570a0"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.1/index.html",
-      "sha256": "8a45b6511b125f7afd46c54ea50e514106f35de16cd6f9196429136d883efc73"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.2/index.html",
+      "sha256": "82ff29fe800e7bc087b576d24916e1dd3605d69fa26c930ae88e68b3cac0f39d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.1/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.2/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
