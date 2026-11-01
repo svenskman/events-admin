@@ -1,23 +1,23 @@
 {
-  "version": "2.4.8",
+  "version": "2.4.9",
   "released": "2026-11-01",
   "changelog": [
-    "Suggestion fix"
+    "Tour Meal times"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.8/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.9/server.js",
       "sha256": "1b8a0a49c7877ed8c0f532a551f3cab67922e8d30be8ab2d8298a353b07c3bc5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.8/index.html",
-      "sha256": "8aa14e9e2a15d4ca2881b9beb24b5ac8e8f2d6942c253d0701bdd545548ad957"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.9/index.html",
+      "sha256": "25b55a6c2e972f66c6dbff50c079ec2317c1196e7520291703e8f9d5d9727fc1"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.8/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.9/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
