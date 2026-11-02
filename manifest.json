@@ -1,23 +1,23 @@
 {
-  "version": "2.4.13",
+  "version": "2.4.14",
   "released": "2026-11-02",
   "changelog": [
-    "Group Logo fix"
+    "Logo fix update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.13/server.js",
-      "sha256": "ec7b7d55daf8ddd77bbe6168c0bde957d7570a5409d743186ed1dfc1dffa27de"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.14/server.js",
+      "sha256": "6872403f0cd7400307d7b0d1adf9d87bb581404c89eaf6ac3b6d43bf9a7f9068"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.13/index.html",
-      "sha256": "1191a6fa61cd7189778e11ac6e486604d0fb2293dd4116373b48cad1b0645eed"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.14/index.html",
+      "sha256": "380d903c7304f43b168fdaf4bfbb224b2028c61a27918b159900c490d25d2155"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.13/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.14/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
