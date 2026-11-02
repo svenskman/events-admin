@@ -1,23 +1,23 @@
 {
-  "version": "2.4.9",
-  "released": "2026-11-01",
+  "version": "2.4.10",
+  "released": "2026-11-02",
   "changelog": [
-    "Tour Meal times"
+    "Autorefresh map, calendar spann days"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.9/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.10/server.js",
       "sha256": "1b8a0a49c7877ed8c0f532a551f3cab67922e8d30be8ab2d8298a353b07c3bc5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.9/index.html",
-      "sha256": "25b55a6c2e972f66c6dbff50c079ec2317c1196e7520291703e8f9d5d9727fc1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.10/index.html",
+      "sha256": "9de64aa09fee5912ac66ce05d51fd0c2a0e257c41fdfe3340d80e4602583536a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.9/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.10/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
