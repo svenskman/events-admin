@@ -1,23 +1,23 @@
 {
-  "version": "2.4.10",
+  "version": "2.4.11",
   "released": "2026-11-02",
   "changelog": [
-    "Autorefresh map, calendar spann days"
+    "Div route fixes"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.10/server.js",
-      "sha256": "1b8a0a49c7877ed8c0f532a551f3cab67922e8d30be8ab2d8298a353b07c3bc5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.11/server.js",
+      "sha256": "bb89873a551797ebac5e7e2d2104f10bd2864b3932ceb26ca19292b7b4cd04bb"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.10/index.html",
-      "sha256": "9de64aa09fee5912ac66ce05d51fd0c2a0e257c41fdfe3340d80e4602583536a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.11/index.html",
+      "sha256": "fd71ae9fa3bda05a044ff7d944927867cdcd14c69fc6ec16b63c0dc7f6477639"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.10/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.11/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
