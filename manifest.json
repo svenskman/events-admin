@@ -1,23 +1,23 @@
 {
-  "version": "2.4.14",
+  "version": "2.4.15",
   "released": "2026-11-02",
   "changelog": [
-    "Logo fix update"
+    "Public pages design"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.14/server.js",
-      "sha256": "6872403f0cd7400307d7b0d1adf9d87bb581404c89eaf6ac3b6d43bf9a7f9068"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.15/server.js",
+      "sha256": "35a8f6bdf9bd2e0e9f28ef073f8720b92e4f532fb4922ce83e41860c95636240"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.14/index.html",
-      "sha256": "380d903c7304f43b168fdaf4bfbb224b2028c61a27918b159900c490d25d2155"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.15/index.html",
+      "sha256": "0fb16820a0c0a6c664b29337bd84ec1bf0c6247eafef83f0ba740bbc573ec87e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.14/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.15/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
