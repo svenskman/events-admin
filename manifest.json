@@ -1,23 +1,24 @@
 {
-  "version": "2.4.16",
+  "version": "2.4.17",
   "released": "2026-11-03",
   "changelog": [
-    "POI update"
+    "POI bug fix",
+    "Trip Planning Day 2+ update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.16/server.js",
-      "sha256": "b5341e98084486e28e7c5d9f70b128a3352721ca338f75f2578504a444c4fc74"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.17/server.js",
+      "sha256": "6d967a1fc959934b7572ec315c27950af2d065aa9647cc94a0cc693b5f37e305"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.16/index.html",
-      "sha256": "9ff5c5d1f8dd258e79ab738e6c1067f52ee9e41fafa77dc4deee9d19397d4f0a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.17/index.html",
+      "sha256": "1b2a70d9599dbbfe4d2ee7c70facaa31569017c893a6aa825ad35cde950bb3f5"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.16/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.17/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
