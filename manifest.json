@@ -1,23 +1,23 @@
 {
-  "version": "2.4.21",
+  "version": "2.4.22",
   "released": "2026-11-04",
   "changelog": [
-    "Google POI Search"
+    "Eval shared"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.21/server.js",
-      "sha256": "92d28b3b4332dfb88564fbab8330df5c20b9aaadedf9db31f68188ea085459dd"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.22/server.js",
+      "sha256": "d29d879f926acbe7db687167c5f3ef9b9ab367366e1a274217a7482e7d8dfb01"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.21/index.html",
-      "sha256": "4302fa4610360e838a1f41606102515be4abd01771503f83ae776273d2c73d46"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.22/index.html",
+      "sha256": "5e7ef768af21cc0a06480759f2758c02cce8c5b10cfa3458200486191ec964aa"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.21/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.22/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
