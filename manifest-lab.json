@@ -1,23 +1,23 @@
 {
-  "version": "2.4.20",
+  "version": "2.4.21",
   "released": "2026-11-04",
   "changelog": [
-    "Google Maps API"
+    "Google POI Search"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.20/server.js",
-      "sha256": "ab661e22f4bac8d38c0fa9cd3abef5aff01bd3ee7b76d4455c43aebd81a8f76a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.21/server.js",
+      "sha256": "92d28b3b4332dfb88564fbab8330df5c20b9aaadedf9db31f68188ea085459dd"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.20/index.html",
-      "sha256": "8c3a53b6314eade42ab5ead1a3413b05c47d36fb71aafe38d9031564bfa99aa0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.21/index.html",
+      "sha256": "4302fa4610360e838a1f41606102515be4abd01771503f83ae776273d2c73d46"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.20/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.21/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
