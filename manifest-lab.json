@@ -1,23 +1,23 @@
 {
-  "version": "2.4.19",
+  "version": "2.4.20",
   "released": "2026-11-04",
   "changelog": [
-    "Tourplanning day picker"
+    "Google Maps API"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.19/server.js",
-      "sha256": "fabc5dbb639801cb48a79f56d88ee11241de68ecf0472ddf66364710921091ce"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.20/server.js",
+      "sha256": "ab661e22f4bac8d38c0fa9cd3abef5aff01bd3ee7b76d4455c43aebd81a8f76a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.19/index.html",
-      "sha256": "2d549361562443f0ee604da6a0a260c2afa4de487333136ddfe7aff61a9ddb72"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.20/index.html",
+      "sha256": "8c3a53b6314eade42ab5ead1a3413b05c47d36fb71aafe38d9031564bfa99aa0"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.19/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.20/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
