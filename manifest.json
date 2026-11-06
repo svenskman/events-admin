@@ -1,23 +1,23 @@
 {
-  "version": "2.4.24",
-  "released": "2026-11-05",
+  "version": "2.4.25",
+  "released": "2026-11-06",
   "changelog": [
-    "Forms update"
+    "Event Report CSV/PDF"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.24/server.js",
-      "sha256": "7b0fb95c3e9fec913a0dbaacc11ea0c7da4bff5b8c37f44eb6ea653c59b30441"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.25/server.js",
+      "sha256": "2f61cc78733d0e8e46896c6a3be0d5b1c56106227695fcf52a21e95c49d79cf5"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.24/index.html",
-      "sha256": "359e99cd38c342575f745d741f3ffc5203b9ab80199a161c3b052baf9f841619"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.25/index.html",
+      "sha256": "300e9caf822e81b1d05a4fd58fbae16535c6f7d59f1b180b698ca2fba91039e7"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.24/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.25/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
