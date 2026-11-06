@@ -1,23 +1,23 @@
 {
-  "version": "2.4.27",
+  "version": "2.4.28",
   "released": "2026-11-06",
   "changelog": [
-    "AI picker"
+    "TV Groups"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.27/server.js",
-      "sha256": "39ba400ee962fdc107bab888e2c52e0aea73416e4bb072ba1e93dc94c1ef6cd3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.28/server.js",
+      "sha256": "dfd08fcfff042de47f5dfd372af1329e15370b2d193a4f5164505faa96775de4"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.27/index.html",
-      "sha256": "0993978f39ad92f77509c3b6f77f64f70c79e87d67f28327324fd1e1584cb66b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.28/index.html",
+      "sha256": "f4546d69f50d98aa0f4564e7feee7aa8395e3c33d7f99d59db8897e93f709f0b"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.27/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.4.28/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
