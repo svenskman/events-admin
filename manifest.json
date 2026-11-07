@@ -1,23 +1,23 @@
 {
-  "version": "2.5.1",
+  "version": "2.5.2",
   "released": "2026-11-07",
   "changelog": [
-    "Datepicker unplanned"
+    "Volonteer bug fixes"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.1/server.js",
-      "sha256": "58037d057e9f8d013837f0e04d479037f7839dd2792d6f392d8b2f3c1a233127"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.2/server.js",
+      "sha256": "1617264b6775760f1279653a071bcad083584b0f4e2fd6ffaa563610e4f6396c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.1/index.html",
-      "sha256": "3900c55e4e6c6b78a44180d487caaabb97b1bacf7c5f923be6124cf6d778dece"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.2/index.html",
+      "sha256": "e5531da221a5962946add6bfaa711f96f203e4c54d083db1b890988507aff1a1"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.1/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.2/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
