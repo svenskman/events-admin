@@ -1,23 +1,23 @@
 {
-  "version": "2.5.3",
+  "version": "2.5.4",
   "released": "2026-11-07",
   "changelog": [
-    "Trip expense bugfix"
+    "Minside Expense big fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.3/server.js",
-      "sha256": "855800617e9b62d52030938246cd51026eeb034dd2106a6770147b8228f63ed0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.4/server.js",
+      "sha256": "82510875fea76589a51de39344b3378352736b915245f51cd172b8abd03b1ce4"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.3/index.html",
-      "sha256": "7cc60f9d0762c286db2cfd28c1faa0192d34d37c7f8f74283a36efb82d824202"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.4/index.html",
+      "sha256": "383b333bd3a0d53cd8086465b7524ff691b821dfb15cdaf9b222dba12734ecc0"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.3/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.4/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
