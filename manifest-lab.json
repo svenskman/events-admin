@@ -1,23 +1,23 @@
 {
-  "version": "2.5.5",
+  "version": "2.5.6",
   "released": "2026-11-08",
   "changelog": [
-    "Event Settings redesign"
+    "Calendar fixes"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.5/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.6/server.js",
       "sha256": "dfcead4bb0ebcada3c7db089c40d36aa91cb616a7bca7614c03897b94d7f31d4"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.5/index.html",
-      "sha256": "9881aa438b5899519f73919a53772472be2a9f6ff77877479f4db4e0ebcb5e0e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.6/index.html",
+      "sha256": "c3798560eea25100d5070092596fff1b5b998c8e86e97cfabb1fe3330f634bb8"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.5/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.6/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
