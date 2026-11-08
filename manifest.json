@@ -1,23 +1,23 @@
 {
-  "version": "2.5.8",
+  "version": "2.5.9",
   "released": "2026-11-08",
   "changelog": [
-    "Manual update"
+    "Expense form Strict"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.8/server.js",
-      "sha256": "dfcead4bb0ebcada3c7db089c40d36aa91cb616a7bca7614c03897b94d7f31d4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.9/server.js",
+      "sha256": "dfac771620ad94fc86078793dd53e536c519e0e2d37188f1cad2093f061c9180"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.8/index.html",
-      "sha256": "7b77d51678a707496f5a2ec23cfd8d3f0c5985c54318171589d77412be1695f1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.9/index.html",
+      "sha256": "fbb8b2a40d491372c65b5820af40e3d43fc92af760a73018654e2c2c6567230e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.8/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.9/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
