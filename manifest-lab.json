@@ -1,23 +1,23 @@
 {
-  "version": "2.5.6",
+  "version": "2.5.7",
   "released": "2026-11-08",
   "changelog": [
-    "Calendar fixes"
+    "Calendar Scroll fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.6/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.7/server.js",
       "sha256": "dfcead4bb0ebcada3c7db089c40d36aa91cb616a7bca7614c03897b94d7f31d4"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.6/index.html",
-      "sha256": "c3798560eea25100d5070092596fff1b5b998c8e86e97cfabb1fe3330f634bb8"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.7/index.html",
+      "sha256": "038a2d5d9b39b8341ec2477b2840557e2816374dddd5c650b4167cd6273e6b31"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.6/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.7/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
