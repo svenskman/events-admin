@@ -1,23 +1,23 @@
 {
-  "version": "2.5.11",
+  "version": "2.5.12",
   "released": "2026-11-09",
   "changelog": [
-    "Div bugs"
+    "Boardmeeting Travel Expense"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.11/server.js",
-      "sha256": "b2ab099533cc6cb94ae636d8e8ee9d38f76652fb3dbcd8af2ed4910d03fe0845"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.12/server.js",
+      "sha256": "99a00cb9afb73cc03d448e19fd91058dace9dfe0256708a730dfefaf7437d37c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.11/index.html",
-      "sha256": "20399f27783805e764d28f073125b317ea524933edcefaab073c412ed21050b1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.12/index.html",
+      "sha256": "db3383f039bbc729274670c8b007dd0f9675559b45e25e03beccd02e0e68fed4"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.11/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.12/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
