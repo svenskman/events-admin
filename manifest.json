@@ -1,23 +1,23 @@
 {
-  "version": "2.5.9",
-  "released": "2026-11-08",
+  "version": "2.5.10",
+  "released": "2026-11-09",
   "changelog": [
-    "Expense form Strict"
+    "Tourplanner update, Board meeting and Members"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.9/server.js",
-      "sha256": "dfac771620ad94fc86078793dd53e536c519e0e2d37188f1cad2093f061c9180"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.10/server.js",
+      "sha256": "a39317f2a17b79af20aeb9d3e4803eb8701dc66d5f60a69242eb935f6ea1645f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.9/index.html",
-      "sha256": "fbb8b2a40d491372c65b5820af40e3d43fc92af760a73018654e2c2c6567230e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.10/index.html",
+      "sha256": "d6d21e8395972dfc89e8d3a1a11cd6810b00f00aacb901b44529f6d0e9c2a1d2"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.9/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.10/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
