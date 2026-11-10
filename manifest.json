@@ -1,23 +1,23 @@
 {
-  "version": "2.5.13",
-  "released": "2026-11-09",
+  "version": "2.6.0",
+  "released": "2026-11-10",
   "changelog": [
-    "Travel expense fix"
+    "Div bugfixes, some redesign"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.13/server.js",
-      "sha256": "779131684d72a653aa26d855ba61146b6ae5ab30df8422d6535c6720be4596d4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.0/server.js",
+      "sha256": "414a98e9d5e6b5d258319c235b892e95367243f4711ca19a674e306709a41865"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.13/index.html",
-      "sha256": "10f21dacc611c824be3f7aa7ead16cf7e4d0cda9ea5bdde00e8a6c3d869e3865"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.0/index.html",
+      "sha256": "1ab5dc1c5962d2d78200167246d05bdd5e7babaf935d323e859d679135f94655"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.5.13/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.0/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
