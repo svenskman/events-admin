@@ -1,23 +1,23 @@
 {
-  "version": "2.6.1",
+  "version": "2.6.2",
   "released": "2026-11-10",
   "changelog": [
-    "Travel expense update"
+    "Volonteer mypage sessions, publicpage back button"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.1/server.js",
-      "sha256": "e491fec7154729114a0882273c096094ab88b72b0325b54594b7b6679e85b8e7"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.2/server.js",
+      "sha256": "f3910429b1f1faecd1ae68ccfe1a585593fefa1e4922cacbd982ec449913bad9"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.1/index.html",
-      "sha256": "25caa96f4bff9065728fe09236c6b01574b0d7011664872c4c18a2538f7f844f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.2/index.html",
+      "sha256": "7730e1155d1c41eabc65988f3c620caf3e5db83c87df507e1d2bc582d62a5fb6"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.1/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.2/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
