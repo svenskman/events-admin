@@ -1,23 +1,23 @@
 {
-  "version": "2.6.3",
+  "version": "2.6.4",
   "released": "2026-11-11",
   "changelog": [
-    "User department removal"
+    "Mobil redesign"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.3/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.4/server.js",
       "sha256": "f3910429b1f1faecd1ae68ccfe1a585593fefa1e4922cacbd982ec449913bad9"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.3/index.html",
-      "sha256": "f96442a467a9c464e21d216ca6a9545f27fb372f84ee1c9dd68f0907018f46ca"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.4/index.html",
+      "sha256": "52676eb8d7236fe323a38622721b364ddda3184e96b7bfd7044f305af56c8711"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.3/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.4/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
