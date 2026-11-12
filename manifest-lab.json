@@ -1,23 +1,23 @@
 {
-  "version": "2.6.7",
+  "version": "2.6.8",
   "released": "2026-11-12",
   "changelog": [
-    "Minside Event register list bug."
+    "Minside Personal list"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.7/server.js",
-      "sha256": "bbfc45cd8ee23cb044dd849e8ddf1a812dfc1fe82a1ae3d68eac2229ac91ef39"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.8/server.js",
+      "sha256": "a91c975be1ca641fed267cb1399c172b19ea311375bb186f20b1d84aa1d9ac1f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.7/index.html",
-      "sha256": "a5c09493add6050100e0f87c42aa564338018e5930854ebeeda22056f835eb1b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.8/index.html",
+      "sha256": "16c0594747ff0543815ebd1049735dd3c91eb25e1d2426488ecc90342ac68af8"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.7/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.8/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
