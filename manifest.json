@@ -1,23 +1,23 @@
 {
-  "version": "2.6.9",
+  "version": "2.6.10",
   "released": "2026-11-12",
   "changelog": [
-    "Manual update Boardmeetings"
+    "User management patching"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.9/server.js",
-      "sha256": "a91c975be1ca641fed267cb1399c172b19ea311375bb186f20b1d84aa1d9ac1f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.10/server.js",
+      "sha256": "8cba227aca6a9ddf9825f7d816580f76c7b72bb841b815a52d63bb005482ee86"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.9/index.html",
-      "sha256": "61c566907f7e4c0a639555fa1d11275376a8e2401ccc982a1e533824324cec72"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.10/index.html",
+      "sha256": "8a1c26e4a4477273cb2687f726ea7667bac89e031599af6fbd3c6730494dd52a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.9/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.10/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
