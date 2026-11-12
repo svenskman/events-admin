@@ -1,23 +1,23 @@
 {
-  "version": "2.6.12",
+  "version": "2.6.13",
   "released": "2026-11-12",
   "changelog": [
-    "Minside Badging"
+    "Volonteer import time tool"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.12/server.js",
-      "sha256": "62c7270072c0f630c97298832392053e14db82a9de15ef7b9aef657c29800efb"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.13/server.js",
+      "sha256": "32c38bfff0a7e7a0615c528fc4906738f53e769f6ea49ca69768a5e75bbb8123"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.12/index.html",
-      "sha256": "2caf47ca577f118c5ef5e009c953a2b9e8cfd60f76643920cf5d07c18bdcf07d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.13/index.html",
+      "sha256": "a09a4c044ae8e1502fb1f3a6e68739c8fcf2555730c7055a5f8becdf895cd713"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.12/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.13/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
