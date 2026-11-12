@@ -1,23 +1,23 @@
 {
-  "version": "2.6.10",
+  "version": "2.6.11",
   "released": "2026-11-12",
   "changelog": [
-    "User management patching"
+    "Minside Group info"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.10/server.js",
-      "sha256": "8cba227aca6a9ddf9825f7d816580f76c7b72bb841b815a52d63bb005482ee86"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.11/server.js",
+      "sha256": "18a169690fd495fd1e0cf932e3f6e78c9de2fdb22dab67b56fdcb1e334c39ce6"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.10/index.html",
-      "sha256": "8a1c26e4a4477273cb2687f726ea7667bac89e031599af6fbd3c6730494dd52a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.11/index.html",
+      "sha256": "c15332bbc72dd566089b1c51958a0eb0a7c5df07d80452035e2d93f3b4ca8ee8"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.10/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.11/package.json",
       "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
     }
   ]
