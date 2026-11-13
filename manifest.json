@@ -1,24 +1,24 @@
 {
-  "version": "2.6.13",
-  "released": "2026-11-12",
+  "version": "2.6.14",
+  "released": "2026-11-13",
   "changelog": [
-    "Volonteer import time tool"
+    "Dark mode bleeds fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.13/server.js",
-      "sha256": "32c38bfff0a7e7a0615c528fc4906738f53e769f6ea49ca69768a5e75bbb8123"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.14/server.js",
+      "sha256": "0a8096dbc5ccb5fa4c8fc14f5e9c26bf41466a6cf96c760492127ec2a6d1d6d0"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.13/index.html",
-      "sha256": "a09a4c044ae8e1502fb1f3a6e68739c8fcf2555730c7055a5f8becdf895cd713"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.14/index.html",
+      "sha256": "53f00999195bfaacaa5900c6e3db8ac24779f88b06714f60df61ad0cb5a2f00e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.13/package.json",
-      "sha256": "b23684d5c947966b01f31392523991856e5931f08c28d21f62f0c61c353b03d4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.14/package.json",
+      "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
 }
