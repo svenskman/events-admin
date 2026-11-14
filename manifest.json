@@ -1,23 +1,23 @@
 {
-  "version": "2.6.17",
+  "version": "2.6.18",
   "released": "2026-11-14",
   "changelog": [
-    "Div bugfixes when creating presentation."
+    "Resolution problem Presentation."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.17/server.js",
-      "sha256": "ca45412336fb954b83d337cffdf8893b2d9845cdc5570d2fd0e432a101026706"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.18/server.js",
+      "sha256": "eb5ea809eed593270e012c9f6ef1554345c341b2f291e4f2cd0f589c09c747d7"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.17/index.html",
-      "sha256": "fee56869d1ca6299b73ccaeca51cfb66da7697110bb98e54b67198231c3b71e6"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.18/index.html",
+      "sha256": "9a794875051bae6dd5c1d0af411c3c71c7d742cf627f3f98808f9e58a3408f56"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.17/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.18/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
