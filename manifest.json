@@ -1,23 +1,23 @@
 {
-  "version": "2.6.16",
+  "version": "2.6.17",
   "released": "2026-11-14",
   "changelog": [
-    "Media pick fix"
+    "Div bugfixes when creating presentation."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.16/server.js",
-      "sha256": "1c2ab6e9b9eca7abec5fe2dac4507a6be9e0a34544448246b4cf3ea88a5bd060"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.17/server.js",
+      "sha256": "ca45412336fb954b83d337cffdf8893b2d9845cdc5570d2fd0e432a101026706"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.16/index.html",
-      "sha256": "13a133e1036ed707b54ca9c1cf3a979164c958adc9c5eb854248b1ca934f0598"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.17/index.html",
+      "sha256": "fee56869d1ca6299b73ccaeca51cfb66da7697110bb98e54b67198231c3b71e6"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.16/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.17/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
