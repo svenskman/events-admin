@@ -1,23 +1,23 @@
 {
-  "version": "2.6.14",
-  "released": "2026-11-13",
+  "version": "2.6.15",
+  "released": "2026-11-14",
   "changelog": [
-    "Dark mode bleeds fix"
+    "Media picker to presentation"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.14/server.js",
-      "sha256": "0a8096dbc5ccb5fa4c8fc14f5e9c26bf41466a6cf96c760492127ec2a6d1d6d0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.15/server.js",
+      "sha256": "2ceca47440c83725a9469f65c65f9b53d4ddb03b0b503ed32f7b004baa0b0224"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.14/index.html",
-      "sha256": "53f00999195bfaacaa5900c6e3db8ac24779f88b06714f60df61ad0cb5a2f00e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.15/index.html",
+      "sha256": "b48592146e935dc9c33da7e74131a1034e05d15e1c224bdc8f172b3d24d05bc0"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.14/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.15/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
