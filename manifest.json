@@ -1,23 +1,23 @@
 {
-  "version": "2.6.22",
+  "version": "2.6.23",
   "released": "2026-11-15",
   "changelog": [
-    "Media disk update"
+    "Facedetect"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.22/server.js",
-      "sha256": "923063afa1c9245317da8982fc30d2029698a8175d27cc5172f209f0a35a7607"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.23/server.js",
+      "sha256": "ca90c01c14aaecd03ad2d43d1823144b3c17902d0ba41cdc9ad4155eb535a6e2"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.22/index.html",
-      "sha256": "2c37190af8836c37a6ef389d5bb0592f8a060e29eeedd2c8f974626ad44cb73b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.23/index.html",
+      "sha256": "0414d6290d0f33fa907c38c4e15bf10ab85fe66cf748e58c0d9a0f57cb1dbef4"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.22/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.23/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
