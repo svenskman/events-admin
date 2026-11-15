@@ -1,23 +1,23 @@
 {
-  "version": "2.6.21",
-  "released": "2026-11-14",
+  "version": "2.6.22",
+  "released": "2026-11-15",
   "changelog": [
-    "Event and name on presentation"
+    "Media disk update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.21/server.js",
-      "sha256": "e2b8e8a95cbda458e2bd5211eae07b738dbd67b8dd70f53f5559ae9338e851e3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.22/server.js",
+      "sha256": "923063afa1c9245317da8982fc30d2029698a8175d27cc5172f209f0a35a7607"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.21/index.html",
-      "sha256": "6d02b5ed66e0ce89b12b57022fe41faea27be6be2aa71b257dd13b3ec0cd09a6"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.22/index.html",
+      "sha256": "2c37190af8836c37a6ef389d5bb0592f8a060e29eeedd2c8f974626ad44cb73b"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.21/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.22/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
