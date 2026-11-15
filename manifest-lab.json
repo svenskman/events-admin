@@ -1,23 +1,23 @@
 {
-  "version": "2.6.23",
+  "version": "2.6.24",
   "released": "2026-11-15",
   "changelog": [
-    "Facedetect"
+    "Group view"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.23/server.js",
-      "sha256": "ca90c01c14aaecd03ad2d43d1823144b3c17902d0ba41cdc9ad4155eb535a6e2"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.24/server.js",
+      "sha256": "7a69ef481f5177ed35cc4e8baa45bdc4426a6e1fa105268759d78552cee89491"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.23/index.html",
-      "sha256": "0414d6290d0f33fa907c38c4e15bf10ab85fe66cf748e58c0d9a0f57cb1dbef4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.24/index.html",
+      "sha256": "de9c42e6c4c1964e0007ab72207cd72f4af6f70aa463e99cd9d788304e2dfaa3"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.23/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.24/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
