@@ -1,23 +1,23 @@
 {
-  "version": "2.6.35",
+  "version": "2.6.36",
   "released": "2026-11-16",
   "changelog": [
-    "Notification bell, larger."
+    "Import hours fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.35/server.js",
-      "sha256": "b843c70a60528c0778b9d3a5ceb913a078ae0dbfcbd7042661af50ca9a429d7c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.36/server.js",
+      "sha256": "38467c8f1a40cb6d94c520d85daf400deb9a9c5ab80dc5a42ed88b0f835a10d2"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.35/index.html",
-      "sha256": "0755bd123355387a57a4789cbc35999fa889b18d1ed0075dae3ac5d145474c03"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.36/index.html",
+      "sha256": "cfabdf43b35dc0eadfac384127c13485e39bac939533654030b935c33f4086d9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.35/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.36/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
