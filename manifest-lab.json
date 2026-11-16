@@ -1,23 +1,23 @@
 {
-  "version": "2.6.27",
+  "version": "2.6.28",
   "released": "2026-11-16",
   "changelog": [
-    "Event Meeting"
+    "Faces Department"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.27/server.js",
-      "sha256": "6ec160e3d3acdbe846994a5ca2a388b143885db28e5b8d4700b469694414477c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.28/server.js",
+      "sha256": "4cbeb9a640a7090614d040ba7e07f675496b8cade2dc59c8d108f1d5c508bcb0"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.27/index.html",
-      "sha256": "f62cd5801cdd873ec1d441c664628ecbcd12b5dfdbe07998a7044790b387e6ab"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.28/index.html",
+      "sha256": "2a9ed5aa7747dd86dc44b75c6b2798c39440c18f3f8d9c4b7bbda949bdc09da5"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.27/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.28/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
