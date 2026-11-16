@@ -1,23 +1,23 @@
 {
-  "version": "2.6.36",
+  "version": "2.6.37",
   "released": "2026-11-16",
   "changelog": [
-    "Import hours fix"
+    "Volonteer Hours connect fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.36/server.js",
-      "sha256": "38467c8f1a40cb6d94c520d85daf400deb9a9c5ab80dc5a42ed88b0f835a10d2"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.37/server.js",
+      "sha256": "2c4e024a14963cee1e56e1912c21f7b30e5a4cc140a673b5ed0e986a41acf30e"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.36/index.html",
-      "sha256": "cfabdf43b35dc0eadfac384127c13485e39bac939533654030b935c33f4086d9"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.37/index.html",
+      "sha256": "d16c867a5e8f4993360dd20f5526673e43aee1df9fc0918dc894819c5b58be70"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.36/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.37/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
