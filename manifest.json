@@ -1,23 +1,23 @@
 {
-  "version": "2.6.29",
+  "version": "2.6.30",
   "released": "2026-11-16",
   "changelog": [
-    "Edit Volonteer Time"
+    "Reroute suggestion."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.29/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.30/server.js",
       "sha256": "65bb459f2bc33b59b887566cfe54dbcc005132f222f3291c6bd20bff40792c66"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.29/index.html",
-      "sha256": "c0317ee8e641d2e92bdbfcc22abbef6e446348111ba1842f09f98972d17128b4"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.30/index.html",
+      "sha256": "deba7460054218b33ebd2bf818ea518964cb30cba40760b2e53861c0efe14ff3"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.29/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.30/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
