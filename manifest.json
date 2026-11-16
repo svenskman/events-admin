@@ -1,23 +1,23 @@
 {
-  "version": "2.6.32",
+  "version": "2.6.33",
   "released": "2026-11-16",
   "changelog": [
-    "Guest invite"
+    "Mailtest"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.32/server.js",
-      "sha256": "9f776f0a27cf08ccb71fdf1739d37ea6f02509027ef743110c502a6d4bf39521"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.33/server.js",
+      "sha256": "1cdc90d281142c2e9123688315dd1726b3ce34c382f4bb9783990bab34b0f70d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.32/index.html",
-      "sha256": "c2e8cf612e18924bae8a54e8053abe362ede564cd375132f4e79354e3cb909ad"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.33/index.html",
+      "sha256": "4f46a8d6fd284d4dd8072a92e844c2bc7061ffa42ba10ab840ec5735a9240e93"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.32/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.33/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
