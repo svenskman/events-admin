@@ -1,23 +1,23 @@
 {
-  "version": "2.6.37",
+  "version": "2.6.38",
   "released": "2026-11-16",
   "changelog": [
-    "Volonteer Hours connect fix"
+    "Open event timesheet"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.37/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.38/server.js",
       "sha256": "2c4e024a14963cee1e56e1912c21f7b30e5a4cc140a673b5ed0e986a41acf30e"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.37/index.html",
-      "sha256": "d16c867a5e8f4993360dd20f5526673e43aee1df9fc0918dc894819c5b58be70"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.38/index.html",
+      "sha256": "c4e245281d8bb017494f3e22abe0aa7d36f77a56ae0e82395e1bb26049d9a7eb"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.37/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.38/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
