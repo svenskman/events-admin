@@ -1,23 +1,23 @@
 {
-  "version": "2.6.33",
+  "version": "2.6.34",
   "released": "2026-11-16",
   "changelog": [
-    "Mailtest"
+    "Notification bell update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.33/server.js",
-      "sha256": "1cdc90d281142c2e9123688315dd1726b3ce34c382f4bb9783990bab34b0f70d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.34/server.js",
+      "sha256": "b843c70a60528c0778b9d3a5ceb913a078ae0dbfcbd7042661af50ca9a429d7c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.33/index.html",
-      "sha256": "4f46a8d6fd284d4dd8072a92e844c2bc7061ffa42ba10ab840ec5735a9240e93"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.34/index.html",
+      "sha256": "23e5d47ea4e1490c2ef0664f6c8cbe3722cb24ec70665c7c6f7fc8465fcd8fee"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.33/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.34/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
