@@ -1,23 +1,23 @@
 {
-  "version": "2.6.28",
+  "version": "2.6.29",
   "released": "2026-11-16",
   "changelog": [
-    "Faces Department"
+    "Edit Volonteer Time"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.28/server.js",
-      "sha256": "4cbeb9a640a7090614d040ba7e07f675496b8cade2dc59c8d108f1d5c508bcb0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.29/server.js",
+      "sha256": "65bb459f2bc33b59b887566cfe54dbcc005132f222f3291c6bd20bff40792c66"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.28/index.html",
-      "sha256": "2a9ed5aa7747dd86dc44b75c6b2798c39440c18f3f8d9c4b7bbda949bdc09da5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.29/index.html",
+      "sha256": "c0317ee8e641d2e92bdbfcc22abbef6e446348111ba1842f09f98972d17128b4"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.28/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.29/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
