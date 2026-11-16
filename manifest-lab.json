@@ -1,23 +1,23 @@
 {
-  "version": "2.6.34",
+  "version": "2.6.35",
   "released": "2026-11-16",
   "changelog": [
-    "Notification bell update"
+    "Notification bell, larger."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.34/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.35/server.js",
       "sha256": "b843c70a60528c0778b9d3a5ceb913a078ae0dbfcbd7042661af50ca9a429d7c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.34/index.html",
-      "sha256": "23e5d47ea4e1490c2ef0664f6c8cbe3722cb24ec70665c7c6f7fc8465fcd8fee"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.35/index.html",
+      "sha256": "0755bd123355387a57a4789cbc35999fa889b18d1ed0075dae3ac5d145474c03"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.34/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.6.35/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
