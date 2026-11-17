@@ -1,23 +1,23 @@
 {
-  "version": "2.7.0",
-  "released": "2026-11-16",
+  "version": "2.7.1",
+  "released": "2026-11-17",
   "changelog": [
-    "Mail tester bug test"
+    "Face update fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.0/server.js",
-      "sha256": "9ce54e9e53732deb93e0ec332049bee3dec8e4dafbb3af079e7b2d38ecb9c460"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.1/server.js",
+      "sha256": "26b5cf78f9d1bd991a80746d6ffefb8138f3c10cc618c8356535782088a42004"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.0/index.html",
-      "sha256": "3593bc773c6459a27302a62bcf8e65995a263a5280646e63fb1749084839aba3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.1/index.html",
+      "sha256": "035ec9b2b9392f4f7ede2eea8f3c120b4bcf68aab69bcfb2cb045929c117e8f3"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.0/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.1/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
