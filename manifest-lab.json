@@ -1,23 +1,23 @@
 {
-  "version": "2.7.5",
+  "version": "2.7.6",
   "released": "2026-11-17",
   "changelog": [
-    "Hero Image Public page"
+    "Internal activities for volonteers"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.5/server.js",
-      "sha256": "5a4036550b062767373fbb1079733735d7add02c6b022b844ec714de17c4465a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.6/server.js",
+      "sha256": "256f7a9a3d484196df2566692d8252bd597e6abe88b785e65dfc460c9f4f87b2"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.5/index.html",
-      "sha256": "e6301d537b3491d2711a29890828d18778b1bd1b88a2c9ec05e1a35d486722a8"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.6/index.html",
+      "sha256": "afeba5e1e0fab7cd9fb7bb19a118a44ff5b1a9a6b7361378dd0ea5483151be8f"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.5/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.6/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
