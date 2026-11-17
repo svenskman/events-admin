@@ -1,23 +1,23 @@
 {
-  "version": "2.7.6",
+  "version": "2.7.7",
   "released": "2026-11-17",
   "changelog": [
-    "Internal activities for volonteers"
+    "Shared ride travel expense"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.6/server.js",
-      "sha256": "256f7a9a3d484196df2566692d8252bd597e6abe88b785e65dfc460c9f4f87b2"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.7/server.js",
+      "sha256": "0ab82c23975508291fc7ccd85976ae7dc8215fc4382b69de1ca329368e4f183c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.6/index.html",
-      "sha256": "afeba5e1e0fab7cd9fb7bb19a118a44ff5b1a9a6b7361378dd0ea5483151be8f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.7/index.html",
+      "sha256": "648a74dc54263d276e032ac54b8cf9a4f4d23c6ee6eaa6ff3690d85892b10346"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.6/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.7/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
