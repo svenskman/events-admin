@@ -1,23 +1,23 @@
 {
-  "version": "2.7.4",
+  "version": "2.7.5",
   "released": "2026-11-17",
   "changelog": [
-    "Admin SSO Bugfix"
+    "Hero Image Public page"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.4/server.js",
-      "sha256": "cb55fdf8f67c44df7b718a406086ed2dd4595cbee38842a5f56d3e81489d2ef0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.5/server.js",
+      "sha256": "5a4036550b062767373fbb1079733735d7add02c6b022b844ec714de17c4465a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.4/index.html",
-      "sha256": "cc4b3616830b8fd12ec4bad1c9a0743a403fd36e0ed117e1e11a582ab67a0e67"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.5/index.html",
+      "sha256": "e6301d537b3491d2711a29890828d18778b1bd1b88a2c9ec05e1a35d486722a8"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.4/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.5/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
