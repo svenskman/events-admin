@@ -1,23 +1,23 @@
 {
-  "version": "2.7.1",
+  "version": "2.7.2",
   "released": "2026-11-17",
   "changelog": [
-    "Face update fix"
+    "Mypage signin update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.1/server.js",
-      "sha256": "26b5cf78f9d1bd991a80746d6ffefb8138f3c10cc618c8356535782088a42004"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.2/server.js",
+      "sha256": "c07ea28f5391a453ce009f34da89a2359f57438358cc7b4401752763db6c2206"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.1/index.html",
-      "sha256": "035ec9b2b9392f4f7ede2eea8f3c120b4bcf68aab69bcfb2cb045929c117e8f3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.2/index.html",
+      "sha256": "e81885889394bb3afb4bbfa847ffcf205fbf926a6c19ed2a4020410fff2dab34"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.1/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.2/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
