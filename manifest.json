@@ -2,18 +2,18 @@
   "version": "2.7.11",
   "released": "2026-11-18",
   "changelog": [
-    "Public group size"
+    "Trip map expense"
   ],
   "files": [
     {
       "name": "server.js",
       "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.11/server.js",
-      "sha256": "678ed3542f7d33175f1424056a474ea2aa9b6ddbcec8fb9c8b10ad454e4eb380"
+      "sha256": "7b0b875ef3132f90ee969706f9cdb9a0b144deef9ea7b09ec3bf461a532522c0"
     },
     {
       "name": "index.html",
       "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.11/index.html",
-      "sha256": "e779457501a0d15104c28d4d6d8fe386b18af9ac5951f5bb4a60c66849f5f4a0"
+      "sha256": "25ee0c013834051b40eb4ef22e6c68b4f497afa661ab7829d89cd5f5ac9d3d18"
     },
     {
       "name": "package.json",
