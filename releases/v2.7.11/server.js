@@ -13045,12 +13045,18 @@ async function _drivingKm(a, b) {
   let out = null;
   try {
     const ctl = new AbortController(); const t = setTimeout(function() { ctl.abort(); }, 8000);
-    const r = await fetch("https://router.project-osrm.org/route/v1/driving/" + a[1] + "," + a[0] + ";" + b[1] + "," + b[0] + "?overview=false", { signal: ctl.signal, headers: { "User-Agent": "Event-Admin/" + APP_VERSION } });
+    const r = await fetch("https://router.project-osrm.org/route/v1/driving/" + a[1] + "," + a[0] + ";" + b[1] + "," + b[0] + "?overview=simplified&geometries=geojson", { signal: ctl.signal, headers: { "User-Agent": "Event-Admin/" + APP_VERSION } });
     clearTimeout(t);
     const d = await r.json();
-    if (d && d.routes && d.routes[0]) out = { km: Math.round(d.routes[0].distance / 100) / 10, estimated: false };
+    if (d && d.routes && d.routes[0]) {
+      // The road line for the trip map: [lat, lon], at most ~120 points
+      const c = (d.routes[0].geometry && d.routes[0].geometry.coordinates) || [];
+      const step = Math.max(1, Math.ceil(c.length / 120));
+      const geo = c.filter(function(_, i) { return i % step === 0 || i === c.length - 1; }).map(function(p) { return [Math.round(p[1] * 1e5) / 1e5, Math.round(p[0] * 1e5) / 1e5]; });
+      out = { km: Math.round(d.routes[0].distance / 100) / 10, estimated: false, geo: geo.length > 1 ? geo : [a, b] };
+    }
   } catch (e) {}
-  if (!out) out = { km: Math.round(_haversineKm(a, b) * 1.3 * 10) / 10, estimated: true };
+  if (!out) out = { km: Math.round(_haversineKm(a, b) * 1.3 * 10) / 10, estimated: true, geo: [a, b] };
   if (!out.estimated) { _kmCache.set(key, out); if (_kmCache.size > 2000) _kmCache.delete(_kmCache.keys().next().value); }
   return out;
 }
@@ -13220,12 +13226,21 @@ async function _travelCalc(vol, ev, route, vehicle, passengers, stops) {
   // Unloading at the base afterwards is part of the base plan; without it the way home skips the base
   const bi = _eventBaseInfo(ev);
   const way = pts.concat(back.filter(function(p) { return !(route === "direct" && p.via === "base" && bi && bi.unload === false); }));
-  const legs = []; let total = 0, estimated = false;
+  const legs = [], geo = []; let total = 0, estimated = false;
   for (let k = 1; k < way.length; k++) {
     const r = await _drivingKm(way[k - 1].ll, way[k].ll);
     legs.push({ from: way[k - 1].name, to: way[k].name, km: r.km });
     total += r.km; if (r.estimated) estimated = true;
+    geo.push(r.geo || [way[k - 1].ll, way[k].ll]);
   }
+  // Trip map (preview only, never stored on the claim). Another volunteer's home is never shown:
+  // no marker there, and the line stops ~400 m short of it.
+  const hidden = way.filter(function(p) { return /^home:/.test(p.via); }).map(function(p) { return p.ll; });
+  const near = function(q) { return hidden.some(function(h) { return _haversineKm(q, h) < 0.4; }); };
+  const map = {
+    lines: geo.map(function(g) { return g.filter(function(q) { return !near(q); }); }).filter(function(g) { return g.length > 1; }),
+    points: pts.filter(function(p) { return !/^home:/.test(p.via); }).map(function(p) { return { name: p.name, ll: p.ll, kind: p.via }; })
+  };
   const r1 = function(x) { return Math.round(x * 10) / 10; };
   const km = r1(total);
   // Km on board per boarding point (only for trips that end at the event)
@@ -13241,7 +13256,7 @@ async function _travelCalc(vol, ev, route, vehicle, passengers, stops) {
   }
   const pax = Math.max(0, Math.min(8, parseInt(passengers, 10) || 0));
   const pRate = rates.passenger || 0;
-  return { legs: legs, km: km, boardKm: boardKm, estimated: estimated, rate: rate, passengers: pax, passengerRate: pRate, trailerRate: rates.trailer || 0, amount: Math.round((km * rate + km * pax * pRate) * 100) / 100 };
+  return { legs: legs, map: map, km: km, boardKm: boardKm, estimated: estimated, rate: rate, passengers: pax, passengerRate: pRate, trailerRate: rates.trailer || 0, amount: Math.round((km * rate + km * pax * pRate) * 100) / 100 };
 }
 function _claimPublic(c) {
   return { id: c.id, eventId: c.eventId, route: c.route, viaBase: !!c.viaBase, viaMeetup: !!c.viaMeetup, vehicle: c.vehicle, transitRoute: c.transitRoute || "", passengers: c.passengers, passengerNames: c.passengerNames || [], paxList: c.paxList || null, paxKm: c.paxKm == null ? null : c.paxKm, meetAt: c.meetAt || null, meetPlace: c.meetPlace || "", rideWith: c.rideWith || null, viaPlace: c.viaPlace || "", trailer: !!c.trailer, trailerRate: c.trailerRate || 0, expenses: c.expenses || [], legs: c.legs, km: c.km, kmAuto: c.kmAuto, kmEdited: !!c.kmEdited, rate: c.rate, passengerRate: c.passengerRate, amount: c.amount, note: c.note || "", status: c.status, managerNote: c.managerNote || "", createdAt: c.createdAt, decidedAt: c.decidedAt || null };
@@ -15112,6 +15127,33 @@ function openTravel(evId){
   renderTravel(); travelPreview();
 }
 // The km a passenger is on board, from where they got in (whole trip = the km used)
+// Small trip map (Leaflet, loaded the first time it is needed)
+var _leafP=null;
+function loadLeaflet(){
+  if(window.L)return Promise.resolve();
+  if(_leafP)return _leafP;
+  _leafP=new Promise(function(ok,no){
+    var c=document.createElement('link');c.rel='stylesheet';c.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';document.head.appendChild(c);
+    var sc=document.createElement('script');sc.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';sc.onload=function(){ok();};sc.onerror=function(){_leafP=null;no();};document.head.appendChild(sc);
+  });
+  return _leafP;
+}
+function drawTvMap(m){
+  loadLeaflet().then(function(){
+    var el=$('tvMap'); if(!el||el._map)return;
+    var map=L.map(el,{zoomControl:false,attributionControl:true,dragging:true,scrollWheelZoom:false,tap:false});
+    el._map=map;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap'}).addTo(map);
+    var all=[];
+    m.lines.forEach(function(g){ L.polyline(g,{color:'#1d4ed8',weight:4,opacity:.85}).addTo(map); all=all.concat(g); });
+    var COL={start:'#16a34a',target:'#dc2626',base:'#f59e0b',meetup:'#f59e0b',place:'#7c3aed'};
+    (m.points||[]).forEach(function(p){
+      L.circleMarker(p.ll,{radius:p.kind==='start'||p.kind==='target'?7:6,color:'#fff',weight:2,fillColor:COL[p.kind]||'#555',fillOpacity:1}).bindTooltip(esc(p.name)).addTo(map);
+      all.push(p.ll);
+    });
+    if(all.length)map.fitBounds(L.latLngBounds(all),{padding:[18,18]});
+  }).catch(function(){ var el=$('tvMap'); if(el)el.remove(); });
+}
 function paxKmOf(p,kmUse){ var B=(tv.calc&&tv.calc.boardKm)||{}; if(p.from==='start'||B[p.from]==null)return kmUse; return Math.min(B[p.from],kmUse); }
 var FROM_LABEL={start:'Hele turen',base:'Fra basen',meetup:'Fra oppmøtestedet',place:'Fra hentestedet'};
 function fromText(e,from,place){ if(from==='start')return 'hele veien'; if(/^home:/.test(from||''))return 'hjemmefra'; if(from==='base')return 'fra '+((e.base&&e.base.name)||(e.office&&e.office.name)||'basen'); if(from==='meetup')return 'fra '+((e.meetup&&e.meetup.name)||'oppmøtestedet'); return 'fra '+(place||'et annet sted'); }
@@ -15276,13 +15318,14 @@ function renderTravel(){
       +(c.estimated?'<div class="hint">Avstanden er anslått (kartet svarte ikke) – sjekk den.</div>':'')
       +'<label class="field" style="margin-top:8px">Km totalt<input type="text" id="tvKm" inputmode="decimal" value="'+esc(tv.km||String(c.km).replace('.',','))+'"/></label>'
       +'<label class="field">Merknad'+(tv.km&&Math.abs(kmUse-c.km)>=0.5?' (påkrevd når du endrer km)':'')+'<textarea id="tvNote" maxlength="500" placeholder="F.eks. omvei for å hente utstyr">'+esc(tv.note||'')+'</textarea></label>'
-      +'</div>'+expensesBox()
+      +'</div>'+(c.map&&c.map.lines&&c.map.lines.length?'<div id="tvMap" class="card" role="img" aria-label="Kart over reisen: '+esc(c.legs.map(function(l){return l.from;}).concat([c.legs.length?c.legs[c.legs.length-1].to:'']).join(' – '))+'" style="height:180px;margin-top:12px;padding:0;overflow:hidden;position:relative;z-index:0"></div>':'')+expensesBox()
       +'<div class="card pad" style="margin-top:12px"><div class="row" style="padding:0"><div class="what"><span><b>Til utbetaling</b></span><small>'+String(kmUse).replace('.',',')+' km × '+kr(c.rate)+(paxKm&&c.passengerRate?' + '+String(Math.round(paxKm*10)/10).replace('.',',')+' passasjer-km × '+kr(c.passengerRate):'')+(tRate?' + tilhenger '+kr(tRate):'')+(ex?' + utlegg '+kr(ex):'')+'</small></div><span class="mins" style="font-size:18px">'+kr(amount)+'</span></div></div>';
   }
   h+='</div></div><div class="sheet-foot" style="display:flex;flex-direction:column;gap:10px"><button type="button" class="btn y" data-act="tv-send"'+(tv.calc&&!tv.busy?'':' disabled')+'>'+(e.travel?'Send på nytt':'Send til godkjenning')+'</button>'
     +(e.travel&&(e.travel.status==='submitted'||e.travel.status==='rejected')?'<button type="button" class="btn" style="height:52px" data-act="tv-del">Trekk tilbake</button>':'')+'</div>';
   h+='<input type="file" id="tvReceiptInput" accept="image/*,application/pdf" hidden/>';
   $('sheet').innerHTML=h; $('sheet').hidden=false; fitSheet(); document.body.style.overflow='hidden';
+  if(tv.calc&&tv.calc.map&&$('tvMap'))drawTvMap(tv.calc.map);
   // Typed places are looked up in the map when the field is left
   ['tvMeetPlace','tvViaPlace'].forEach(function(id){ var x=$(id); if(x)x.addEventListener('change',function(){ readTravelForm(); tv.km=''; travelPreview(); }); });
   var rs=$('tvRide'); if(rs)rs.addEventListener('change',function(){ readTravelForm(); renderTravel(); });
