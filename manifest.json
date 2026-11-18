@@ -1,23 +1,23 @@
 {
-  "version": "2.7.10",
+  "version": "2.7.11",
   "released": "2026-11-18",
   "changelog": [
-    "Passenger address update"
+    "Public group size"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.10/server.js",
-      "sha256": "adf8658bd2224ed1e4e434de00e43ccbd5b2f161a6406578d32239bbcfea5928"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.11/server.js",
+      "sha256": "678ed3542f7d33175f1424056a474ea2aa9b6ddbcec8fb9c8b10ad454e4eb380"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.10/index.html",
-      "sha256": "c4485db4654ae507c67830c1d93065e558a033c70a4373df8067b36fb03cc125"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.11/index.html",
+      "sha256": "e779457501a0d15104c28d4d6d8fe386b18af9ac5951f5bb4a60c66849f5f4a0"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.10/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.11/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
