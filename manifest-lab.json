@@ -1,23 +1,23 @@
 {
-  "version": "2.7.11",
+  "version": "2.7.12",
   "released": "2026-11-18",
   "changelog": [
-    "Trip map expense"
+    "Guest date pick bug fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.11/server.js",
-      "sha256": "7b0b875ef3132f90ee969706f9cdb9a0b144deef9ea7b09ec3bf461a532522c0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.12/server.js",
+      "sha256": "af49bba4b90411ce779c2b54651582651a9d9fbaee675de4f523d733725f7045"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.11/index.html",
-      "sha256": "25ee0c013834051b40eb4ef22e6c68b4f497afa661ab7829d89cd5f5ac9d3d18"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.12/index.html",
+      "sha256": "fd1630f4cb96f81a4985039c2c62861849745e8a4e50c2f1c1c8d6df47a7fff6"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.11/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.12/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
