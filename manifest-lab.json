@@ -1,23 +1,23 @@
 {
-  "version": "2.7.7",
-  "released": "2026-11-17",
+  "version": "2.7.8",
+  "released": "2026-11-18",
   "changelog": [
-    "Shared ride travel expense"
+    "Calendar eventlist update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.7/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.8/server.js",
       "sha256": "0ab82c23975508291fc7ccd85976ae7dc8215fc4382b69de1ca329368e4f183c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.7/index.html",
-      "sha256": "648a74dc54263d276e032ac54b8cf9a4f4d23c6ee6eaa6ff3690d85892b10346"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.8/index.html",
+      "sha256": "9398655e41098abd575d17e403e5b8482e13c0cb9036c10b4a5e194612c4b3e4"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.7/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.8/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
