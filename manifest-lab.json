@@ -1,23 +1,23 @@
 {
-  "version": "2.7.14",
+  "version": "2.7.15",
   "released": "2026-11-18",
   "changelog": [
-    "Poll remove fix"
+    "Group filter bug"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.14/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.15/server.js",
       "sha256": "efd8a39c0b424c58b54684d00bada5ec542970b1a7c9c12616b9072e7f8066a1"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.14/index.html",
-      "sha256": "7006c698e86fabddd30ca17230b548b194ae6b9917f7b4c2930f0f16940ea1c5"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.15/index.html",
+      "sha256": "00c25998e5e024008d40f9c1ece776820a0eb48f4e3571b08eba469aab2cd6f7"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.14/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.15/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
