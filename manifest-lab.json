@@ -1,23 +1,23 @@
 {
-  "version": "2.7.12",
+  "version": "2.7.13",
   "released": "2026-11-18",
   "changelog": [
-    "Guest date pick bug fix"
+    "Poll guest fix"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.12/server.js",
-      "sha256": "af49bba4b90411ce779c2b54651582651a9d9fbaee675de4f523d733725f7045"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.13/server.js",
+      "sha256": "fedb6c18a95692f7d8254eb29c5b6bdebd584fc88c127e7e32305b83b6f0d787"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.12/index.html",
-      "sha256": "fd1630f4cb96f81a4985039c2c62861849745e8a4e50c2f1c1c8d6df47a7fff6"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.13/index.html",
+      "sha256": "507fb5b09441fff89a4026998091e8a3cda2e869059c713bd9f2c05fae05b621"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.12/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.13/package.json",
       "sha256": "ea5b2af22ccb1488ac045ea25fe0205ee0ef9800c683b3cc1431196761a3e5ea"
     }
   ]
