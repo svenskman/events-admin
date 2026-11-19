@@ -1,23 +1,23 @@
 {
-  "version": "2.7.19",
+  "version": "2.7.20",
   "released": "2026-11-19",
   "changelog": [
-    "Historic Archive"
+    "Event Template rework."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.19/server.js",
-      "sha256": "3b73e609b8e55d088dc0ade43aa3882bd132f70c31bc52758d4913b9fefff0d1"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.20/server.js",
+      "sha256": "629a706f3979003fe7ecaebbbd3fac10bacce9fac3aef3a003066fd7232e4487"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.19/index.html",
-      "sha256": "312fd429d9c8684fb4747e16e8fdb0753ecb9707258d4128c765ff81055e48e3"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.20/index.html",
+      "sha256": "732b1386d2eddc88fca63b5dc6b3fec40c844dc8a7ddea9d730900b147edc018"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.19/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.20/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
