@@ -1,23 +1,23 @@
 {
-  "version": "2.7.20",
+  "version": "2.7.21",
   "released": "2026-11-19",
   "changelog": [
-    "Event Template rework."
+    "Date column redesign"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.20/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.21/server.js",
       "sha256": "629a706f3979003fe7ecaebbbd3fac10bacce9fac3aef3a003066fd7232e4487"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.20/index.html",
-      "sha256": "732b1386d2eddc88fca63b5dc6b3fec40c844dc8a7ddea9d730900b147edc018"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.21/index.html",
+      "sha256": "d66783f3612dd15c5c3d8b60a79ac766aade7979b3607e862cf903f5adb1155a"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.20/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.21/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
