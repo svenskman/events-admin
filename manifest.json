@@ -1,23 +1,23 @@
 {
-  "version": "2.7.17",
+  "version": "2.7.18",
   "released": "2026-11-19",
   "changelog": [
-    "View password in invite."
+    "Design update, template"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.17/server.js",
-      "sha256": "ccd00cc4703449932b50c4efad200195c55c03ee16c2b776f73136056270ca10"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.18/server.js",
+      "sha256": "a3eb3a5a0542378ade0c1edf92ed9eea43452ac123a6d08ad76ef5fd2046304c"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.17/index.html",
-      "sha256": "a70439ee53ee16887860991d20ed8d023f131c53b867917ab34d5e078116ef58"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.18/index.html",
+      "sha256": "b05b87f22352508d9e646dbbe29bd00d16686c67322345b6e7923f771842c390"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.17/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.18/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
