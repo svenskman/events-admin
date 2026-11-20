@@ -1,23 +1,23 @@
 {
-  "version": "2.7.22",
-  "released": "2026-11-19",
+  "version": "2.7.23",
+  "released": "2026-11-20",
   "changelog": [
-    "Badging update"
+    "Date badge picker"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.22/server.js",
-      "sha256": "629a706f3979003fe7ecaebbbd3fac10bacce9fac3aef3a003066fd7232e4487"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.23/server.js",
+      "sha256": "55967499020d116d6edc5ea8549229399b0d53a120b28b6a793607ad8cbbe0fe"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.22/index.html",
-      "sha256": "f1cfabafda0b0d7236991e7f7b4fe59896cf10bf6078842fa55e70d03ab26c9e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.23/index.html",
+      "sha256": "f43b8e3960981ec51f3f46f1613ee36167742d736caee20271c27db3aa5d1968"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.22/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.23/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
