@@ -1,23 +1,23 @@
 {
-  "version": "2.7.25",
-  "released": "2026-11-20",
+  "version": "2.7.26",
+  "released": "2026-11-21",
   "changelog": [
-    "Camper servicestations"
+    "Navigation Public Pages"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.25/server.js",
-      "sha256": "afe665a607b82074c59aea995bfb703efa4c7f593150eb36fe2d964368d4de2e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.26/server.js",
+      "sha256": "cfb13e466f23081a7d2891cb0927dd364f92ef5f1b655955918ce3796d32694d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.25/index.html",
-      "sha256": "ef757dbada900759f957fa49d218509c9a193f43ca17ce6200b3c0e0e9fe2183"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.26/index.html",
+      "sha256": "b1de42c32fe2386b714b92fdc659e8df9853d6f6d79c02eff1e9a88c90bb08b9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.25/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.26/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
