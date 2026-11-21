@@ -1,23 +1,23 @@
 {
-  "version": "2.7.29",
+  "version": "2.7.30",
   "released": "2026-11-21",
   "changelog": [
-    "Picture gallery redesign"
+    "Travel expense update (Out of town living)"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.29/server.js",
-      "sha256": "4855ee9897e9707efaba7efe3d825c6b5a8396787fdfd4fa02683e61af88b7c0"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.30/server.js",
+      "sha256": "48714d6d2ce80226e312f3294c9b5df9b4c50db5298fb7612a880a5e68d8323a"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.29/index.html",
-      "sha256": "c0b9e04bbe9eb7495311a93e4c2dc13fd7259526f32d3c93e7fc965fd330511e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.30/index.html",
+      "sha256": "7eebc7916e78862d51e7b854e1b2b25898b4bc64201ed4dd60cbbe13b697cc6d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.29/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.30/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
