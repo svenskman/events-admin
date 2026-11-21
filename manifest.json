@@ -1,23 +1,23 @@
 {
-  "version": "2.7.30",
+  "version": "2.7.31",
   "released": "2026-11-21",
   "changelog": [
-    "Travel expense update (Out of town living)"
+    "Minside update, statistics"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.30/server.js",
-      "sha256": "48714d6d2ce80226e312f3294c9b5df9b4c50db5298fb7612a880a5e68d8323a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.31/server.js",
+      "sha256": "38483f6fb07884c0f800c0375a9eddd9b876cddfeaf67d3f52aa5d46a7d920df"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.30/index.html",
-      "sha256": "7eebc7916e78862d51e7b854e1b2b25898b4bc64201ed4dd60cbbe13b697cc6d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.31/index.html",
+      "sha256": "ce589197b056694f2c1f52a34da8a18f46c13562ee3467dd825e3fb596a5b011"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.30/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.31/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
