@@ -1,23 +1,23 @@
 {
-  "version": "2.7.28",
+  "version": "2.7.29",
   "released": "2026-11-21",
   "changelog": [
-    "Common image storage"
+    "Picture gallery redesign"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.28/server.js",
-      "sha256": "c8b663fd311f88e2873c30142cd5a0ad966992a816de1427900be86e37ba1b0d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.29/server.js",
+      "sha256": "4855ee9897e9707efaba7efe3d825c6b5a8396787fdfd4fa02683e61af88b7c0"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.28/index.html",
-      "sha256": "66a9285c30da1a282670d19abf327508b0da397bb914da9efc1d5aabfb7f733b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.29/index.html",
+      "sha256": "c0b9e04bbe9eb7495311a93e4c2dc13fd7259526f32d3c93e7fc965fd330511e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.28/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.29/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
