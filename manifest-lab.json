@@ -1,23 +1,23 @@
 {
-  "version": "2.8.2",
+  "version": "2.8.3",
   "released": "2026-11-21",
   "changelog": [
-    "Department public page \"App\" install"
+    "Main site update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.2/server.js",
-      "sha256": "8e9ab5c7d0f02ef999a9fa43b754d110680c16fbcdbe1a8d0c9047da30425468"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.3/server.js",
+      "sha256": "b4d89afd2f47f30899cef37baf481f9a2a9df4a2d795135cdeec3d9da2119535"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.2/index.html",
-      "sha256": "ea8b93efc6b5e19358c899a468ca157b1780d1524f37019e226071adb43a6a4c"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.3/index.html",
+      "sha256": "0cd44c7768fde477d939c7a87511630f08c750dfe8e5dd2c75ad79ac22cc7fa9"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.2/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.3/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
