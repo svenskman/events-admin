@@ -1,23 +1,23 @@
 {
-  "version": "2.7.27",
+  "version": "2.7.28",
   "released": "2026-11-21",
   "changelog": [
-    "Image upload and storage"
+    "Common image storage"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.27/server.js",
-      "sha256": "f4b852bdfd7c417e3b37f6fdc6d7bb9e118e9122b4ea958fd050a80de1409c47"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.28/server.js",
+      "sha256": "c8b663fd311f88e2873c30142cd5a0ad966992a816de1427900be86e37ba1b0d"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.27/index.html",
-      "sha256": "093ac1b416a03bb63e349150643394cc859cdbdf7d8436b8e58079a89280f1ce"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.28/index.html",
+      "sha256": "66a9285c30da1a282670d19abf327508b0da397bb914da9efc1d5aabfb7f733b"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.27/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.7.28/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
