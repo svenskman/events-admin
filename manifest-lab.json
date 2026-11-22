@@ -1,23 +1,23 @@
 {
-  "version": "2.8.9",
+  "version": "2.8.10",
   "released": "2026-11-22",
   "changelog": [
-    "Notification fix"
+    "Event tast assigning"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.9/server.js",
-      "sha256": "95a8b2d9fd65ed29bd128461d37c7f4c3ef46e4c0b54c8481b988e22cd7506c9"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.10/server.js",
+      "sha256": "32c60c9b59399fc71562ea3fc31bd9bd9be285e206ab5518ff8836181e29fa74"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.9/index.html",
-      "sha256": "0dc8a0e7c86bef00321db33173ae72f2a78144aebdc95c4341fd95ff3da34c03"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.10/index.html",
+      "sha256": "27f4c75087c2dc6684e63ef50ebfbf3ed90c03bc9677ca1fc027c0432ee68d4d"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.9/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.10/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
