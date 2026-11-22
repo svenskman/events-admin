@@ -1,23 +1,23 @@
 {
-  "version": "2.8.5",
-  "released": "2026-11-21",
+  "version": "2.8.6",
+  "released": "2026-11-22",
   "changelog": [
-    "SVV Records"
+    "Guestbook media update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.5/server.js",
-      "sha256": "e80a1dfe7d6e56d5ba9f6579fab826f86599465a6475ceb4ccbb85c571512974"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.6/server.js",
+      "sha256": "c7ae998800265ec8a460efb7356fa9d3e9441b4abcf7c3ee950fc97a0d687879"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.5/index.html",
-      "sha256": "e4287cdf4aa6d5c595eb20f43e4c56b62fa7a827fb79bef6c1835bf4496cb600"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.6/index.html",
+      "sha256": "af3bb579486e1053d428f8cee27701507d8f9fd6ce57c4709bffa94cd188f109"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.5/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.6/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
