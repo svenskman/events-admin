@@ -1,23 +1,23 @@
 {
-  "version": "2.8.7",
+  "version": "2.8.8",
   "released": "2026-11-22",
   "changelog": [
-    "Mypage profile"
+    "Vehicles and other fixes."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.7/server.js",
-      "sha256": "41f604a7fd97ff750f8fca9de866bf4036743e8602eae84281ab65ae6c93d64d"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.8/server.js",
+      "sha256": "2aa94d50babd95223746a292e3c47905ae987015bc98da8b8cb3043ddf14e990"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.7/index.html",
-      "sha256": "a3119a40b3328f6b241b5e6faa66ea5ba6cbc9188d836cb452f73d06f44a0f8a"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.8/index.html",
+      "sha256": "0dc8a0e7c86bef00321db33173ae72f2a78144aebdc95c4341fd95ff3da34c03"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.7/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.8/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
