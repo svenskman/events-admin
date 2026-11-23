@@ -1,23 +1,23 @@
 {
-  "version": "2.8.14",
+  "version": "2.8.15",
   "released": "2026-11-23",
   "changelog": [
-    "Calendar decal update"
+    "Inventory, Tasks, calendar update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.14/server.js",
-      "sha256": "a66467b68516a21102bdf6bf95b224b1338510473f2bcde78ed4c832aba7d78f"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.15/server.js",
+      "sha256": "812fe56ae87b00500f7e27e3c468bc67e6be529571d9143f95640c0e5b415053"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.14/index.html",
-      "sha256": "0d2d7297cbdfc12eb4f95fe25193ac0e773377fba3e477ba1d36eb8973acfeca"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.15/index.html",
+      "sha256": "d06718153070db6bae383bf142318daf06b42f5b676953680aec1418bc0e69dd"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.14/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.15/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
