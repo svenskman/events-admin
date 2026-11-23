@@ -1,23 +1,23 @@
 {
-  "version": "2.8.13",
+  "version": "2.8.14",
   "released": "2026-11-23",
   "changelog": [
-    "Calendar overview"
+    "Calendar decal update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.13/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.14/server.js",
       "sha256": "a66467b68516a21102bdf6bf95b224b1338510473f2bcde78ed4c832aba7d78f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.13/index.html",
-      "sha256": "3f4ebfeb9552263f9341b08f4ddda7be5cd6022250b4380b9031bfae7bd69367"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.14/index.html",
+      "sha256": "0d2d7297cbdfc12eb4f95fe25193ac0e773377fba3e477ba1d36eb8973acfeca"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.13/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.14/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
