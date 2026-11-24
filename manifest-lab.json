@@ -1,23 +1,23 @@
 {
-  "version": "2.8.16",
+  "version": "2.8.17",
   "released": "2026-11-24",
   "changelog": [
-    "Demo system update"
+    "Demo page update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.16/server.js",
-      "sha256": "40685ba9ce6223ade1d60db58c296c9f0e88383bfe3cc9b0ff8b1d3a5efdb94e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.17/server.js",
+      "sha256": "1f9e26d847318bba290eede9a7e59bf263b2e662f9400deae7e4d9cc617ed481"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.16/index.html",
-      "sha256": "d06718153070db6bae383bf142318daf06b42f5b676953680aec1418bc0e69dd"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.17/index.html",
+      "sha256": "5cc2ba0d9f091760d1dfa18dfebc90ec7fe513c515bed199524a9a9fe2b196e4"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.16/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.17/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
