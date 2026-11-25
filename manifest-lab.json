@@ -1,23 +1,23 @@
 {
-  "version": "2.8.20",
+  "version": "2.8.21",
   "released": "2026-11-25",
   "changelog": [
-    "Public notification fix"
+    "Board member updates"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.20/server.js",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.21/server.js",
       "sha256": "2810fe33a16c45d8a33599fb997a9e0998c9118ba69bdae2b200457f32d912c6"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.20/index.html",
-      "sha256": "c4d93aa19902a28174bd81b6ad8cd1a4c99e7d9e516df21449c7beccef885272"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.21/index.html",
+      "sha256": "e666fa8e003546787b66a441298c4bdfae3c7d67f80dbd1a05569c4086e6fe11"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.20/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.21/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
