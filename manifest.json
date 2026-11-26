@@ -1,23 +1,23 @@
 {
-  "version": "2.8.22",
+  "version": "2.8.23",
   "released": "2026-11-26",
   "changelog": [
-    "Swedish costumer implementation"
+    "Swedish settings"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.22/server.js",
-      "sha256": "391acbd8a07ae790fc625c57346a8b5e6587f9f8594ca7bb8c53433a08b9b988"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.23/server.js",
+      "sha256": "92f8709cc9981d3fec420d9c43b92b8896efd46608938c586c1609dfdc4717ee"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.22/index.html",
-      "sha256": "c01c15d16680da68c5be8c98a2bf6adcd0566641a253437a07ba12352f5e048b"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.23/index.html",
+      "sha256": "cbb6b3dae1e54dd7dddb55d9436a24e6d298b95b78668b63f18ee7bdfad0ffcd"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.22/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.23/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
