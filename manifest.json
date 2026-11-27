@@ -1,23 +1,23 @@
 {
-  "version": "2.8.34",
+  "version": "2.8.35",
   "released": "2026-11-27",
   "changelog": [
-    "Gradient color switch"
+    "Cleaner public page."
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.34/server.js",
-      "sha256": "296efd530ba817db5ecbeb7ecd90e86dd76b1e1ac0eb25248900baace4676542"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.35/server.js",
+      "sha256": "8f8b14fc05a3268bd004339f900d9c5feedea784879cd33b258552ebe5d93963"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.34/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.35/index.html",
       "sha256": "4c5e643500738da9e8aa77e3c84188ec39f4db25583646f3bafdec758c8bf886"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.34/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.35/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
