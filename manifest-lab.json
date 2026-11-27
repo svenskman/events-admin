@@ -1,23 +1,23 @@
 {
-  "version": "2.8.30",
+  "version": "2.8.31",
   "released": "2026-11-27",
   "changelog": [
-    "Public Department page redesign"
+    "Department redesign"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.30/server.js",
-      "sha256": "d75fff9bf8ef6469926ebb3339fbfb304a0aca5f572bbb149b83795ca6a66c51"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.31/server.js",
+      "sha256": "780b845f7a8a3608737b35b0abd108eb52bbd926c0972d311dab8e3bb7c3c021"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.30/index.html",
-      "sha256": "10c699fadc05994ef465cec09bc3ba485d074b304678553a0617e21725dabc7e"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.31/index.html",
+      "sha256": "7e0df2e74b9f769ccb5cf217d31769927d08368cae356025767d16fdde4aad4f"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.30/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.31/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
