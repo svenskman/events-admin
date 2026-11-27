@@ -1,23 +1,23 @@
 {
-  "version": "2.8.28",
+  "version": "2.8.29",
   "released": "2026-11-27",
   "changelog": [
-    "Boardmeeting mypage update"
+    "Design profile update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.28/server.js",
-      "sha256": "f6b7c203500e992a3d1e91376e832928166bafef87d01f91ccb483b810634c80"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.29/server.js",
+      "sha256": "bb8759a951b307b5ea935c22d615b689d8b94ff0c35440d4b63b1af7fcc22406"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.28/index.html",
-      "sha256": "986a5b7edf8ed5b4a75a6779c3632f47b827c7a58b5513bae291342a1076b2f9"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.29/index.html",
+      "sha256": "10c699fadc05994ef465cec09bc3ba485d074b304678553a0617e21725dabc7e"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.28/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.29/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
