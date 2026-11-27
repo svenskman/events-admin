@@ -1,23 +1,23 @@
 {
-  "version": "2.8.25",
-  "released": "2026-11-26",
+  "version": "2.8.26",
+  "released": "2026-11-27",
   "changelog": [
-    "Android Calendar fix"
+    "Mypage travelexpense update"
   ],
   "files": [
     {
       "name": "server.js",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.25/server.js",
-      "sha256": "1c5c7ff333692a81c351b3ea5ac6116f422aa9add95a357a85907b50a5d42dbb"
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.26/server.js",
+      "sha256": "0582f21f0549d76244c2e2ad0db453495b3379b0f85a9f18f08699c72b44249f"
     },
     {
       "name": "index.html",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.25/index.html",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.26/index.html",
       "sha256": "62852facebd33a1929a44606e0a7b516c064aad8154bb554161f991078aea6e2"
     },
     {
       "name": "package.json",
-      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.25/package.json",
+      "url": "https://raw.githubusercontent.com/svenskman/events-admin/main/releases/v2.8.26/package.json",
       "sha256": "709aa227fa691249695996d3d69da6bc7430edc1c7ca677f33318824871fd5bc"
     }
   ]
